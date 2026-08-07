@@ -1,5 +1,100 @@
 # Simon DCP Formalization and Audit
 
+## Table of contents
+
+- [Status of Lemmas 1, 3, and 4](#status-of-lemmas-1-3-and-4)
+  - [Lemma 1](#lemma-1)
+  - [Lemma 3](#lemma-3)
+  - [Lemma 4](#lemma-4)
+- [Project scope](#project-scope)
+- [Formalization map](#formalization-map)
+- [Toolchain](#toolchain)
+- [Verification policy](#verification-policy)
+
+## Status of Lemmas 1, 3, and 4
+
+**Bottom line:** this development does not refute the final statement of any of
+Lemmas 1, 3, or 4.  All three conclusions remain unproved.  What it does refute
+are specific intermediate claims and inference rules on which the paper's proof
+sketches rely.  Those refutations show that the published sketches do not prove
+the lemmas, even though a different proof might conceivably establish some of
+their conclusions.
+
+| Lemma | Status of the final statement | What has been refuted |
+| --- | --- | --- |
+| Lemma 1 | Unproved, not refuted | The proposed swap is not fibre-preserving, so the claimed injection is invalid. |
+| Lemma 3 | Unproved, not refuted | The phases are not pairwise independent after the adaptive choice of `A`. |
+| Lemma 4 | Unproved, not refuted | Correlated overflow need not improve uniformity; count closeness does not imply multiplicative amplitude closeness; and a displayed exponent estimate is false for the stated parameter range. |
+
+### Lemma 1
+
+The Lean development proves that the change caused by the paper's simultaneous
+swap of selection bits and low sample parts is
+
+```text
+B * (phi_j - phi_i) * (H_i - H_j).
+```
+
+This expression need not vanish modulo the measured subset-sum modulus.  A
+locally valid `n = 8` instance changes the relevant contribution from `1` to
+`5` modulo `128`.  Thus the proposed map does not preserve a measured fibre;
+see [`SwapFiber.lean`](SimonDCP/Arithmetic/SwapFiber.lean).
+
+The concrete `n = 8` witness is not a full member of the paper's event `D_Y`,
+because that event imposes additional global distinctness conditions.  More
+importantly, failure of this particular injection does not logically imply
+that Lemma 1's constant-probability conclusion is false.  The injection argument
+is refuted; the lemma statement remains unproved.
+
+### Lemma 3
+
+Step 4 selects `A` from blocks on which the measured mask `D` is zero.  Hence
+`D_A = 0`, and
+
+```text
+(-1)^(phi dot D) = (-1)^(phi_B dot D_B).
+```
+
+States with the same `B` component and different `A` components therefore have
+identical phases.  They are perfectly correlated rather than pairwise
+independent, contrary to the variance argument in the proof sketch; see
+[`PhaseCorrelation.lean`](SimonDCP/Quantum/PhaseCorrelation.lean).
+
+This directly refutes the claimed phase-independence step.  It does not yet give
+a complete instance of the paper's conditioned experiment that violates the
+final "well-behaved" probability statement, so Lemma 3 itself remains unproved
+rather than refuted.
+
+### Lemma 4
+
+The development gives finite counterexamples to three inference patterns used
+in or around the proof:
+
+- independent Boolean coordinates can become perfectly correlated after
+  conditioning;
+- adding a correlated overflow bit can turn a balanced bit into a constant;
+- nearly equal counts of signed terms give no multiplicative control of an
+  amplitude when cancellation is possible.
+
+See [`Conditioning.lean`](SimonDCP/Probability/Conditioning.lean) and
+[`AmplitudeCancellation.lean`](SimonDCP/Quantum/AmplitudeCancellation.lean).
+In addition, substituting `c = 12` into the displayed page-14 exponent yields
+
+```text
+-n/2 + 6n/(c' log n) + 6 log n,
+```
+
+which is not below `-n`; therefore the claimed `delta < 2^(-n)` bound does not
+follow for the stated range.
+
+These results refute general assertions and arithmetic steps used in the proof,
+but they do not constitute a full counterexample drawn from the paper's exact
+conditioned distribution.  The final multiplicative-amplitude conclusion of
+Lemma 4 therefore also remains unproved, not refuted.  The detailed audit is in
+[`AUDIT.md`](AUDIT.md).
+
+## Project scope
+
 This Lean 4 project formalizes and audits Daniel R. Simon's preliminary draft
 [*A Polynomial-Time Quantum Algorithm for the Dihedral Coset Problem*](https://eprint.iacr.org/2026/1591)
 (IACR ePrint 2026/1591).
