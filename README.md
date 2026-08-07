@@ -1,5 +1,9 @@
 # Simon DCP Formalization and Audit
 
+**Reference:** Daniel R. Simon,
+[*A Polynomial-Time Quantum Algorithm for the Dihedral Coset Problem*](https://eprint.iacr.org/2026/1591),
+IACR Cryptology ePrint Archive, Report 2026/1591 (2026).
+
 ## Table of contents
 
 - [Status of Lemmas 1, 3, and 4](#status-of-lemmas-1-3-and-4)
