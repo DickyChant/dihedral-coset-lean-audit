@@ -1,7 +1,9 @@
 import SimonDCP.Arithmetic.SampleRecursion
 import SimonDCP.Arithmetic.SwapFiber
+import SimonDCP.Arithmetic.SwapFiberRepair
 import SimonDCP.Arithmetic.TranslationFiber
 import SimonDCP.Probability.Conditioning
+import SimonDCP.Probability.Lemma4Parameters
 import SimonDCP.Probability.LinearPhaseIndependence
 import SimonDCP.Quantum.AmplitudeCancellation
 import SimonDCP.Quantum.BitReadout
@@ -22,8 +24,10 @@ build. In particular, none may depend on `sorryAx` or a project-specific axiom.
 
 open SimonDCP.Arithmetic.SampleRecursion
 open SimonDCP.Arithmetic.SwapFiber
+open SimonDCP.Arithmetic.SwapFiberRepair
 open SimonDCP.Arithmetic.TranslationFiber
 open SimonDCP.Probability.Conditioning
+open SimonDCP.Probability.Lemma4Parameters
 open SimonDCP.Probability.LinearPhaseIndependence
 open SimonDCP.Quantum.AmplitudeCancellation
 open SimonDCP.Quantum.BitReadout
@@ -41,12 +45,23 @@ open SimonDCP.Quantum.Step2Phase
 #print axioms counterexample_preserves_phase_but_not_fiber
 #print axioms lemmaOneMap_not_fiberPreserving
 #print axioms lemmaOneMap_not_fiberPreserving_on_locallyWellFormed_inputs
+#print axioms lowPart_swap_fiber_iff_matching
+#print axioms zero_one_scaled_modulus_swap_fiber_iff
+#print axioms fullSwap_preserves_contribution
+#print axioms permuteCoordinates_preserves_fiber
+#print axioms certifiedRepair_injective
+#print axioms bad_totalOutcomeWeight_le_good_totalOutcomeWeight
 #print axioms fiberCoefficient_translate_fixedXor
 #print axioms walshPhase_eq_of_eq_off_zero_set
 #print axioms coordinate_independence_destroyed_by_conditioning
 #print axioms correlated_overflow_can_destroy_balance
 #print axioms nonzero_dot_balanced
 #print axioms distinct_nonzero_joint_fiber_card_eq
+#print axioms printedBinDeviationExponent_eq_corrected_add_n
+#print axioms corrected_c12_rpow_le
+#print axioms uniformBinTotal
+#print axioms weightedSumErrorBound
+#print axioms aggregatePolynomialExponent_c12_three_halves
 #print axioms one_term_change_can_escape_any_multiplicative_zero_bound
 #print axioms SimonDCP.Quantum.BitReadout.probOutcome_encodedBit
 #print axioms readout_of_exact_balancedRelativePhase

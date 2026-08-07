@@ -1,8 +1,10 @@
 import SimonDCP.Basic
 import SimonDCP.Arithmetic.SampleRecursion
 import SimonDCP.Arithmetic.SwapFiber
+import SimonDCP.Arithmetic.SwapFiberRepair
 import SimonDCP.Arithmetic.TranslationFiber
 import SimonDCP.Probability.Conditioning
+import SimonDCP.Probability.Lemma4Parameters
 import SimonDCP.Probability.LinearPhaseIndependence
 import SimonDCP.Quantum.AmplitudeCancellation
 import SimonDCP.Quantum.BitReadout

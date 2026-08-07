@@ -12,7 +12,8 @@ corollaries can be reached.
 ## Lean formalization targets
 
 The source contains no `sorry`, `admit`, or project-local axioms.  A clean Arch
-WSL build completed all 3278 jobs successfully on August 7, 2026.
+WSL build, including both repair modules, completed all 3280 jobs successfully
+on August 7, 2026.
 `SimonDCP/AxiomAudit.lean` prints the axiom dependencies of the principal
 results; the output contains only `propext`, `Classical.choice`, and
 `Quot.sound`, with no `sorryAx` or project-local axiom.
@@ -71,6 +72,28 @@ machine-checked here.
 
 Accordingly, the current result invalidates the proposed injection argument;
 it does not by itself prove that Lemma 1's probability conclusion is false.
+
+The repair module proves two valid algebraic alternatives.  First, the low-part-only
+swap is fibre-preserving exactly when the measured modulus divides
+`B * (phi_j - phi_i) * (H_i - H_j)`; for a zero/one swap with modulus
+`B * stride`, this reduces to `stride | (H_i - H_j)`.  Second, permuting the
+complete samples together with the selection and Hadamard-output coordinates
+preserves the subset sum and phase exactly and is bijective.
+
+This is not yet a complete Lemma 1 proof.  Since `phi` is summed out after the
+Hadamard transform, a state-dependent permutation must be chosen only from the
+measured outcome and must map the `(h, s_1, ..., s_g)` interference classes by
+one fixed label equivalence.  `SwapFiberRepair.lean` exposes these requirements
+as a `LemmaOneRepairCertificate`; no such certificate is currently constructed.
+This is only a structural interface on complete states containing the hidden
+selection string.  Even constructing an instance would not by itself prove a
+weighted injection on projected `(Y, D)` outcomes.  A full repair must also
+preserve term amplitudes up to an outcome-global unit scalar, cover the faulty
+sample support, and prove that the target outcome's probability weight is at
+least the source weight.  The separate
+`MeasuredOutcomeWeightInjectionCertificate` formalizes the last step and proves
+that an injective, pointwise weight-nondecreasing outcome map bounds total bad
+weight by total good weight.  No instance is currently constructed.
 
 ### Lemma 3 phase-correlation obstruction
 
@@ -132,10 +155,47 @@ fibres. The proof constructs dual masks explicitly. Its hypotheses fail after
 the paper selects `A` from the zero coordinates of that same mask and
 conditions on the resulting measurement record.
 
+### Lemma 4 quantitative repairs
+
+The page-14 calculation retains an extra `+n`.  Its standard-deviation exponent
+already includes `-n`, which is cancelled when multiplying by
+`kappa' = 2^n`.  Removing the extra term changes the total exponent from
+
+```text
+E_print(c) = ((11 - c)/2) * n + faultLoss/2 + (c/2) * log n
+```
+
+to
+
+```text
+E_corrected(c) = ((9 - c)/2) * n + faultLoss/2 + (c/2) * log n.
+```
+
+At `c = 12`, the corrected exponent is at most `-n` whenever
+`faultLoss + 12 * log n <= n`.  If the printed expression is retained instead,
+the same type of bound is recovered at `c = 14` under
+`faultLoss + 14 * log n <= n`.  `Lemma4Parameters.lean` proves both statements
+and the corresponding base-two real-power inequality.
+
+If the extra `+n` is left in place, the `c = 12` expression is still
+`-n/2 + o(n)`.  Conditional on it being a simultaneous absolute error bound for
+normalized amplitudes, it is exponentially smaller than every downstream
+polynomial loss and would suffice for the final inverse-polynomial error goal.
+It does not prove the literal `< 2^(-n)` line or any multiplicative ratio near a
+zero amplitude.
+
+The same module proves that uniform bin multiplicity factors out as `mu`, while
+the total cardinality is the number of bins times `mu`; substituting
+`|A_(g_a)|` therefore inserts an extra bin-count factor.  It also propagates the
+corollary's stated `n^(3/2)` amplitude bound: at `c = 12` the resulting aggregate
+polynomial exponent is `-2`, so replacing it by the unsupported bound `n` is
+unnecessary.  Only additive signed-sum error control follows without a
+non-cancellation hypothesis.
+
 ## Remaining invalid or missing obligations
 
-- Lemma 1 also assumes an unproved sign symmetry and does not construct an
-  injection preserving all measured registers.
+- Lemma 1 still assumes an unproved sign symmetry and lacks a concrete
+  reversible bad-to-good plan preserving all Step-4 interference classes.
 - Lemma 3 varies `D` as if it changed only signs, although changing `D` can
   change the adaptive `A/B` partition and later measurement records.
 - Lemma 4 reuses pairwise independence after conditioning on
@@ -147,14 +207,10 @@ conditions on the resulting measurement record.
 - The all-zero `q_(g_a)` makes `s_a = 0`, contradicting literal pairwise
   independence over all `q_(g_a)` values (although this isolated exception may
   be asymptotically removable).
-- Substituting `c = 12` into the displayed page-14 exponent gives
-  `-n/2 + 6n/(c' log n) + 6 log n`, not a value below `-n`; the asserted
-  `delta < 2^(-n)` does not follow for the stated parameter range.
-- The page-14 prose requires a multiplicative factor `mu`, while the displayed
-  amplitude formula substitutes `|A_(g_a)|`; these differ by the number of
-  bins.
-- The corollary to Lemma 3 states an `n^(3/2)` amplitude bound, while the final
-  derivation uses `n`.
+- The repaired Lemma 4 parameter arithmetic still relies on unproved
+  conditional balls-in-bins, variance, and union-bound premises, and additive
+  count control still does not imply a multiplicative amplitude ratio under
+  cancellation.
 - Step 6 postselection probabilities, recursive recovery of all bits, fault-rate
   preservation, amplification, and uniform circuit cost are not proved.
 - The lattice corollary relies on external Regev/BKSW reductions that are not

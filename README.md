@@ -24,11 +24,11 @@ sketches rely.  Those refutations show that the published sketches do not prove
 the lemmas, even though a different proof might conceivably establish some of
 their conclusions.
 
-| Lemma | Status of the final statement | What has been refuted |
+| Lemma | Status of the final statement | Refutation and repair status |
 | --- | --- | --- |
-| Lemma 1 | Unproved, not refuted | The proposed swap is not fibre-preserving, so the claimed injection is invalid. |
+| Lemma 1 | Unproved, not refuted | The proposed low-part swap is invalid. An exact matching criterion and a fibre-preserving full-sample permutation are proved, but no plan preserving the Step-4 interference classes is known. |
 | Lemma 3 | Unproved, not refuted | The phases are not pairwise independent after the adaptive choice of `A`. |
-| Lemma 4 | Unproved, not refuted | Correlated overflow need not improve uniformity; count closeness does not imply multiplicative amplitude closeness; and a displayed exponent estimate is false for the stated parameter range. |
+| Lemma 4 | Unproved, not refuted | The exponent, `mu`, and `n^(3/2)` bookkeeping errors are repaired. Conditional independence, correlated overflow, and multiplicative amplitude control remain unresolved. |
 
 ### Lemma 1
 
@@ -49,6 +49,27 @@ because that event imposes additional global distinctness conditions.  More
 importantly, failure of this particular injection does not logically imply
 that Lemma 1's constant-probability conclusion is false.  The injection argument
 is refuted; the lemma statement remains unproved.
+
+[`SwapFiberRepair.lean`](SimonDCP/Arithmetic/SwapFiberRepair.lean) proves the
+exact repair criterion: for a zero/one swap with measured modulus
+`B * stride`, the original low-part operation is valid exactly when
+`stride` divides `H_i - H_j`.  It also proves that permuting each complete
+Fourier sample together with its selection and Hadamard-output coordinates is
+a bijection preserving the subset sum, every measured residue fibre, the phase
+exponent, and sample distinctness.
+
+This repairs the algebraic map, but not yet the whole Lemma 1 injection.  After
+Step 4, terms with equal `(h, s_1, ..., s_g)` labels interfere.  A complete
+repair must construct a reversible bad-to-good permutation chosen only from
+the measured outcome and carry every such interference class through one fixed
+label equivalence.  The Lean module packages these requirements as an explicit
+`LemmaOneRepairCertificate`; this is only a structural interface.  Even an
+instance would still need to descend to an injective map on measured `(Y, D)`
+outcomes and prove that their probability weights do not decrease.  The
+separate `MeasuredOutcomeWeightInjectionCertificate` states exactly that
+remaining finite weighted-injection obligation, and Lean proves that any such
+certificate implies total bad-event weight at most total good-event weight; no
+instance is assumed.
 
 ### Lemma 3
 
@@ -82,20 +103,39 @@ in or around the proof:
 
 See [`Conditioning.lean`](SimonDCP/Probability/Conditioning.lean) and
 [`AmplitudeCancellation.lean`](SimonDCP/Quantum/AmplitudeCancellation.lean).
-In addition, substituting `c = 12` into the displayed page-14 exponent yields
+
+The page-14 exponent does admit a local repair.  The standard-deviation
+exponent already contains `-n`, so multiplication by `kappa' = 2^n` must cancel
+that term.  The printed calculation instead retains an extra `+n`.  Correcting
+it changes the total exponent at `c = 12` from
 
 ```text
 -n/2 + 6n/(c' log n) + 6 log n,
 ```
 
-which is not below `-n`; therefore the claimed `delta < 2^(-n)` bound does not
-follow for the stated range.
+to
 
-These results refute general assertions and arithmetic steps used in the proof,
-but they do not constitute a full counterexample drawn from the paper's exact
-conditioned distribution.  The final multiplicative-amplitude conclusion of
-Lemma 4 therefore also remains unproved, not refuted.  The detailed audit is in
-[`AUDIT.md`](AUDIT.md).
+```text
+-3n/2 + 6n/(c' log n) + 6 log n.
+```
+
+Consequently the desired exponent is at most `-n` under the explicit budget
+`12n/(c' log n) + 12 log n <= n`.  The same module proves that the amplitude
+sum factors out the mean bin multiplicity `mu`, not the total `|A_(g_a)|`, and
+that retaining the actual `n^(3/2)` bound gives polynomial exponent `-2` at
+`c = 12`.  These repairs are in
+[`Lemma4Parameters.lean`](SimonDCP/Probability/Lemma4Parameters.lean).
+
+Even without correcting the extra `+n`, the printed exponent at `c = 12` is
+`-n/2 + o(n)`.  If this were first established as a simultaneous absolute
+error bound on normalized amplitudes, it would absorb every downstream
+polynomial factor.  Thus the exponent typo is repairable and is not the
+decisive obstruction to Lemma 4.
+
+The repaired arithmetic does not establish the conditional balls-in-bins
+premises or overcome signed-amplitude cancellation.  The final
+multiplicative-amplitude conclusion of Lemma 4 therefore remains unproved, not
+refuted.  The detailed audit is in [`AUDIT.md`](AUDIT.md).
 
 ## Project scope
 
@@ -134,6 +174,12 @@ axioms.
 - `Arithmetic/SwapFiber.lean` gives an `n = 8` locally valid two-coordinate
   counterexample to the fibre-preserving algebra used in Lemma 1, together
   with the general error formula.
+- `Arithmetic/SwapFiberRepair.lean` proves the exact matching condition, the
+  complete-coordinate permutation identity, and partial certificate interfaces
+  for the still-missing Step-4 interference and measured-weight arguments.
+- `Probability/Lemma4Parameters.lean` repairs the page-14 exponent arithmetic,
+  distinguishes `mu` from total cardinality, and propagates the stated
+  `n^(3/2)` amplitude bound.
 
 The project deliberately separates these formalized local facts from the missing
 adaptive-measurement, probability, postselection, amplification, and lattice-
@@ -165,8 +211,9 @@ The checked environment uses Elan 4.2.3 and Lean 4.31.0.  For faster builds on
 Windows-mounted drives, copy the repository to a WSL-native directory before
 running `scripts/build-wsl.sh`; the source tree remains authoritative.
 
-The full project was verified in Arch Linux under WSL on August 7, 2026.  The
-command `lake build` completed all 3278 jobs successfully.
+The full project, including both repair modules, was verified in Arch Linux
+under WSL on August 7, 2026.  The command `lake build` completed all 3280 jobs
+successfully.
 
 ## Verification policy
 
