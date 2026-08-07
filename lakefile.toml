@@ -1,0 +1,24 @@
+name = "SimonDCP"
+version = "0.1.0"
+defaultTargets = ["SimonDCP"]
+
+[leanOptions]
+autoImplicit = false
+
+[[lean_lib]]
+name = "SimonDCP"
+
+[[require]]
+name = "mathlib"
+git = "https://github.com/leanprover-community/mathlib4.git"
+rev = "v4.31.0"
+
+[[require]]
+name = "cslib"
+git = "https://github.com/leanprover/cslib.git"
+rev = "v4.31.0"
+
+[[require]]
+name = "QuantumAlg"
+git = "https://github.com/QudeLeap/Lean-QuantumAlg.git"
+rev = "7e80846034b9e76fdeded711775a513a7d5ba917"
