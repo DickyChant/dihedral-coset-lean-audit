@@ -62,14 +62,49 @@ This repairs the algebraic map, but not yet the whole Lemma 1 injection.  After
 Step 4, terms with equal `(h, s_1, ..., s_g)` labels interfere.  A complete
 repair must construct a reversible bad-to-good permutation chosen only from
 the measured outcome and carry every such interference class through one fixed
-label equivalence.  The Lean module packages these requirements as an explicit
-`LemmaOneRepairCertificate`; this is only a structural interface.  Even an
-instance would still need to descend to an injective map on measured `(Y, D)`
-outcomes and prove that their probability weights do not decrease.  The
-separate `MeasuredOutcomeWeightInjectionCertificate` states exactly that
-remaining finite weighted-injection obligation, and Lean proves that any such
-certificate implies total bad-event weight at most total good-event weight; no
-instance is assumed.
+label equivalence.  The Lean module now formalizes the resulting group-level
+tension: a complete-record permutation that stays within every Step-3 group
+preserves the full group subset sums (and hence their high-bit `s_j` labels),
+but provably leaves the number of all-zero Hadamard-output groups unchanged.
+It therefore cannot implement the required `D_Y^bad`-to-`D_Y^good` step, which
+must move outputs across groups.  Moving whole groups does not escape the
+obstruction: Lean proves that it coherently relabels the group-sum vector but
+only bijects the all-zero groups, leaving their cardinality fixed.  A successful
+map must therefore mix coordinates between groups and prove a nontrivial fixed
+relabeling theorem for the resulting `s_j` values.  The module packages the
+remaining requirements as an explicit
+`LemmaOneRepairCertificate`; this is only a structural interface.  Lean now
+proves that every such certificate descends through the erased hidden selection
+string to an injective map on measured outcomes.  It does not prove that their
+probability weights do not decrease.  The separate
+`MeasuredOutcomeWeightInjectionCertificate` states exactly that remaining
+finite weighted-injection obligation, and Lean proves that any such certificate
+implies total bad-event weight at most total good-event weight; no instance of
+either certificate is assumed.
+
+For the stronger label containing each *full* group subset sum, Lean proves a
+rigidity theorem: outcome coherence permits one-coordinate hidden-selection
+probes, and when every Fourier sample is nonzero these force any fixed
+group-relabeling certificate to move whole groups.  Its all-zero-group count is
+therefore unchanged.  This does not yet settle the paper's weaker label, which
+stores only the most significant `log n` bits `s_j`; truncation can erase the
+one-coordinate distinctions used by the rigidity proof.
+
+The truncation escape is not automatic.  A concrete two-group, six-coordinate
+witness uses samples `17, 34, 51, 68, 85, 153`, whose residues modulo `16` are
+pairwise distinct.  Two hidden selection strings give the same truncated group
+labels `(3, 9)`, while swapping one complete coordinate across the groups sends
+them to labels with first components `2` and `7`.  Lean proves that no fixed
+label equivalence can describe both images.  The measured output bits are chosen
+so neither group is initially all-zero, while the swap makes one group all-zero:
+the map accomplishes the local bad-to-good objective but splits an interference
+class.  Packaged as a reversible constant plan, it is outcome-coherent, yet Lean
+proves that it cannot satisfy `PreservesInterferenceClasses` or occur in any
+`LemmaOneRepairCertificate`.  Its mask has four zeroes and two ones, so it also
+lies in the local analogue of the paper's `D₀`.  This is a local counterexample,
+not yet a complete member of the paper's full `D_Y` event—with its global `Q`
+coordinates and `n/log n` threshold—or a proof that every adaptive mixed-group
+plan fails.
 
 ### Lemma 3
 

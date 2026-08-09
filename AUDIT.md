@@ -85,12 +85,50 @@ Hadamard transform, a state-dependent permutation must be chosen only from the
 measured outcome and must map the `(h, s_1, ..., s_g)` interference classes by
 one fixed label equivalence.  `SwapFiberRepair.lean` exposes these requirements
 as a `LemmaOneRepairCertificate`; no such certificate is currently constructed.
-This is only a structural interface on complete states containing the hidden
-selection string.  Even constructing an instance would not by itself prove a
-weighted injection on projected `(Y, D)` outcomes.  A full repair must also
-preserve term amplitudes up to an outcome-global unit scalar, cover the faulty
-sample support, and prove that the target outcome's probability weight is at
-least the source weight.  The separate
+It also proves a concrete obstruction to the simplest full-sample repair:
+permuting complete coordinate records only within their Step-3 groups preserves
+the full group subset-sum labels, but cannot change the all-zero status of any
+group or the total number of all-zero groups.  Such a plan therefore cannot map
+`D_Y^bad` to `D_Y^good`; any useful plan must cross groups and separately prove
+compatibility with the stored `s_j` interference labels.
+The same obstruction holds for permutations that move each entire group by a
+fixed group relabeling: Lean proves that the group-contribution vector transforms
+by that relabeling, but also constructs an equivalence between the all-zero
+groups before and after the move and proves their cardinalities equal.  Thus a
+plan capable of increasing the number of all-zero groups must genuinely mix
+coordinates across group boundaries.
+For interference labels containing the full group subset sums, an additional
+rigidity theorem uses outcome coherence to vary the erased selection string one
+coordinate at a time.  If all Fourier samples are nonzero and the certificate's
+fixed label equivalence is induced by a group relabeling, these probes force its
+coordinate permutation to move whole groups, so the all-zero-group cardinality
+is again unchanged.  The paper retains only the most significant `log n` bits
+`s_j`, not the full sums, so this rigidity theorem is a precisely scoped
+obstruction rather than a proof that every possible truncated-label repair is
+impossible.
+Lean also checks that truncation does not make arbitrary mixed-group swaps
+valid.  In a two-group, six-coordinate witness, the samples
+`17, 34, 51, 68, 85, 153` have pairwise-distinct residues modulo `16`.  Two
+hidden selection strings have the same truncated group label `(3, 9)`, but a
+partial cross-group complete-sample swap changes their first label components
+to `2` and `7`.  Hence no fixed equivalence of the truncated label space can
+carry both interference classes.  Its measured output has no all-zero group
+before the swap and one afterward, so it also realizes the local bad-to-good
+purpose of the map.  The corresponding constant plan is reversible and
+outcome-coherent, but cannot satisfy `PreservesInterferenceClasses` or be the
+repair field of any `LemmaOneRepairCertificate`.  This witness satisfies the
+local distinct-low-part condition, and its measured mask has four zeroes and
+two ones (the local analogue of `D₀`).  It is not asserted to realize the
+paper's full `D_Y` event with its global `Q` coordinates and `n/log n` threshold,
+or to rule out every state-dependent mixed-group plan.
+Lean proves that the outcome-coherence field makes the hidden-state map descend
+through the erased selection string to an involutive map on measured outcomes,
+and that every structural certificate therefore induces an injective
+bad-to-good measured-outcome map.  This still does not prove a weighted
+injection on projected `(Y, D)` outcomes.  A full repair must also preserve term
+amplitudes up to an outcome-global unit scalar, cover the faulty sample support,
+and prove that the target outcome's probability weight is at least the source
+weight.  The separate
 `MeasuredOutcomeWeightInjectionCertificate` formalizes the last step and proves
 that an injective, pointwise weight-nondecreasing outcome map bounds total bad
 weight by total good weight.  No instance is currently constructed.
