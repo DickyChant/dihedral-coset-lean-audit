@@ -1,10 +1,19 @@
+import SimonDCP.Arithmetic.LemmaOneFiniteSupportPrototype
 import SimonDCP.Arithmetic.SampleRecursion
 import SimonDCP.Arithmetic.SwapFiber
 import SimonDCP.Arithmetic.SwapFiberRepair
 import SimonDCP.Arithmetic.TranslationFiber
+import SimonDCP.Probability.BoundedTail
 import SimonDCP.Probability.Conditioning
+import SimonDCP.Probability.LabelledBornProbability
+import SimonDCP.Probability.LabelledParseval
 import SimonDCP.Probability.Lemma4Parameters
 import SimonDCP.Probability.LinearPhaseIndependence
+import SimonDCP.Probability.OneTimePadCounting
+import SimonDCP.Probability.PairwiseBernoulliTail
+import SimonDCP.Probability.ProjectionInjectivity
+import SimonDCP.Probability.ResidueConditioningBound
+import SimonDCP.Probability.RestrictedParseval
 import SimonDCP.Quantum.AmplitudeCancellation
 import SimonDCP.Quantum.BitReadout
 import SimonDCP.Quantum.ConditionalReadout
@@ -19,16 +28,28 @@ import SimonDCP.Quantum.Step2Phase
 
 The declarations below are the principal machine-checked outputs of the current
 formalization. These commands make their axiom dependencies visible during a
-build. In particular, none may depend on `sorryAx` or a project-specific axiom.
+build.  Analytic results should expose only standard Lean dependencies.  The
+finite exhaustive searches intentionally use `native_decide`, whose generated
+evaluation certificates are also printed here.  No result may depend on
+`sorryAx` or a user-declared mathematical axiom.
 -/
 
+open SimonDCP.Arithmetic.LemmaOneFiniteSupportPrototype
 open SimonDCP.Arithmetic.SampleRecursion
 open SimonDCP.Arithmetic.SwapFiber
 open SimonDCP.Arithmetic.SwapFiberRepair
 open SimonDCP.Arithmetic.TranslationFiber
+open SimonDCP.Probability.BoundedTail
 open SimonDCP.Probability.Conditioning
+open SimonDCP.Probability.LabelledBornProbability
+open SimonDCP.Probability.LabelledParseval
 open SimonDCP.Probability.Lemma4Parameters
 open SimonDCP.Probability.LinearPhaseIndependence
+open SimonDCP.Probability.OneTimePadCounting
+open SimonDCP.Probability.PairwiseBernoulliTail
+open SimonDCP.Probability.ProjectionInjectivity
+open SimonDCP.Probability.ResidueConditioningBound
+open SimonDCP.Probability.RestrictedParseval
 open SimonDCP.Quantum.AmplitudeCancellation
 open SimonDCP.Quantum.BitReadout
 open SimonDCP.Quantum.ConditionalReadout
@@ -55,6 +76,11 @@ open SimonDCP.Quantum.Step2Phase
 #print axioms card_allZeroGroups_eq_of_relabelsGroups
 #print axioms relabelsGroups_of_summarizedLabel_singleSelection
 #print axioms no_fixed_truncatedLabelRelabel_for_partialCrossGroupSwap
+#print axioms no_compatible_allZeroCreating_permutation
+#print axioms crossGroupPermutationCompatible_iff_movesWholeGroups
+#print axioms crossGroupSourceRawWeightForOutput_classification
+#print axioms crossGroupSparseBadOutputs_have_zero_raw_weight
+#print axioms partialCrossGroupSwap_normalizedWeight
 #print axioms crossGroupTruncated_output_counts
 #print axioms crossGroupTruncated_no_allZeroGroup_before
 #print axioms crossGroupTruncated_has_allZeroGroup_after
@@ -73,6 +99,27 @@ open SimonDCP.Quantum.Step2Phase
 #print axioms correlated_overflow_can_destroy_balance
 #print axioms nonzero_dot_balanced
 #print axioms distinct_nonzero_joint_fiber_card_eq
+#print axioms restricted_character_orthogonality
+#print axioms restricted_parseval
+#print axioms card_masksVanishingOn
+#print axioms restricted_squaredAmplitude_sum_ge_diagonal_pow
+#print axioms labelled_restricted_parseval
+#print axioms labelled_restricted_sum_ge_diagonal_pow
+#print axioms pow_le_labelledZeroEventMass
+#print axioms labelledZeroEventMass_empty_eq_one
+#print axioms subsetSumInjectiveOn_of_injectiveWithin
+#print axioms labelled_restricted_parseval_eq_diagonal
+#print axioms residueFibre_restricted_parseval_eq_diagonal
+#print axioms upperTailMass_ge_of_mean_ge_of_threshold_lt_mu
+#print axioms rational_upperTailMass_ge_scaled_parameters
+#print axioms rational_bayes_residue_bound
+#print axioms rational_bayes_residue_bound_of_dyadic
+#print axioms completedSelectedSum_translate
+#print axioms outsideResidueFibreEquiv
+#print axioms mean_indicatorSum_ge
+#print axioms variance_indicatorSum
+#print axioms finite_chebyshev
+#print axioms chebyshev_indicatorSum_le_mean
 #print axioms printedBinDeviationExponent_eq_corrected_add_n
 #print axioms corrected_c12_rpow_le
 #print axioms uniformBinTotal

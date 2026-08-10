@@ -11,12 +11,14 @@ corollaries can be reached.
 
 ## Lean formalization targets
 
-The source contains no `sorry`, `admit`, or project-local axioms.  A clean Arch
-WSL build, including both repair modules, completed all 3280 jobs successfully
-on August 7, 2026.
+The source contains no `sorry`, `admit`, or handwritten project-local axioms.
+A clean Arch WSL build, including the Lemma 1 repair modules, completed all
+8600 jobs successfully on August 10, 2026.
 `SimonDCP/AxiomAudit.lean` prints the axiom dependencies of the principal
-results; the output contains only `propext`, `Classical.choice`, and
-`Quot.sound`, with no `sorryAx` or project-local axiom.
+results.  Analytic theorems contain only `propext`, `Classical.choice`, and
+`Quot.sound`.  The six-coordinate exhaustive searches also expose their
+generated `native_decide` evaluation certificates.  No result depends on
+`sorryAx` or on a user-declared mathematical axiom.
 
 ### Ideal sample and Step 2 phase extraction
 
@@ -82,9 +84,11 @@ preserves the subset sum and phase exactly and is bijective.
 
 This is not yet a complete Lemma 1 proof.  Since `phi` is summed out after the
 Hadamard transform, a state-dependent permutation must be chosen only from the
-measured outcome and must map the `(h, s_1, ..., s_g)` interference classes by
-one fixed label equivalence.  `SwapFiberRepair.lean` exposes these requirements
-as a `LemmaOneRepairCertificate`; no such certificate is currently constructed.
+measured outcome.  A termwise weight-preserving proof must map the
+`(h, s_1, ..., s_g)` interference classes by one fixed label equivalence; a
+weaker map instead needs a direct proof that coherent target weight does not
+decrease.  `SwapFiberRepair.lean` exposes the first route as a
+`LemmaOneRepairCertificate`; no such certificate is currently constructed.
 It also proves a concrete obstruction to the simplest full-sample repair:
 permuting complete coordinate records only within their Step-3 groups preserves
 the full group subset-sum labels, but cannot change the all-zero status of any
@@ -108,19 +112,53 @@ obstruction rather than a proof that every possible truncated-label repair is
 impossible.
 Lean also checks that truncation does not make arbitrary mixed-group swaps
 valid.  In a two-group, six-coordinate witness, the samples
-`17, 34, 51, 68, 85, 153` have pairwise-distinct residues modulo `16`.  Two
-hidden selection strings have the same truncated group label `(3, 9)`, but a
-partial cross-group complete-sample swap changes their first label components
-to `2` and `7`.  Hence no fixed equivalence of the truncated label space can
-carry both interference classes.  Its measured output has no all-zero group
-before the swap and one afterward, so it also realizes the local bad-to-good
-purpose of the map.  The corresponding constant plan is reversible and
-outcome-coherent, but cannot satisfy `PreservesInterferenceClasses` or be the
-repair field of any `LemmaOneRepairCertificate`.  This witness satisfies the
-local distinct-low-part condition, and its measured mask has four zeroes and
-two ones (the local analogue of `D₀`).  It is not asserted to realize the
-paper's full `D_Y` event with its global `Q` coordinates and `n/log n` threshold,
-or to rule out every state-dependent mixed-group plan.
+`17, 34, 51, 68, 85, 153` have pairwise-distinct residues modulo `16`.  The full
+measured fibre `z = 76 (mod 128)` contains four selections.  They all have the
+local complete label `(h, s_a, s_b) = (1, 3, 9)`, while their Hadamard signs are
+`+1, -1, -1, +1`; the displayed bad outcome therefore has zero coherent
+probability.  A partial cross-group complete-sample swap creates an all-zero
+group, splits the one source class into four target labels, and changes the
+normalized local weight from `0` to `1/64`.
+
+The finite search in `LemmaOneFiniteSupportPrototype.lean` exhausts all `64`
+hidden selections and `720` coordinate permutations.  Exactly `288`
+permutations create an all-zero group, exactly `72` allow the target label to
+factor through the occupied source label, and these are exactly the whole-group
+movers.  No permutation does both.  The other `648` permutations all have raw
+target weight `4`, compared with raw source weight `0`.  An exhaustive second
+search covers every measured output mask: all `27` masks with at most three
+ones and no all-zero group have raw source weight zero.  Thus this is a valid
+obstruction to the exact interference-class route, but not to every weighted
+injection: every local bad outcome has no mass.  Moreover, division by `16` is
+only a local truncation surrogate and is not asserted to instantiate all of
+the paper's parameter relations.
+
+There is a separate swap-free repair program.  Restricted Parseval gives
+`Pr[D_A = 0 | Y, z'] >= 2^(-|A|)` for every coordinate set `A`.  It immediately
+proves an inverse-polynomial `Omega(n^(-c))` version of Lemma 1, which can be
+amplified by polynomially many fresh repetitions.  If Boolean subset sums are
+injective modulo `2^(n-1)` on every union of two groups, restricted Parseval
+makes the group-zero indicators pairwise independent and Chebyshev gives
+failure probability `O(log n/n)`.  `LEMMA1_REPAIR.md` records the derivation and
+isolates the remaining size-biased-`Y` conditioning and faulty-sample bounds.
+`RestrictedParseval.lean` and `LabelledParseval.lean` machine-check the
+character identity, its collision-count expansion, and the diagonal bound over
+all occupied complete labels.  `LabelledBornProbability.lean` normalizes the
+finite mass by `2^Q * |Z_Y|` and proves the rational `2^(-|A|)` bound.
+`BoundedTail.lean` machine-checks the weighted tail inequality and the exact
+ratio `(k-c)/(k*n^c-c)`.  Identifying the paper's concrete QuantumAlg state with
+this finite model and packaging its integer-rounding conventions remain; the
+high-probability route remains incomplete.  Its rational Bayes step and dyadic
+affine-dimension simplification are formalized in
+`ResidueConditioningBound.lean`, but the one-time-pad joint-count premise and
+the coordinate-subcube fault instantiation are not yet fully formalized.
+`OneTimePadCounting.lean` proves the key fibre-equicardinality translation for
+one selected free outside coordinate; summing this result over the affine
+selection support to obtain the joint-count premise remains open.
+The deterministic implication from local subset-sum injectivity to exact
+one- and two-group Parseval masses is formalized in
+`ProjectionInjectivity.lean`; the exact pairwise-Bernoulli variance and finite
+Chebyshev steps are formalized in `PairwiseBernoulliTail.lean`.
 Lean proves that the outcome-coherence field makes the hidden-state map descend
 through the erased selection string to an involutive map on measured outcomes,
 and that every structural certificate therefore induces an injective

@@ -26,7 +26,7 @@ their conclusions.
 
 | Lemma | Status of the final statement | Refutation and repair status |
 | --- | --- | --- |
-| Lemma 1 | Unproved, not refuted | The proposed low-part swap is invalid. An exact matching criterion and a fibre-preserving full-sample permutation are proved, but no plan preserving the Step-4 interference classes is known. |
+| Lemma 1 | Unproved, not refuted | The proposed low-part swap is invalid. Restricted Parseval gives an unconditional inverse-polynomial replacement, and two-group subset-sum injectivity is a candidate route back to high probability; the latter route is not yet fully formalized. |
 | Lemma 3 | Unproved, not refuted | The phases are not pairwise independent after the adaptive choice of `A`. |
 | Lemma 4 | Unproved, not refuted | The exponent, `mu`, and `n^(3/2)` bookkeeping errors are repaired. Conditional independence, correlated overflow, and multiplicative amplitude control remain unresolved. |
 
@@ -59,10 +59,12 @@ a bijection preserving the subset sum, every measured residue fibre, the phase
 exponent, and sample distinctness.
 
 This repairs the algebraic map, but not yet the whole Lemma 1 injection.  After
-Step 4, terms with equal `(h, s_1, ..., s_g)` labels interfere.  A complete
-repair must construct a reversible bad-to-good permutation chosen only from
-the measured outcome and carry every such interference class through one fixed
-label equivalence.  The Lean module now formalizes the resulting group-level
+Step 4, terms with equal `(h, s_1, ..., s_g)` labels interfere.  A termwise
+weight-preserving permutation proof must choose its map only from the measured
+outcome and carry every such interference class through one fixed label
+equivalence.  A weaker class map can still be useful if its target coherent
+weight is proved directly to be at least the source weight.  The Lean module
+formalizes the resulting group-level
 tension: a complete-record permutation that stays within every Step-3 group
 preserves the full group subset sums (and hence their high-bit `s_j` labels),
 but provably leaves the number of all-zero Hadamard-output groups unchanged.
@@ -92,19 +94,49 @@ one-coordinate distinctions used by the rigidity proof.
 
 The truncation escape is not automatic.  A concrete two-group, six-coordinate
 witness uses samples `17, 34, 51, 68, 85, 153`, whose residues modulo `16` are
-pairwise distinct.  Two hidden selection strings give the same truncated group
-labels `(3, 9)`, while swapping one complete coordinate across the groups sends
-them to labels with first components `2` and `7`.  Lean proves that no fixed
-label equivalence can describe both images.  The measured output bits are chosen
-so neither group is initially all-zero, while the swap makes one group all-zero:
-the map accomplishes the local bad-to-good objective but splits an interference
-class.  Packaged as a reversible constant plan, it is outcome-coherent, yet Lean
-proves that it cannot satisfy `PreservesInterferenceClasses` or occur in any
-`LemmaOneRepairCertificate`.  Its mask has four zeroes and two ones, so it also
-lies in the local analogue of the paper's `D₀`.  This is a local counterexample,
-not yet a complete member of the paper's full `D_Y` event—with its global `Q`
-coordinates and `n/log n` threshold—or a proof that every adaptive mixed-group
-plan fails.
+pairwise distinct.  On the measured fibre `z = 76 (mod 128)`, however, there
+are four supported selections rather than only the two originally displayed.
+All four have the complete local label `(h, s_a, s_b) = (1, 3, 9)`, and their
+Hadamard signs are `+1, -1, -1, +1`.  The source outcome therefore has zero
+coherent weight.  Swapping one coordinate across the groups splits this class
+four ways and changes the normalized local weight from `0` to `1/64`.
+
+[`LemmaOneFiniteSupportPrototype.lean`](SimonDCP/Arithmetic/LemmaOneFiniteSupportPrototype.lean)
+checks the whole finite experiment.  Of all `720` coordinate permutations,
+`288` create an all-zero group and `72` let the target full label factor through
+the occupied source label; these are exactly the `72 = 2(3!)^2` permutations
+that move the two groups as whole blocks.  None creates an all-zero group.  The
+remaining `648` permutations all change the raw coherent weight from `0` to
+`4`.  Moreover, all `27` six-bit outputs with at most three ones and no
+all-zero group have raw source weight zero.  Thus the witness rules out an exact
+interference-class repair by a useful coordinate permutation, but it does not
+rule out a direct weight-nondecreasing repair: every local bad output is null.
+The `/16` summary is a local truncation surrogate, not a complete instantiation
+of the paper's relations among `n`, group size, and truncation width.
+
+A different route avoids the swap entirely.  Restricted Parseval on the
+Boolean cube gives, for every coordinate set `A`,
+
+```text
+Pr[D_A = 0 | Y, z'] >= 2^(-|A|).
+```
+
+Consequently the expected number of all-zero groups is at least
+`(k/c) * n/log n`.  Boundedness alone yields probability
+`(k-c)/(k*n^c-c) = Omega(n^(-c))` of reaching `n/log n` groups, which is already
+amplifiable in polynomial time.  Requiring Boolean subset sums to be injective
+on every union of two groups makes the group-zero indicators pairwise
+independent; Chebyshev then gives failure probability
+`O(log n/n)`.  The natural-language derivation and the remaining conditioning
+and faulty-sample obligations are recorded in
+[`LEMMA1_REPAIR.md`](LEMMA1_REPAIR.md).
+
+Lean now proves the restricted character identity, the collision-count form
+of Parseval, and the diagonal lower bound after summing every occupied complete
+Step-4 label.  It normalizes that bound to the exact rational baseline
+`2^(-|A|)`, proves the finite weighted tail inequality, and simplifies the
+paper's parameter ratio to `(k-c)/(k*n^c-c)`.  The high-probability route still
+needs its size-biased conditioning and fault-model estimates.
 
 ### Lemma 3
 
@@ -212,6 +244,35 @@ axioms.
 - `Arithmetic/SwapFiberRepair.lean` proves the exact matching condition, the
   complete-coordinate permutation identity, and partial certificate interfaces
   for the still-missing Step-4 interference and measured-weight arguments.
+- `Arithmetic/LemmaOneFiniteSupportPrototype.lean` models the complete local
+  `(h, s_a, s_b)` label, exhausts the six-coordinate support and all `720`
+  coordinate permutations, and computes exact coherent weights for all `64`
+  measured output masks.
+- `Probability/RestrictedParseval.lean` proves restricted Walsh orthogonality
+  and the finite signed-amplitude Parseval identity used by the swap-free
+  repair.
+- `Probability/LabelledParseval.lean` sums that identity across arbitrary
+  occupied coherent labels and proves the exact `2^(Q-|A|) * |Z_Y|` diagonal
+  lower bound.
+- `Probability/LabelledBornProbability.lean` divides by the exact
+  `2^Q * |Z_Y|` denominator and proves the normalized lower bound
+  `2^(-|A|)` for every nonempty finite support.
+- `Probability/BoundedTail.lean` proves the finite weighted first-moment bound
+  that turns a lower expectation bound into an explicit upper-tail mass.
+- `Probability/ResidueConditioningBound.lean` proves the exact rational Bayes
+  loss and its dyadic affine-dimension specialization, conditional on the
+  finite experiment's joint- and marginal-mass premises.
+- `Probability/OneTimePadCounting.lean` constructs the translation equivalence
+  showing that one selected free coordinate outside a local event makes all
+  residue fibres equicardinal after the local samples are fixed.
+- `Probability/ProjectionInjectivity.lean` proves that local Boolean
+  subset-sum injectivity removes every off-diagonal residue-fibre collision,
+  giving exact one- and two-group Parseval masses.
+- `Probability/PairwiseBernoulliTail.lean` proves the corresponding finite
+  pairwise-Bernoulli mean, second moment, variance, and Chebyshev bound.
+- `LEMMA1_REPAIR.md` derives the restricted-Parseval replacement for Lemma 1
+  and separates its unconditional inverse-polynomial conclusion from the
+  stronger two-group-injectivity route.
 - `Probability/Lemma4Parameters.lean` repairs the page-14 exponent arithmetic,
   distinguishes `mu` from total cardinality, and propagates the stated
   `n^(3/2)` amplitude bound.
@@ -246,18 +307,21 @@ The checked environment uses Elan 4.2.3 and Lean 4.31.0.  For faster builds on
 Windows-mounted drives, copy the repository to a WSL-native directory before
 running `scripts/build-wsl.sh`; the source tree remains authoritative.
 
-The full project, including both repair modules, was verified in Arch Linux
-under WSL on August 7, 2026.  The command `lake build` completed all 3280 jobs
-successfully.
+The full project, including the Lemma 1 repair modules, was verified in Arch
+Linux under WSL on August 10, 2026.  The command `lake build` completed all
+8600 jobs successfully.
 
 ## Verification policy
 
 Every theorem in the project must compile without `sorry`. Missing arguments
 from the paper are recorded as named obligations or refuted by explicit
 counterexamples; they are never silently promoted to assumptions. Final claims
-are checked with `#print axioms`.  The audit reports only the standard Lean
-dependencies `propext`, `Classical.choice`, and `Quot.sound`; it reports no
-`sorryAx` or project-local axiom.
+are checked with `#print axioms`.  The analytic repair theorems report only the
+standard Lean dependencies `propext`, `Classical.choice`, and `Quot.sound`.
+The explicitly executable six-coordinate searches additionally report the
+generated certificates named `*.native_decide.ax_*`, which record reliance on
+Lean's native evaluator.  The audit reports no `sorryAx` and the source declares
+no project-specific mathematical axiom.
 
 See [AUDIT.md](AUDIT.md) for the proof-status map and
 [LIBRARIES.md](LIBRARIES.md) for the TCS/quantum-library survey.
