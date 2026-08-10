@@ -28,7 +28,7 @@ paper's overall headline algorithm theorem remains open.
 
 | Lemma | Status of the core claim | Published proof and repair status |
 | --- | --- | --- |
-| Lemma 1 | **Repaired and formalized** | The proposed low-part swap is invalid, so the repair replaces it rather than completing that argument. Restricted Parseval gives an unconditional inverse-polynomial bound, while the stronger route connects the corrected mixed correct/fault amplitudes, Step-2 joint law, complete Step-4 label, exact Born moments, collision-plus-Chebyshev bound, classical fault-environment averaging, and rounded parameters. For the padded repaired schedule with `k = 24`, `c = 12`, and every `n >= 1024`, the failure mass is at most `1/2`. This proves the constant-probability core needed from Lemma 1. |
+| Lemma 1 | **Repaired and formalized** | The proposed low-part swap is invalid, so the repair replaces it rather than completing that argument. Restricted Parseval gives an unconditional inverse-polynomial bound, while the stronger route connects the corrected mixed correct/fault amplitudes, Step-2 joint law, complete Step-4 label, exact Born moments, collision-plus-Chebyshev bound, classical fault-environment averaging, and rounded parameters. For the padded repaired schedule with `k = 24`, `c = 12`, and every `n >= 1024`, the explicitly summed success event has mass at least `1/2`. This is the formalized constant-probability core needed from Lemma 1. |
 | Lemma 3 | Unproved, not refuted | The phases are not pairwise independent after the adaptive choice of `A`. |
 | Lemma 4 | Unproved, not refuted | The exponent, `mu`, and `n^(3/2)` bookkeeping errors are repaired. Conditional independence, correlated overflow, and multiplicative amplitude control remain unresolved. |
 
@@ -198,7 +198,10 @@ collecting fewer than one extra group of samples.  It proves the required
 mean lower bound and explicit collision/tail budgets.  The end-to-end module
 `LemmaOneRoundedFixedEnvironment.lean` gives failure mass at most `1/2` for
 `k = 24`, `c = 12`, and every `n >= 1024`, including arbitrary normalized
-finite classical fault-environment mixtures.  A density-matrix/channel
+finite classical fault-environment mixtures.  `LemmaOneRepaired.lean` defines
+the complementary success event explicitly, proves that success and failure
+masses sum to one, and exposes the direct success-mass-at-least-`1/2` theorem.
+A density-matrix/channel
 realization of the random fault process is an optional semantic refinement, not
 an obligation for the analytic Lemma 1 repair.  The later algorithmic steps
 remain open.
@@ -438,6 +441,11 @@ now a proved Lean result; the remaining headline-theorem gaps occur later.
   `Probability/LemmaOneRoundedFixedEnvironment.lean` plugs these facts into the
   actual analytic and classical-environment chains and proves the resulting
   failure mass is at most `1/2`.
+- `Probability/LemmaOneRepaired.lean` is the public repaired Lemma 1 interface.
+  It explicitly sums the event with at least `n / floor(log_2 n)` all-zero
+  groups, proves its mass plus the strict lower-tail mass is exactly one, and
+  concludes success mass at least `1/2` for both fixed and arbitrary normalized
+  finite classical fault-environment mixtures.
 - `Probability/ProjectionInjectivity.lean` proves that local Boolean
   subset-sum injectivity removes every off-diagonal residue-fibre collision,
   giving exact one- and two-group Parseval masses.
@@ -484,7 +492,7 @@ running `scripts/build-wsl.sh`; the source tree remains authoritative.
 
 The full project, including the Lemma 1 repair modules, was verified in Arch
 Linux under WSL on August 10, 2026.  The command `lake build` completed all
-8639 jobs successfully.
+8640 jobs successfully.
 
 ## Verification policy
 

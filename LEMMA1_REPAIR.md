@@ -4,19 +4,26 @@ Reference: Daniel R. Simon,
 [*A Polynomial-Time Quantum Algorithm for the Dihedral Coset Problem*](https://eprint.iacr.org/2026/1591),
 IACR ePrint 2026/1591, Lemma 1 and Steps 2--4.
 
-This note gives a replacement route for Lemma 1.  It does not use the paper's
-invalid low-part swap.  The first conclusion below is an unconditional
-inverse-polynomial repair.  The stronger constant-probability conclusion uses
-an additional sparse subset-sum event.  The complete analytic experiment for
-one fixed classical fault environment is now formalized from the mixed
-correct/fault amplitudes through the Step-2 joint measurement law and the
-Step-4 Born distribution to the collision-plus-Chebyshev bound.  Classical
-averaging over arbitrary finite fault-environment distributions is also proved.
-This is not a gate/tensor-circuit or density-matrix theorem.  General rounded
-parameters and their budgets are now formalized for a repaired sample schedule;
-what remains is a quantum realization of the random fault mixture and the later
-algorithmic steps, so the paper's full
-Lemma 1 is still unproved.
+This note completes a repaired proof of the core constant-probability statement
+of Lemma 1.  It does not use the paper's invalid low-part swap.  The first
+conclusion below is an unconditional inverse-polynomial repair.  The stronger
+constant-probability conclusion uses a sparse subset-sum event.  The complete
+analytic experiment for one fixed classical fault environment is formalized
+from the mixed correct/fault amplitudes through the Step-2 joint measurement
+law and the Step-4 Born distribution to the collision-plus-Chebyshev bound.
+Classical averaging over arbitrary finite fault-environment distributions is
+also proved.  General rounded parameters and their budgets are formalized for
+a padded complete-group sample schedule.  The corrected faulty sampler and
+this padding are deliberate repairs, not outstanding obligations: the project
+targets the paper's core mathematical claims rather than a verbatim rendering
+of every displayed formula and convention.
+
+The development does not claim a gate/tensor-circuit equality or a
+density-matrix construction.  Those would strengthen the semantic connection
+to a particular implementation or physical noise model, but they are not
+needed for the repaired Lemma 1 probability theorem.  Lemmas 3 and 4, the later
+algorithmic steps, and therefore the paper's overall polynomial-time theorem
+remain open.
 
 ## 1. Exact Step-4 weight
 
@@ -184,11 +191,12 @@ bound.  It normalizes this finite mass by `2^Q * |Z_Y|` and proves the rational
 `2^(-|A|)` statement, then proves the generic finite weighted tail inequality
 and the simplification of its Lemma-1 parameter ratio.  For one fixed fault
 environment, `ActualStepFourBorn.lean` now identifies this labelled law with
-the normalized analytic mixed-amplitude Step-4 Born law.  What remains is a
-gate/tensor-circuit realization, a quantum density-matrix realization of the
-random environment, and the later repetition/algorithmic conventions.
+the normalized analytic mixed-amplitude Step-4 Born law.  A gate/tensor-circuit
+or density-matrix realization is outside the scope of this probability proof;
+the later algorithmic steps remain separate obligations for the overall paper
+theorem.
 
-## 4. Candidate constant-probability repair
+## 4. Constant-probability repair
 
 A clean sufficient condition on `Y` is **two-group subset-sum injectivity**:
 for every two distinct groups `g` and `h`, the map
@@ -390,9 +398,15 @@ module proves a logarithmic sufficient collision condition and verifies both
 `1/4` budgets for every `n >= 1024` with `c = 12` and `k = 24`.
 `LemmaOneRoundedFixedEnvironment.lean` inserts these facts into the fixed and
 classically averaged analytic experiments, giving failure mass at most `1/2`
-with no remaining arithmetic budget hypothesis.  A quantum density/channel
-realization of the paper's random fault process and the final repetition count
-remain open.
+with no remaining arithmetic budget hypothesis.  This completes the repaired
+core constant-probability theorem.  `LemmaOneRepaired.lean` additionally
+defines the complementary success event as an explicit event sum, proves that
+its mass plus the strict lower-tail failure mass is one, and states the final
+success-mass-at-least-`1/2` theorem directly.  The padded schedule collects
+fewer than one extra complete group and is part of the repair, rather than a
+blocker.  A
+quantum density/channel realization would be an optional stronger semantics
+result; later algorithmic steps remain open for the paper's overall theorem.
 
 ## 5. Why bit complementation is insufficient
 
@@ -462,7 +476,12 @@ not the zero-majority inequality asserted in the paper's first paragraph.
     collision/tail budgets.  For `c = 12`, `k = 24`, and `n >= 1024`, the
     classically averaged analytic failure mass is at most `1/2` without extra
     arithmetic hypotheses.
-14. **Open:** a QuantumAlg gate/tensor-circuit realization, a quantum
-    density-mixture construction for the random fault environment, the
-    revised repetition count, and the later algorithmic steps.  Until these are
-    supplied, the full headline Lemma 1 remains unproved.
+14. **Completed:** `LemmaOneRepaired.lean` exposes the repaired core Lemma 1
+    statement directly: the explicitly summed success event has mass at least
+    `1/2` for general integer security parameters and arbitrary normalized
+    finite classical fault-environment mixtures.  The
+    published swap argument remains invalid, but is no longer used.  A
+    gate/tensor-circuit equality and quantum density-mixture construction are
+    optional semantic strengthening, not blockers for this result.  Lemmas 3
+    and 4 and the later algorithmic steps remain open, so the paper's overall
+    polynomial-time theorem is not yet established.

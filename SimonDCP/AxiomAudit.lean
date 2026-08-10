@@ -33,6 +33,7 @@ import SimonDCP.Probability.LemmaOneGoodEnvironment
 import SimonDCP.Probability.LemmaOneOuterAveraging
 import SimonDCP.Probability.LemmaOneRoundedParameters
 import SimonDCP.Probability.LemmaOneRoundedFixedEnvironment
+import SimonDCP.Probability.LemmaOneRepaired
 import SimonDCP.Probability.LinearPhaseIndependence
 import SimonDCP.Probability.OneTimePadCounting
 import SimonDCP.Probability.PairwiseBernoulliTail
@@ -108,6 +109,7 @@ open SimonDCP.Probability.LemmaOneGoodEnvironment
 open SimonDCP.Probability.LemmaOneOuterAveraging
 open SimonDCP.Probability.LemmaOneRoundedParameters
 open SimonDCP.Probability.LemmaOneRoundedFixedEnvironment
+open SimonDCP.Probability.LemmaOneRepaired
 open SimonDCP.Probability.LinearPhaseIndependence
 open SimonDCP.Probability.OneTimePadCounting
 open SimonDCP.Probability.PairwiseBernoulliTail
@@ -267,6 +269,11 @@ open SimonDCP.Quantum.Step2Phase
 #print axioms mixedFixedEnvironmentLowerTailMass_paperConstants_le_half
 #print axioms mixedFaultEnvironmentLowerTailMass_rounded_le_half
 #print axioms mixedFaultEnvironmentLowerTailMass_paperConstants_le_half
+#print axioms repairedLemmaOneSuccessEvent_iff_not_lowerTail
+#print axioms mixedFixedEnvironmentSuccessMass_add_lowerTailMass_eq_one
+#print axioms mixedFixedEnvironmentSuccessMass_paperConstants_ge_half
+#print axioms mixedFaultEnvironmentSuccessMass_add_lowerTailMass_eq_one
+#print axioms mixedFaultEnvironmentSuccessMass_paperConstants_ge_half
 #print axioms card_groupUnionFamily_le
 #print axioms mass_groupUnionFailure_le
 #print axioms card_rectangularGroups

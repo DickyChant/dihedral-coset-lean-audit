@@ -13,7 +13,7 @@ corollaries can be reached.
 
 The source contains no `sorry`, `admit`, or handwritten project-local axioms.
 A clean Arch WSL build, including the Lemma 1 repair modules, completed all
-8639 jobs successfully on August 10, 2026.
+8640 jobs successfully on August 10, 2026.
 `SimonDCP/AxiomAudit.lean` prints the axiom dependencies of the principal
 results.  Analytic theorems contain only `propext`, `Classical.choice`, and
 `Quot.sound`.  The six-coordinate exhaustive searches also expose their
@@ -82,8 +82,9 @@ swap is fibre-preserving exactly when the measured modulus divides
 complete samples together with the selection and Hadamard-output coordinates
 preserves the subset sum and phase exactly and is bijective.
 
-This is not yet a complete Lemma 1 proof.  Since `phi` is summed out after the
-Hadamard transform, a state-dependent permutation must be chosen only from the
+This does not complete the paper's original swap-based proof.  Since `phi` is
+summed out after the Hadamard transform, a state-dependent permutation must be
+chosen only from the
 measured outcome.  A termwise weight-preserving proof must map the
 `(h, s_1, ..., s_g)` interference classes by one fixed label equivalence; a
 weaker map instead needs a direct proof that coherent target weight does not
@@ -252,9 +253,18 @@ of samples.  It proves the mean lower
 bound and verifies both explicit budgets for `k = 24`, `c = 12`, and every
 `n >= 1024`.  `LemmaOneRoundedFixedEnvironment.lean` carries these parameters
 through the fixed and classically averaged analytic chains to a failure bound
-of `1/2`.  A quantum density/channel realization of the environment mixture
-and later algorithm-level steps remain open.  Therefore the paper's full
-headline Lemma 1 remains unproved.
+of `1/2`.  This completes and formalizes the repaired core
+constant-probability statement of Lemma 1.  `LemmaOneRepaired.lean` defines the
+complementary success event by an explicit event sum, proves exact
+success-plus-failure normalization, and gives the direct success-mass-at-least-
+`1/2` theorem for both fixed and classically averaged environments.  The
+corrected faulty sampler and
+the padding by fewer than one complete group are legitimate repairs rather
+than blockers: this development targets the core mathematical claim, not a
+verbatim formalization of the paper.  A quantum density/channel realization
+would provide stronger implementation semantics but is not required for this
+probability theorem.  Lemmas 3 and 4 and the later algorithm-level steps remain
+open, so the paper's overall polynomial-time theorem is not established.
 Lean proves that the outcome-coherence field makes the hidden-state map descend
 through the erased selection string to an involutive map on measured outcomes,
 and that every structural certificate therefore induces an injective
@@ -366,14 +376,15 @@ non-cancellation hypothesis.
 
 ## Remaining invalid or missing obligations
 
-- The original proof of Lemma 1 still assumes an unproved sign symmetry and
+- The original proof of Lemma 1 assumes an unproved sign symmetry and
   lacks a concrete reversible bad-to-good plan preserving all Step-4
   interference classes.  The swap-free finite-model route avoids that premise,
-  and its corrected analytic fixed-environment experiment is now formalized
-  through the Step-2 joint law, concrete Step-4 label, and final probability
-  bound; finite classical environment averaging is also formalized.  What
-  remains is a gate/tensor-circuit realization, a quantum density-mixture
-  construction for the random fault process, and later algorithmic steps.
+  and completes the repaired core Lemma 1 theorem through the Step-2 joint law,
+  concrete Step-4 label, final constant-probability bound, rounded complete-
+  group schedule, and finite classical environment averaging.  A
+  gate/tensor-circuit equality or quantum density-mixture construction would be
+  a semantic strengthening, not a missing premise of this repaired probability
+  theorem.  Later algorithmic steps remain open.
 - Lemma 3 varies `D` as if it changed only signs, although changing `D` can
   change the adaptive `A/B` partition and later measurement records.
 - Lemma 4 reuses pairwise independence after conditioning on
@@ -400,12 +411,14 @@ non-cancellation hypothesis.
 ## Formalization boundary
 
 The current development proves kernel-checkable algebraic identities,
-counterexamples, finite probability bounds, an end-to-end analytic
-fixed-fault-environment Lemma-1 estimate, and its finite classical averaging.
-A repaired main theorem still needs
-a gate/tensor-circuit semantics theorem for that analytic experiment, an
-unconditional density mixture for the paper's random fault process, the unresolved conditional phase
-and amplitude claims in Lemmas 3 and 4, adaptive measurement and postselection
-semantics, error amplification, and the external lattice reductions.  Until
-those obligations exist, the headline theorem and its SVP/LWE corollaries must
-remain unproved.
+counterexamples, finite probability bounds, and the repaired core Lemma 1
+constant-probability theorem for both fixed analytic fault environments and
+their arbitrary normalized finite classical mixtures.  It does not claim a
+gate/tensor-circuit equality or a density-matrix model; those are optional
+semantic strengthening for Lemma 1 rather than blockers to its core result.
+The paper's overall theorem still needs the unresolved conditional phase and
+amplitude claims in Lemmas 3 and 4, later adaptive measurement and
+postselection semantics, error amplification, a suitable polynomial-cost
+implementation argument, and the external lattice reductions.  Until those
+obligations are supplied, the paper's overall polynomial-time theorem and its
+SVP/LWE corollaries remain unproved.

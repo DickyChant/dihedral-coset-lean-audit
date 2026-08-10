@@ -34,6 +34,7 @@ import SimonDCP.Probability.LemmaOneGoodEnvironment
 import SimonDCP.Probability.LemmaOneOuterAveraging
 import SimonDCP.Probability.LemmaOneRoundedParameters
 import SimonDCP.Probability.LemmaOneRoundedFixedEnvironment
+import SimonDCP.Probability.LemmaOneRepaired
 import SimonDCP.Probability.LinearPhaseIndependence
 import SimonDCP.Probability.OneTimePadCounting
 import SimonDCP.Probability.PairwiseBernoulliTail
