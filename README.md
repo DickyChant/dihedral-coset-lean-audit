@@ -17,16 +17,18 @@ IACR Cryptology ePrint Archive, Report 2026/1591 (2026).
 
 ## Status of Lemmas 1, 3, and 4
 
-**Bottom line:** this development does not refute the final statement of any of
-Lemmas 1, 3, or 4.  All three conclusions remain unproved.  What it does refute
-are specific intermediate claims and inference rules on which the paper's proof
-sketches rely.  Those refutations show that the published sketches do not prove
-the lemmas, even though a different proof might conceivably establish some of
-their conclusions.
+**Bottom line:** the published proof of Lemma 1 is invalid, but its core
+constant-probability claim now has a corrected proof formalized in Lean.  The
+repair follows the draft's textual faulty-sample definition where its Step-1
+display is inconsistent, and supplies an explicit rounding convention where
+the schedule is underspecified; the goal is to prove the core mathematical
+claim, not to reproduce the draft line by line.
+The final claims of Lemmas 3 and 4 remain unproved and not refuted, and the
+paper's overall headline algorithm theorem remains open.
 
-| Lemma | Status of the final statement | Refutation and repair status |
+| Lemma | Status of the core claim | Published proof and repair status |
 | --- | --- | --- |
-| Lemma 1 | Unproved, not refuted | The proposed low-part swap is invalid. Restricted Parseval gives an unconditional inverse-polynomial replacement. The stronger route now has an end-to-end theorem for the corrected analytic experiment: mixed correct/fault amplitudes, the Step-2 joint law, the complete Step-4 label, exact Born moments, the collision-plus-Chebyshev bound, classical fault-environment averaging, and rounded parameters are connected. For the padded repaired schedule with `k = 24`, `c = 12`, and every `n >= 1024`, the analytic failure mass is at most `1/2`. This is not yet a gate/tensor-circuit or density-matrix theorem, so the paper's full headline Lemma 1 remains unproved. |
+| Lemma 1 | **Repaired and formalized** | The proposed low-part swap is invalid, so the repair replaces it rather than completing that argument. Restricted Parseval gives an unconditional inverse-polynomial bound, while the stronger route connects the corrected mixed correct/fault amplitudes, Step-2 joint law, complete Step-4 label, exact Born moments, collision-plus-Chebyshev bound, classical fault-environment averaging, and rounded parameters. For the padded repaired schedule with `k = 24`, `c = 12`, and every `n >= 1024`, the failure mass is at most `1/2`. This proves the constant-probability core needed from Lemma 1. |
 | Lemma 3 | Unproved, not refuted | The phases are not pairwise independent after the adaptive choice of `A`. |
 | Lemma 4 | Unproved, not refuted | The exponent, `mu`, and `n^(3/2)` bookkeeping errors are repaired. Conditional independence, correlated overflow, and multiplicative amplitude control remain unresolved. |
 
@@ -47,8 +49,10 @@ see [`SwapFiber.lean`](SimonDCP/Arithmetic/SwapFiber.lean).
 The concrete `n = 8` witness is not a full member of the paper's event `D_Y`,
 because that event imposes additional global distinctness conditions.  More
 importantly, failure of this particular injection does not logically imply
-that Lemma 1's constant-probability conclusion is false.  The injection argument
-is refuted; the lemma statement remains unproved.
+that Lemma 1's constant-probability conclusion is false.  The injection
+argument is refuted; the independent restricted-Parseval and
+collision-plus-Chebyshev route below proves a repaired version of the core
+conclusion.
 
 [`SwapFiberRepair.lean`](SimonDCP/Arithmetic/SwapFiberRepair.lean) proves the
 exact repair criterion: for a zero/one swap with measured modulus
@@ -58,8 +62,9 @@ Fourier sample together with its selection and Hadamard-output coordinates is
 a bijection preserving the subset sum, every measured residue fibre, the phase
 exponent, and sample distinctness.
 
-This repairs the algebraic map, but not yet the whole Lemma 1 injection.  After
-Step 4, terms with equal `(h, s_1, ..., s_g)` labels interfere.  A termwise
+This repairs the algebraic map, but not the original Lemma 1 injection route;
+that route is not needed by the completed replacement proof.  After Step 4,
+terms with equal `(h, s_1, ..., s_g)` labels interfere.  A termwise
 weight-preserving permutation proof must choose its map only from the measured
 outcome and carry every such interference class through one fixed label
 equivalence.  A weaker class map can still be useful if its target coherent
@@ -128,8 +133,9 @@ amplifiable in polynomial time.  Requiring Boolean subset sums to be injective
 on every union of two groups makes the group-zero indicators pairwise
 independent; Chebyshev then gives failure probability
 `O(log n/n)`.  The natural-language derivation, the fixed-environment theorem,
-the rounded-parameter repair, and the remaining circuit-level obligations are
-recorded in [`LEMMA1_REPAIR.md`](LEMMA1_REPAIR.md).
+the rounded-parameter repair, optional circuit-level refinements, and the later
+algorithmic obligations are recorded in
+[`LEMMA1_REPAIR.md`](LEMMA1_REPAIR.md).
 
 Lean now proves the restricted character identity, the collision-count form
 of Parseval, and the diagonal lower bound after summing every occupied complete
@@ -193,8 +199,9 @@ mean lower bound and explicit collision/tail budgets.  The end-to-end module
 `LemmaOneRoundedFixedEnvironment.lean` gives failure mass at most `1/2` for
 `k = 24`, `c = 12`, and every `n >= 1024`, including arbitrary normalized
 finite classical fault-environment mixtures.  A density-matrix/channel
-realization of the random fault process and later algorithmic steps remain
-open; consequently the paper's full Lemma 1 is still unproved.
+realization of the random fault process is an optional semantic refinement, not
+an obligation for the analytic Lemma 1 repair.  The later algorithmic steps
+remain open.
 
 ### Lemma 3
 
@@ -272,7 +279,8 @@ The draft's headline theorem is not currently represented as a proved Lean
 theorem. Its proof relies on several false or unproved intermediate claims. The
 development therefore starts with the sound algebraic kernel and kernel-checkable
 obstructions to the invalid proof steps. It does not use `sorry` or hide gaps as
-axioms.
+axioms.  Within that larger open program, the repaired core claim of Lemma 1 is
+now a proved Lean result; the remaining headline-theorem gaps occur later.
 
 ## Formalization map
 
