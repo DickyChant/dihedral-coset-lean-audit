@@ -7,9 +7,16 @@ IACR ePrint 2026/1591, Lemma 1 and Steps 2--4.
 This note gives a replacement route for Lemma 1.  It does not use the paper's
 invalid low-part swap.  The first conclusion below is an unconditional
 inverse-polynomial repair.  The stronger constant-probability conclusion uses
-an additional sparse subset-sum event whose interaction with Step-2
-conditioning and faulty samples is listed explicitly among the remaining proof
-obligations.
+an additional sparse subset-sum event.  The complete analytic experiment for
+one fixed classical fault environment is now formalized from the mixed
+correct/fault amplitudes through the Step-2 joint measurement law and the
+Step-4 Born distribution to the collision-plus-Chebyshev bound.  Classical
+averaging over arbitrary finite fault-environment distributions is also proved.
+This is not a gate/tensor-circuit or density-matrix theorem.  General rounded
+parameters and their budgets are now formalized for a repaired sample schedule;
+what remains is a quantum realization of the random fault mixture and the later
+algorithmic steps, so the paper's full
+Lemma 1 is still unproved.
 
 ## 1. Exact Step-4 weight
 
@@ -41,9 +48,64 @@ The conditional Born probability of `D` is exactly
 p_Y(D) = 1 / (2^Q * |Z_Y|) * sum_lambda |A_lambda(D)|^2.       (1)
 ```
 
-The factor `(-1)^(h_Y(phi) * d_n)` is constant inside one full label
-fibre, so it disappears after taking the squared magnitude.  The remaining
-Fourier phase is global after fixing `Y` and `z'`.
+The secret phase requires one correction before this formula applies to faulty
+samples.  The paper describes a correct sample as
+`2^(-1/2) sum_b |b,x+bd>` and a faulty sample as `|b,x>`, but its displayed
+Step-1 product formula writes `x_i+b_i d` at every coordinate, including the
+faulty coordinates.  Those statements are inconsistent.  The formal model
+follows the stated faulty sampler: only correct coordinates carry the secret
+shift, while a faulty coordinate remains at `x_i` with a fixed selection bit.
+
+If `F` is the set of correct/free coordinates, every supported selection then
+satisfies the exact decomposition
+
+```text
+fullSubsetSum = freeSelectedSum + fixedFaultyContribution.
+```
+
+Consequently the residue equation is equivalently a translated equation for
+the free sum.  `FaultySamplePhase.lean` proves the support-level decomposition,
+and `BooleanMaskBridge.lean` identifies the Boolean coordinate subcube and
+residue fibre with the mask support used below.
+
+The analytic amplitude chain is now explicit.  `FaultyBasisSample.lean` proves
+the one-coordinate Fourier and Hadamard laws of `|b,x>`, and
+`FaultPatternProductAmplitude.lean` constructs the normalized product
+selection amplitude on a fixed coordinate subcube.
+`FaultPatternFourierProduct.lean` first supplies a phase-free product formula.
+`MixedFaultPatternFourierProduct.lean` then proves that the corrected mixed
+amplitude--using `x_i+b_i d` on correct coordinates and `x_i` on faulty
+coordinates--is exactly that formula times an explicit unit secret phase.
+Its pointwise support and squared norms are therefore unchanged, and the full
+Fourier vector `Y` is uniform for every fixed environment.
+
+`StepTwoMeasurementBridge.lean` represents measurement of the low `n-1` bits
+as the canonical quotient `ZMod (2^n) -> ZMod (2^(n-1))` and proves that the
+resulting Boolean selection fibre is exactly the mask fibre in (1).
+`StepTwoJointKernel.lean` normalizes the joint law of `(Y,z')`, proves total
+mass one and the required local uniformity, and identifies its real cast
+pointwise with the sum of the mixed-amplitude Born masses over that measured
+fibre.
+
+The actual secret exponent is the free-coordinate subset sum, whereas the
+classical Step-2 sum also contains the fixed faulty contribution.
+`FaultyHighBitCarry.lean` performs the affine high-bit borrow/carry calculation.
+After `z'` is fixed, the offset contributes a common unit phase depending only
+on `z'` and the fixed environment; the only selection-dependent high-bit factor
+is `(-1)^(h_Y(phi) * d_n)`.  Thus no extra carry bit is needed in the complete
+Step-4 label.  `StepFourLabelPhaseBridge.lean` removes this common unit phase
+from each label fibre.  `ActualStepFourBorn.lean` factors the raw projected
+Hadamard amplitudes, computes their total mass, proves that their normalized
+ratio is the conditional Step-4 Born law in (1), and identifies it pointwise on
+every reachable Step-2 fibre.  Under the corresponding local subset-sum
+injectivity hypotheses, it also gives the exact one- and two-group zero-event
+masses.
+
+These are analytic product-amplitude and finite measurement-law theorems
+conditioned on one classical fault environment.  They are not a QuantumAlg
+gate/tensor-circuit equality, and `RandomFixedBitsMixture.lean` is only a
+classical uniform-mask pushforward theorem, not an unconditional quantum
+density-mixture construction over random fault environments.
 
 ## 2. Restricted Parseval identity
 
@@ -120,10 +182,11 @@ identity over arbitrary finite Boolean supports, its extension across all
 occupied full-label fibres, and the exact `2^(Q-|A|) * |Z_Y|` diagonal lower
 bound.  It normalizes this finite mass by `2^Q * |Z_Y|` and proves the rational
 `2^(-|A|)` statement, then proves the generic finite weighted tail inequality
-and the simplification of its Lemma-1 parameter ratio.  What remains on this
-route is identifying the paper's post-measurement QuantumAlg state with this
-finite labelled model and instantiating the integer-rounded parameter
-conventions.
+and the simplification of its Lemma-1 parameter ratio.  For one fixed fault
+environment, `ActualStepFourBorn.lean` now identifies this labelled law with
+the normalized analytic mixed-amplitude Step-4 Born law.  What remains is a
+gate/tensor-circuit realization, a quantum density-matrix realization of the
+random environment, and the later repetition/algorithmic conventions.
 
 ## 4. Candidate constant-probability repair
 
@@ -163,13 +226,18 @@ Pr[Z < n / log_2(n)]
 This is high probability, stronger than the published constant-probability
 claim.
 
-Lean now formalizes the deterministic core of this implication.  It defines
-Boolean subset-sum injectivity on masks supported inside a chosen union of
-groups, proves that a common complementary contribution cancels, and derives
-projection injectivity of every measured residue fibre.  Restricted Parseval
+Lean now formalizes the complete finite-model version of this implication.  It
+defines Boolean subset-sum injectivity on masks supported inside a chosen union
+of groups, transports the local problem to the restricted index type, and
+proves the `3^|A|-1` ternary collision bound with the local rather than ambient
+exponent.  A common complementary contribution cancels, yielding projection
+injectivity of every coordinate-subcube residue fibre.  Restricted Parseval
 then becomes an exact diagonal equality for one group and for a union of two
-groups.  The separate finite Bernoulli module proves the exact mean, second
-moment, variance `G*p*(1-p)`, and a finite weighted Chebyshev bound.
+groups.  Lean constructs the full normalized output Born weight, proves its
+total mass is one, obtains exact single-group means and disjoint two-group
+moments, and feeds them to the finite pairwise-Bernoulli Chebyshev theorem.  The
+result is the closed form (5), conditional only on the explicitly stated group
+sizes, injectivity hypotheses, and rational parameter equalities.
 
 Before conditioning, failure on one union `A` of `a <= 2m` independent uniform
 coordinates has probability at most
@@ -179,7 +247,10 @@ coordinates has probability at most
 ```
 
 A union bound over all pairs of groups remains exponentially small because
-`c` and `k` are constants.  The subtlety is that Step 2 measures `z'` before
+`c` and `k` are constants.  Lean packages every single group and every pair
+union as one family, proves that the family has at most `N^2` members and that
+each member has at most `2m` coordinates, and derives the corresponding
+simultaneous local-failure bound.  The subtlety is that Step 2 measures `z'` before
 `Y`, so the conditional law of `Y` is size-biased by `|Z_Y|`.
 
 The conditioning loss can nevertheless be stated exactly.  Let the hidden
@@ -210,22 +281,118 @@ Pr[Bad_A | Z = z']
 ```
 
 In the fault-free case `R = Q`.  In the paper's coordinate-subcube fault model,
-let `F` be the free selection coordinates.  Then the exact exceptional factor
-is `delta_A = 2^(-|F \ A|)`.  Supported selections cannot differ at fixed fault
+let `F` be the free selection coordinates.  If every fixed coordinate outside
+`A` is fixed to zero, then the exact exceptional factor is
+`delta_A = 2^(-|F \ A|)`.  If any coordinate outside `A` is fixed to one, then
+`delta_A = 0`.  Thus the unconditional statement is
+`delta_A <= 2^(-|F \ A|)`.  Supported selections cannot differ at fixed fault
 coordinates, so the necessary injectivity event concerns only
 `S = A intersection F`, with prior failure probability at most
 `(3^|S| - 1) / M`.  This stronger form retains the small factor `p_A` on the
 exceptional branch and avoids demanding randomness from faulty `Y_i` values.
 
-Lean now proves the exact rational implication (7) and its dyadic consequence
-(8), assuming the displayed joint-mass and marginal-mass premises.  The main
-one-time-pad kernel is also proved: after fixing `Y_A`, any selected free
-coordinate outside `A` gives an explicit translation equivalence between the
-outside-sample fibres of any two residues.  The remaining conditioning tasks
-are to aggregate these equicardinal fibres over the affine selection support,
-derive the joint and marginal premises of (7), instantiate the
-coordinate-subcube fault support, and prove the required high-probability lower
-bound on `|F|`.
+Lean proves the exact rational implication (7), its dyadic consequence (8),
+and the finite counting premises from which (7) follows.  After fixing `Y_A`,
+any selected coordinate outside `A` gives an explicit translation equivalence
+between residue fibres.  Summing those fibres over an arbitrary finite
+selection support gives the joint-count bound with exceptional numerator
+`delta_A`; a separate full-sample count proves that only the globally zero
+selection contributes the marginal numerator `epsilon`.  Lean normalizes both
+counts and assembles the complete finite Bayes estimate for every nonempty
+support and every residue of positive marginal mass.  It also proves the
+uniform ternary-relation bound (6), the exact coordinate-subcube counts, and
+the dimension implications
+
+```text
+R <= |F|, |A| <= r
+  ==> epsilon <= 2^(-R), delta_A <= 2^(-(R-r)).
+```
+
+These facts are assembled into a coordinate-subcube specialization of (8).
+For the concrete local bad event, Lean further splits the inside sample space
+as `(F intersection A)` times `(A \ F)`, cancels the irrelevant complement
+cardinality exactly, and proves the one-set conditioned estimate with explicit
+prior factor
+
+```text
+(3^(|F intersection A|) - 1) / M.
+```
+
+Separately, a finite Markov theorem shows that per-coordinate fault marginal
+at most `1/(c' L)` implies
+
+```text
+Pr[number of faults >= Q/2] <= 2/(c' L),
+```
+
+without assuming independence among faults.  The same weighted-space API adds
+this exceptional event to the simultaneous local-collision event without an
+independence assumption.  `FaultPatternSupportBridge.lean` identifies the
+fault-set cardinality with that random variable, proves that its complement has
+cardinality `Q - numberOfFaults`, and turns the good half-fault event into the
+required lower bound on the coordinate-subcube dimension.
+This combined environment theorem is a prior bound, not a claim that the same
+fault marginals survive conditioning on a prescribed residue.  The intended
+outer argument instead needs a uniform conditional success theorem for every
+good realized environment and every reachable residue, followed by total-
+probability averaging over the original environment law.
+
+`LemmaOneOuterAveraging.lean` now proves exactly this finite two-level theorem:
+an outer bad-event mass `p` plus a uniform good-environment conditional failure
+bound `q` gives total failure at most `p+q`, without independence.  It also
+proves that subset-sum injectivity is monotone under shrinking the coordinate
+set, so injectivity on every full group or pair union automatically supplies
+the `F intersection A` hypothesis for every realized fault pattern.  This gives
+a shorter Lemma-1 route: bound bad full-coordinate `Y` in the prior, use the
+same conditional Chebyshev bound for every good `Y` and reachable residue, and
+average.  The half-free Markov bound is therefore useful for refined posterior
+estimates and later algorithmic steps, but is not needed for the Step-4
+all-zero-group conclusion itself.
+
+For completeness, the more refined posterior route is also closed in the
+finite model.  `CoordinateSubcubeConditionalFamily.lean` defines the common
+selection/full-sample conditional weight, proves that each family event is
+exactly noninjectivity on `F intersection A`, bridges it to the existing joint
+counts, and derives both sum and `family.card` dyadic bounds.
+
+`LemmaOneFiniteModel.lean` now performs the complete finite probability
+assembly.  Its main bound adds the at-most-`N^2` ternary-collision term to the
+conditional Chebyshev term, without assuming independence between the two
+layers; explicit hypotheses budgeting each term by `1/4` give total failure at
+most `1/2`.  `LemmaOneFixedEnvironment.lean` instantiates this theorem with
+`StepTwoJointKernel` and the analytic Step-4 Born law.  Its outer outcome is
+exactly `(Y,z')`, its inner law is pointwise the mixed-amplitude analytic
+conditional Born law, and its conclusion holds for an arbitrary fixed free set
+and arbitrary fixed faulty bits.  This closes the end-to-end analytic fixed-environment
+estimate.  `LemmaOneFaultEnvironmentAveraging.lean` then preserves the same
+bound under every nonnegative normalized finite classical distribution of
+fault environments, without any independence assumption.  This is classical
+probability averaging, not a density-matrix construction.
+
+`RectangularGroupPartition.lean` constructs exactly `N` disjoint groups of
+exactly `m` coordinates covering `N*m` coordinates.  The earlier
+`LemmaOneExactParameters.lean` proves the expected-mean identity under the
+stronger assumptions that the security parameter is exactly `2^logN` and the
+sample count is exactly divisible by the group width.
+
+The rounded repair removes those assumptions.  `LemmaOneRoundedParameters.lean`
+sets `ell = floor(log_2 n)`, `m = c*ell`, and
+`K = ceil(k*n^(c+1)/m)`.  Thus `K*m` covers the nominal sample count while
+adding strictly fewer than one group.  Lean proves
+
+```text
+K * 2^(-m) >= (k/c) * (n/ell) > n/ell
+```
+
+when `0 < c < k` and `n >= 2`.  Since the Chebyshev ratio decreases as the
+actual mean grows above the target, no exact-mean identity is needed.  The same
+module proves a logarithmic sufficient collision condition and verifies both
+`1/4` budgets for every `n >= 1024` with `c = 12` and `k = 24`.
+`LemmaOneRoundedFixedEnvironment.lean` inserts these facts into the fixed and
+classically averaged analytic experiments, giving failure mass at most `1/2`
+with no remaining arithmetic budget hypothesis.  A quantum density/channel
+realization of the paper's random fault process and the final repetition count
+remain open.
 
 ## 5. Why bit complementation is insufficient
 
@@ -249,23 +416,53 @@ not the zero-majority inequality asserted in the paper's first paragraph.
 
 ## 6. Formalization order and current status
 
-1. **Proved:** Boolean character orthogonality and the restricted Parseval
-   identity for one arbitrary finite support.
-2. **Proved:** package arbitrary occupied full-label fibres, derive the exact
-   `2^(Q-|A|) * |Z_Y|` diagonal lower bound behind (3), and prove the
-   bounded-variable tail theorem, the algebraic ratio in (4), and the exact
-   rational normalization giving (3).  Connecting the paper's concrete
-   QuantumAlg state to this finite model remains bookkeeping rather than a new
-   probabilistic claim.
-3. **Proved:** local subset-sum injectivity implies residue-fibre projection
-   injectivity and exact one- and two-group Parseval masses.
-4. **Proved:** finite pairwise-Bernoulli second moments, variance, and
-   Chebyshev; instantiate their parameters to obtain the displayed closed form
-   (5) after the paper's rounding conventions are fixed.
-5. Formalize the sparse subset-sum union bound under uniform `Y`.
-6. **Bayes algebra and one-pad fibre equivalence proved; aggregation open:**
-   derive the joint and marginal premises of (7) by summing the equicardinal
-   outside-sample fibres over the affine selection support, then incorporate
-   faulty coordinates.
-7. Revisit the algorithm's total repetition count under both the unconditional
-   and constant-probability repairs.
+1. **Proved:** Boolean character orthogonality, restricted Parseval on an
+   arbitrary finite support, the full-label diagonal bound, its exact rational
+   normalization, and the inverse-polynomial tail estimate (3)--(4).
+2. **Proved for one fixed classical fault environment:** the corrected analytic
+   mixed correct/fault product amplitude has the exact coordinate-subcube
+   support and differs from the phase-free amplitude by a unit secret phase.
+   This follows the stated faulty sampler `|b,x>`, not the inconsistent Step-1
+   display that shifts faulty coordinates by `b d`.
+3. **Proved for the analytic measurement law:** the Step-2 low-bit quotient
+   fibre, normalized joint `(Y,z')` kernel, total mass, local uniformity, and
+   pointwise Born-mass identification.
+4. **Proved for the analytic Step-4 law:** the fixed faulty offset/high-bit
+   carry is a common phase after fixing `z'`; the complete `(h,s_1,...,s_g)`
+   label therefore gives exactly the labelled Walsh Born law.  Under the
+   corresponding local subset-sum injectivity hypotheses, it also gives the
+   exact one- and two-group masses.
+5. **Proved:** local subset-sum injectivity implies coordinate-subcube
+   residue-fibre projection injectivity, and the sparse ternary bound controls
+   simultaneous failure over the at-most-`N^2` one- and two-group family.
+6. **Proved in the finite model:** the normalized labelled Born law has the
+   required Bernoulli means and pair moments, and Chebyshev gives (5).
+7. **Proved for the coordinate-subcube conditioning model:** the one-time-pad
+   fibre counts, distinct `delta_A` and `epsilon` branches, dyadic estimates,
+   and the direct family bounds (7)--(8).
+8. **Proved abstractly:** fault-count Markov control and prior-event unioning do
+   not require fault independence; uniform free and fixed-fault bits push
+   forward to a uniform full mask.
+9. **Proved:** outer averaging combines the prior local-collision loss with a
+   uniform conditional tail, and full-coordinate injectivity descends to every
+   free-coordinate intersection.
+10. **Proved end to end for the analytic fixed-environment experiment:**
+    `LemmaOneFiniteModel.lean` assembles the collision and Chebyshev terms, and
+    `LemmaOneFixedEnvironment.lean` instantiates it with the actual analytic
+    Step-2 and Step-4 laws, including an explicit failure-at-most-`1/2` theorem
+    under two `1/4` budgets.
+11. **Proved at the classical mixture level:** every normalized finite mixture
+    of the fixed-environment analytic experiments inherits the same bound, even
+    when positions and fault data vary with the environment.
+12. **Proved in a stronger arithmetic special case:** the exact mean when
+    the security parameter is a power of two and the sample count is exactly
+    divisible by the group width.
+13. **Proved for general integer security parameters:** floor-log group width,
+    ceiling-rounded complete groups, the mean lower bound, and explicit
+    collision/tail budgets.  For `c = 12`, `k = 24`, and `n >= 1024`, the
+    classically averaged analytic failure mass is at most `1/2` without extra
+    arithmetic hypotheses.
+14. **Open:** a QuantumAlg gate/tensor-circuit realization, a quantum
+    density-mixture construction for the random fault environment, the
+    revised repetition count, and the later algorithmic steps.  Until these are
+    supplied, the full headline Lemma 1 remains unproved.
