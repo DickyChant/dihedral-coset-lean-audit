@@ -12,8 +12,8 @@ corollaries can be reached.
 ## Lean formalization targets
 
 The source contains no `sorry`, `admit`, or handwritten project-local axioms.
-A clean Arch WSL build, including the Lemma 1 repair modules, completed all
-8640 jobs successfully on August 10, 2026.
+A clean build, including the Lemma 1 and conditional Lemma 4 repair modules,
+completed all 8641 jobs successfully on August 11, 2026.
 `SimonDCP/AxiomAudit.lean` prints the axiom dependencies of the principal
 results.  Analytic theorems contain only `propext`, `Classical.choice`, and
 `Quot.sound`.  The six-coordinate exhaustive searches also expose their
@@ -388,6 +388,22 @@ Lean converts the additive bound into the corresponding relative-error bound.
 Thus a repaired Lemma 4 can target the additive conclusion directly, or prove
 the new lower-bound premise; conditional balls-in-bins control alone cannot
 establish the paper's multiplicative statement.
+
+The same module now proves a complete finite probabilistic repair. On a
+normalized nonnegative finite space, if every low-part bin in both high-bit
+branches has deviation-event mass at most `tail`, the additive comparison has
+success mass at least
+
+```text
+1 - 2 * numberOfBins * tail.
+```
+
+The relative comparison has the same success mass under a uniform positive
+reference-amplitude lower bound. The per-bin tail hypotheses can be supplied
+by the existing pairwise-Bernoulli Chebyshev theorem once conditional first and
+second moments are proved. This separates a formalized corrected Lemma 4 from
+the still-open task of connecting its hypotheses to the paper's adaptive,
+conditioned experiment.
 
 ## Remaining invalid or missing obligations
 

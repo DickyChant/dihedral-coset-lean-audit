@@ -316,6 +316,10 @@ open SimonDCP.Quantum.Step2Phase
 #print axioms weightedAmplitude_pair_additive
 #print axioms relative_error_of_additive_error
 #print axioms weightedAmplitude_pair_relative
+#print axioms eventMass_finset_exists_le
+#print axioms pairedCountDeviationBad_mass_le
+#print axioms repairedLemmaFour_additive_success_mass_ge
+#print axioms repairedLemmaFour_relative_success_mass_ge
 #print axioms one_term_change_can_escape_any_multiplicative_zero_bound
 #print axioms afterPositionDftState_apply_eq_normalizedDft
 #print axioms probPositionOutcome_afterPositionDft

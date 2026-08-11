@@ -30,7 +30,7 @@ paper's overall headline algorithm theorem remains open.
 | --- | --- | --- |
 | Lemma 1 | **Repaired and formalized** | The proposed low-part swap is invalid, so the repair replaces it rather than completing that argument. Restricted Parseval gives an unconditional inverse-polynomial bound, while the stronger route connects the corrected mixed correct/fault amplitudes, Step-2 joint law, complete Step-4 label, exact Born moments, collision-plus-Chebyshev bound, classical fault-environment averaging, and rounded parameters. For the padded repaired schedule with `k = 24`, `c = 12`, and every `n >= 1024`, the explicitly summed success event has mass at least `1/2`. This is the formalized constant-probability core needed from Lemma 1. |
 | Lemma 3 | Unproved, not refuted | The phases are not pairwise independent after the adaptive choice of `A`. |
-| Lemma 4 | Unproved, not refuted | The exponent, `mu`, and `n^(3/2)` bookkeeping errors are repaired. Conditional independence, correlated overflow, and multiplicative amplitude control remain unresolved. |
+| Lemma 4 | Unproved, not refuted | The exponent, `mu`, and `n^(3/2)` bookkeeping errors are repaired. A finite corrected theorem now gives high-probability additive control from explicit per-bin tails, and relative control with an explicit anti-cancellation lower bound. Establishing those hypotheses for the paper's conditioned experiment remains open. |
 
 ### Lemma 1
 
@@ -276,16 +276,30 @@ only after assuming an explicit positive lower bound on one reference
 amplitude. That anti-cancellation lower bound, or a replacement such as phase
 alignment, is the precise additional obligation missing from the sketch.
 
+The repair is also lifted to a normalized finite probability space. If every
+bin in each of the two branches has deviation-event mass at most `tail`, Lean
+proves additive success mass at least
+
+```text
+1 - 2 * numberOfBins * tail.
+```
+
+With a uniform positive reference-amplitude lower bound, the relative success
+event has the same mass. The existing finite pairwise-Bernoulli Chebyshev
+theorem can supply each per-bin tail when the required conditional moment
+identities are available; the repair deliberately does not infer them from the
+paper's unconditioned distribution.
+
 Even without correcting the extra `+n`, the printed exponent at `c = 12` is
 `-n/2 + o(n)`.  If this were first established as a simultaneous absolute
 error bound on normalized amplitudes, it would absorb every downstream
 polynomial factor.  Thus the exponent typo is repairable and is not the
 decisive obstruction to Lemma 4.
 
-The repaired arithmetic does not establish the conditional balls-in-bins
-premises or overcome signed-amplitude cancellation.  The final
-multiplicative-amplitude conclusion of Lemma 4 therefore remains unproved, not
-refuted.  The detailed audit is in [`AUDIT.md`](AUDIT.md).
+The repaired finite theorem does not establish its conditional concentration
+or anti-cancellation hypotheses for the paper's actual experiment. The
+original multiplicative-amplitude claim of Lemma 4 therefore remains unproved,
+not refuted. The detailed audit is in [`AUDIT.md`](AUDIT.md).
 
 ## Project scope
 
@@ -473,8 +487,9 @@ now a proved Lean result; the remaining headline-theorem gaps occur later.
   distinguishes `mu` from total cardinality, and propagates the stated
   `n^(3/2)` amplitude bound.
 - `Probability/Lemma4Repair.lean` derives the valid pairwise additive-amplitude
-  estimate from two near-uniform bin-count bounds and proves the claimed
-  relative estimate under an explicit positive anti-cancellation lower bound.
+  estimate from two near-uniform bin-count bounds, lifts it through a finite
+  union bound to success mass `1 - 2 * numberOfBins * tail`, and proves the
+  relative form under an explicit positive anti-cancellation lower bound.
 
 The project deliberately separates the formalized and classically averaged
 analytic experiment from a gate/tensor-circuit implementation, a quantum
@@ -508,9 +523,9 @@ The checked environment uses Elan 4.2.3 and Lean 4.31.0.  For faster builds on
 Windows-mounted drives, copy the repository to a WSL-native directory before
 running `scripts/build-wsl.sh`; the source tree remains authoritative.
 
-The full project, including the Lemma 1 repair modules, was verified in Arch
-Linux under WSL on August 10, 2026.  The command `lake build` completed all
-8640 jobs successfully.
+The full project, including the Lemma 1 and conditional Lemma 4 repair modules,
+was verified on August 11, 2026. The command `lake build` completed all 8641
+jobs successfully.
 
 ## Verification policy
 
