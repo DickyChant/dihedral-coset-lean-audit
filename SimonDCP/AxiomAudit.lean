@@ -1,4 +1,6 @@
 import SimonDCP.Arithmetic.LemmaOneFiniteSupportPrototype
+import SimonDCP.Arithmetic.LemmaThreeStepSixCarry
+import SimonDCP.Arithmetic.LemmaThreeStepSixBitBridge
 import SimonDCP.Arithmetic.SampleRecursion
 import SimonDCP.Arithmetic.SwapFiber
 import SimonDCP.Arithmetic.SwapFiberRepair
@@ -35,8 +37,28 @@ import SimonDCP.Probability.LemmaOneOuterAveraging
 import SimonDCP.Probability.LemmaOneRoundedParameters
 import SimonDCP.Probability.LemmaOneRoundedFixedEnvironment
 import SimonDCP.Probability.LemmaOneRepaired
+import SimonDCP.Probability.LemmaThreeAdaptiveSectorCounterexample
+import SimonDCP.Probability.LemmaThreeAdaptiveFibreUpperBound
 import SimonDCP.Probability.LemmaThreeBornBounds
+import SimonDCP.Probability.LemmaThreeBooleanFinePathUpperBound
+import SimonDCP.Probability.LemmaThreeBudgetedFirstClause
+import SimonDCP.Probability.LemmaThreeCoherentFibreObstruction
+import SimonDCP.Probability.LemmaThreeConservativeThresholdImpact
+import SimonDCP.Probability.LemmaThreeCountEnergy
+import SimonDCP.Probability.LemmaThreeFiniteRepair
+import SimonDCP.Probability.LemmaThreeFirstZeroFrame
+import SimonDCP.Probability.LemmaThreePaperFirstClause
+import SimonDCP.Probability.LemmaThreePaperPathBridge
+import SimonDCP.Probability.LemmaThreePaperPathEnergy
 import SimonDCP.Probability.LemmaThreePathRefinement
+import SimonDCP.Probability.LemmaThreePostselection
+import SimonDCP.Probability.LemmaThreePostselectionSlack
+import SimonDCP.Probability.LemmaThreeSectorRefinement
+import SimonDCP.Probability.LemmaThreeStepSixAcceptance
+import SimonDCP.Probability.LemmaThreeStepSevenRegrouping
+import SimonDCP.Probability.LemmaThreeTranscriptModel
+import SimonDCP.Probability.LemmaThreeToFourL2
+import SimonDCP.Probability.LemmaThreeUniformWalshPaths
 import SimonDCP.Probability.LinearPhaseIndependence
 import SimonDCP.Probability.OneTimePadCounting
 import SimonDCP.Probability.PairwiseBernoulliTail
@@ -78,6 +100,8 @@ evaluation certificates are also printed here.  No result may depend on
 -/
 
 open SimonDCP.Arithmetic.LemmaOneFiniteSupportPrototype
+open SimonDCP.Arithmetic.LemmaThreeStepSixCarry
+open SimonDCP.Arithmetic.LemmaThreeStepSixBitBridge
 open SimonDCP.Arithmetic.SampleRecursion
 open SimonDCP.Arithmetic.SwapFiber
 open SimonDCP.Arithmetic.SwapFiberRepair
@@ -114,8 +138,28 @@ open SimonDCP.Probability.LemmaOneOuterAveraging
 open SimonDCP.Probability.LemmaOneRoundedParameters
 open SimonDCP.Probability.LemmaOneRoundedFixedEnvironment
 open SimonDCP.Probability.LemmaOneRepaired
+open SimonDCP.Probability.LemmaThreeAdaptiveSectorCounterexample
+open SimonDCP.Probability.LemmaThreeAdaptiveFibreUpperBound
 open SimonDCP.Probability.LemmaThreeBornBounds
+open SimonDCP.Probability.LemmaThreeBooleanFinePathUpperBound
+open SimonDCP.Probability.LemmaThreeBudgetedFirstClause
+open SimonDCP.Probability.LemmaThreeCoherentFibreObstruction
+open SimonDCP.Probability.LemmaThreeConservativeThresholdImpact
+open SimonDCP.Probability.LemmaThreeCountEnergy
+open SimonDCP.Probability.LemmaThreeFiniteRepair
+open SimonDCP.Probability.LemmaThreeFirstZeroFrame
+open SimonDCP.Probability.LemmaThreePaperFirstClause
+open SimonDCP.Probability.LemmaThreePaperPathBridge
+open SimonDCP.Probability.LemmaThreePaperPathEnergy
 open SimonDCP.Probability.LemmaThreePathRefinement
+open SimonDCP.Probability.LemmaThreePostselection
+open SimonDCP.Probability.LemmaThreePostselectionSlack
+open SimonDCP.Probability.LemmaThreeSectorRefinement
+open SimonDCP.Probability.LemmaThreeStepSixAcceptance
+open SimonDCP.Probability.LemmaThreeStepSevenRegrouping
+open SimonDCP.Probability.LemmaThreeTranscriptModel
+open SimonDCP.Probability.LemmaThreeToFourL2
+open SimonDCP.Probability.LemmaThreeUniformWalshPaths
 open SimonDCP.Probability.LinearPhaseIndependence
 open SimonDCP.Probability.OneTimePadCounting
 open SimonDCP.Probability.PairwiseBernoulliTail
@@ -146,6 +190,13 @@ open SimonDCP.Quantum.PhaseTransfer
 open SimonDCP.Quantum.Step2Phase
 
 #print axioms lowPartBitSwap_delta
+#print axioms stepSix_topBit_eq_fullSum
+#print axioms highBlockTopBit_eq_fullWordTopBit
+#print axioms floorLogPaperFlag_false_not_carryVulnerable
+#print axioms stepSix_floorLogPaperFlag_false_topBit_eq_fullSum
+#print axioms paperGroupCount_mul_log_le_width
+#print axioms stepSix_paperGroupCount_floorLogPaperFlag_false_topBit_eq_fullSum
+#print axioms ceilRoundedLogLog_counterexample
 #print axioms reducedSamplePosition_true_sub_false
 #print axioms reducedDot_modEq
 #print axioms lemmaOneMap_does_not_preserve_measured_fiber
@@ -191,6 +242,63 @@ open SimonDCP.Quantum.Step2Phase
 #print axioms largeNormalizedComponentMass_le_bucketThreshold
 #print axioms totalIncoherentPathEnergy_eq
 #print axioms pathModel_smallBranchMass_le_paperThreshold
+#print axioms compatiblePaths_allBranchesSmall_mass_le
+#print axioms uniformWalshPaths_smallBranchMass_le
+#print axioms adaptiveSectorTail_le_energyBudget
+#print axioms exactSectorMass_le_of_dyadicBudget
+#print axioms bucketSectorMass_le_of_quadraticBudget
+#print axioms normalizedCoarseMass_sum
+#print axioms normalizedAdaptiveSectorEnergy_sum
+#print axioms adaptiveSectorEnergy_strictly_exceeds_one
+#print axioms totalSectorEnergy_adaptiveBucket_le
+#print axioms adaptiveBucketTail_le_of_fineCard
+#print axioms card_booleanFinePath
+#print axioms booleanFinePath_adaptiveBucketTail_le
+#print axioms twelveBooleanBlocks_adaptiveBucketTail_le
+#print axioms card_mul_sum_sq_fibreCard_ge
+#print axioms equalAmplitudeFibreEnergy_lower_bound
+#print axioms powTwo_cleared_collision_lower_bound
+#print axioms conservativeTotalDeviationExponent_eq
+#print axioms conservativeTotalDeviationExponent_nonneg
+#print axioms countErrorEnergy_centering_identity
+#print axioms countErrorEnergy_bucketCount_actualMean
+#print axioms expected_selectedCountErrorEnergy_actualMean_eq
+#print axioms twoBitHash_jointFiber_card_eq_one
+#print axioms equalBitCondition_countErrorEnergy_eq_two
+#print axioms card_adaptiveFirstZeroRefinements_le_choose
+#print axioms twoPowBlock_mul_adaptiveFirstZeroFrameWeight_le_choose
+#print axioms finiteConditionalBadMass_le_dyadic
+#print axioms finiteConditionalBadMass_le_inverseSquare
+#print axioms repairedUniformWalshJointBounds
+#print axioms repairedDyadicJointBounds_of_budget
+#print axioms repairedConditionalBounds
+#print axioms hiddenBit_xor_branch_eq_hPrime
+#print axioms paperDirectBranchAmplitude_eq_paperBranchAmplitude
+#print axioms paperDirectBranchAmplitude_eq_tPlus_sub_tMinus
+#print axioms paperBranchAmplitude_eq_tPlus_sub_tMinus
+#print axioms normSq_paperBranchAmplitude
+#print axioms paperHiddenAndD_injective
+#print axioms sum_normSq_paperCommonPathAmplitude_le_inv_card_low
+#print axioms paperPaths_allBranchesSmall_mass_le
+#print axioms finiteConditionalBadMass_le_of_splitExponent
+#print axioms finiteConditionalBadMass_le_halfExponent
+#print axioms paperFirstClause_conditional_small_mass_le_halfExponent
+#print axioms branchEnergy_badMass_le_budget
+#print axioms paperPaths_allBranchesSmall_mass_le_inv_card_low
+#print axioms paperPaths_conditional_allBranchesSmall_mass_le
+#print axioms normSq_sum_real_mul_le
+#print axioms weightedAmplitude_error_normSq_le_budget
+#print axioms coefficientEnergy_restrictedWalshCoefficient_eq
+#print axioms weightedAmplitude_restrictedWalsh_error_normSq_le
+#print axioms directDoubleSum_eq_weightedAmplitude
+#print axioms scaledDirect_sub_scaledMean_normSq_le_budget
+#print axioms coefficientEnergy_bResidueCoefficient_eq_collisionSum
+#print axioms allZeroHadamardMass_eq
+#print axioms diagonalInputMass_destructiveBoolAmplitude
+#print axioms allZeroHadamardMass_destructiveBoolAmplitude_eq_zero
+#print axioms average_allZeroHadamardMass_environmentAmplitude_eq_half
+#print axioms retained_joint_allZeroMass_lt_half_retainedMass
+#print axioms sum_normSq_boolHadamardAmplitude
 #print axioms restricted_character_orthogonality
 #print axioms restricted_parseval
 #print axioms card_masksVanishingOn

@@ -7,11 +7,15 @@ Reference: [ePrint 2026/1591](https://eprint.iacr.org/2026/1591)
 The objective is to prove and formalize the mathematical core of Lemma 3, not
 to preserve its proof sketch word for word.  In particular, the repaired proof
 does not try to recover pairwise independence after the adaptive choice of
-`A`.  It replaces that invalid step with finite Born-energy estimates that are
-stable under arbitrary classical dependence of `A` on the measured mask `D`.
+`A`.  Its first replacement estimate is stable under arbitrary classical
+dependence of `A` on the measured mask `D`.  Its second estimate exposes the
+resulting adaptive coherent-sector energy as an explicit budget rather than
+silently treating it as a normalized measurement.
 
-This document describes the repair and separates the proved finite
-inequalities from the remaining circuit-to-finite-model bridge.
+This document separates the proved first-clause bound, the conditional
+second-clause inequality, and the remaining analytic energy estimate.  It also
+records a newer decoder-level obstruction: the sound finite inequalities do
+not imply that the paper's Steps 2--7 have a useful output bias.
 
 ## The original obstruction
 
@@ -34,8 +38,9 @@ Moreover, `D` is sampled with its Born weight, not uniformly.  A Chebyshev
 bound under a hypothetical uniform mask distribution therefore cannot be
 read directly as a probability over measured transcripts.
 
-These points invalidate the proof sketch, but they do not refute the final
-probability bounds.
+These points invalidate the proof sketch.  They do not by themselves refute
+the first final probability bound.  The second bound requires an additional
+adaptive-sector energy estimate that the published argument does not prove.
 
 ## Exact finite repair of the well-behaved bound
 
@@ -47,9 +52,13 @@ Delta(M,h) = tPlus(M,h) - tMinus(M,h),
 t(M,h)     = tPlus(M,h) + tMinus(M,h).
 ```
 
-Suppose the paths in one `(M,h)` fibre have a common squared magnitude
-`scale(M,h)`.  The coherent Born contribution and the corresponding
-incoherent path energy are then
+Suppose the paths in one `(M,h)` fibre have one common *unnormalized joint*
+complex amplitude up to their displayed Boolean sign, and let its squared
+magnitude be `scale(M,h)`.  This amplitude includes transform and projection
+factors but not the transcript-dependent conditional normalization `nu4`.
+Suppose also that the two residual `h` labels are orthogonal output sectors.
+The coherent Born contribution and the corresponding incoherent path energy
+are then
 
 ```text
 coherent(M,h)   = scale(M,h) * Delta(M,h)^2,
@@ -68,37 +77,58 @@ then, pointwise in `M`,
 BornMass(M) <= 2^(-n) * sum_h incoherent(M,h).
 ```
 
-Now refine the experiment by retaining the original path as an orthogonal
-label.  Completeness of this refined measurement gives
+For the equal-amplitude Step-2 fibre followed by the normalized Walsh
+transform, the fine pairs `(hidden selection, D)` have total diagonal energy
+one.  Arbitrary later postselection retains a subset, so
 
 ```text
 sum_(M,h) incoherent(M,h) <= 1.
 ```
 
-Summing the pointwise inequality proves that the joint Born mass of accepted
+Once the actual Step-3--7 amplitude is identified with this signed path model,
+summing the pointwise inequality proves that the joint Born mass of accepted
 transcripts for which both branches are below threshold is at most `2^(-n)`.
-No independence or uniformity of `D` is used, and `A` may be an arbitrary
-function of the already measured part of the transcript.
+The finite theorem uses no independence or uniformity of `D`, and `A` may be
+an arbitrary function of the already measured part of the transcript.
 
 The finite inequality and its exact `2^(-n)` specialization are formalized in
-`SimonDCP/Probability/LemmaThreeBornBounds.lean`.
+`SimonDCP/Probability/LemmaThreeBornBounds.lean` and
+`SimonDCP/Probability/LemmaThreePathRefinement.lean`.
+`SimonDCP/Probability/LemmaThreeUniformWalshPaths.lean` additionally proves
+the total path-energy bound for an equal-amplitude Step-2 fibre, normalized
+Walsh outcomes, and any later filter represented as a compatibility subset.
+Additional coherent transforms must be added as fine-path coordinates in the
+paper-facing instantiation rather than treated as deletion.
+`SimonDCP/Probability/LemmaThreeTranscriptModel.lean` records the correct
+relational fine path `(complete transcript, compatible hidden selection)`.
+`SimonDCP/Probability/LemmaThreePaperPathBridge.lean` further supplies the
+paper-shaped record `(Y,D,W',S,h')`, adaptive compatibility, `h*` branch
+label, Boolean sign, and raw Hadamard/common factor.  It explicitly sums the
+signed raw contributions over a transcript/branch `Finset` fibre and proves
+the non-definitional identity `commonAmplitude * (tPlus-tMinus)`.
+`SimonDCP/Probability/LemmaThreePaperPathEnergy.lean` proves that compatible
+paths inject into `(hidden,D)`, computes the exact squared Hadamard factor,
+and derives total common-path energy at most `1/|Low| <= 1` from normalized
+Step-2 diagonal energy.  It then gives the direct paper-shaped joint
+`2^(-n)` bound.  Equality between this finite analytic Born model and the
+actual circuit amplitude, and circuit-level orthogonality of its residual
+branches, remain required model-identification obligations.  The concrete
+Step-2 state must also discharge the diagonal-energy premise used above.
 
-## Exact finite repair of the implicit-component tail
+## Conditional finite bound for the implicit-component tail
 
-For a transcript `M`, let `p(M)` be its unnormalized Born mass.  After `(Y,D)`
-has been measured, `A(D)` is fixed.  Reversibly compute an additional sector
-label `z` before the operation that erases or merges that label.  Let
-`u(M,z)` be the resulting unnormalized component and define the paper's
-normalized implicit component by
+For a transcript `M`, let `p(M)` be its unnormalized Born mass, let `u(M,z)`
+be the paper's unnormalized path-restricted contribution for the adaptive
+value `z = z*(A(D))`, and define
 
 ```text
 alpha(M,z) = u(M,z) / sqrt(p(M)).
 ```
 
-The reversible sector refinement gives the energy identity or inequality
+Set
 
 ```text
-sum_(M,z) |u(M,z)|^2 <= 1.
+C = sum_(M,z) |u(M,z)|^2.
 ```
 
 For any positive squared threshold `R2`, if some component satisfies
@@ -111,19 +141,248 @@ then the mass of that transcript is at most the sum of its labelled component
 energies divided by `R2`.  Summing over transcripts gives
 
 ```text
-Pr[exists z, |alpha(M,z)|^2 > R2] <= 1 / R2.
+Pr[exists z, |alpha(M,z)|^2 > R2] <= C / R2.
 ```
 
-Taking `R2 = 2^(3*n)` yields `2^(-3*n)`, stronger than the exponential scale
-requested by Lemma 3.  The argument does not require the transcript to be
-well-behaved.
+Taking `R2 = 2^(3*n)` yields a joint `O(2^(-n))` scale if one additionally
+proves `C = O(2^(2*n))`.  If the probability is instead conditioned on an
+acceptance event of mass `rho`, the bound is `C / (R2 * rho)`; retaining the
+literal `O(2^(-n))` scale then requires `C = O(rho * 2^(2*n))`.  This is now
+the precise missing mathematical estimate and normalization choice.
 
-For the corollary, compute the high `log n` bits as the sector label directly.
-Taking `R2 = n^3` gives an `n^(-3)` joint tail, avoiding a lossy union bound
-over exact residues.
+The tempting stronger premise `C <= 1` does not follow from measurement
+completeness.  The paper's component has operator order `Q_D P_z^(A(D))`:
+the original path is first restricted using an outcome-dependent projector,
+and its contributions are then coherently combined into the measured `D`
+outcome.  The normalized reverse order `P_z^(A(D)) Q_D` instead measures `D`
+first and produces a different sector.  A finite equal-amplitude four-bit
+Walsh toy model, inspired by the Step-2 support shape but not instantiating the
+paper's schedule, has normalized coarse Born mass `1` but adaptive sector
+energy `4/3`.  This refutes `coarse normalization => C <= 1`, not by itself
+the paper-specific asymptotic `C_n` bound.
 
-Both finite bounds are formalized in
-`SimonDCP/Probability/LemmaThreeBornBounds.lean`.
+For a high-bit bucket the same general inequality holds with its own coherent
+bucket energy budget.  A bound at threshold `n^(3/2)` therefore also requires
+a proved budget; it is not obtained by merely storing the bucket label.  At
+squared threshold `n^3`, a conditional `O(1/n)` tail requires conditional
+bucket energy `O(n^2)`, or equivalently a pre-acceptance joint budget
+`O(rho * n^2)` when acceptance has mass `rho`.
+
+The budgeted finite inequality is formalized in
+`SimonDCP/Probability/LemmaThreeBornBounds.lean` and
+`SimonDCP/Probability/LemmaThreeSectorRefinement.lean`.  The exact `4/3`
+adaptive counterexample is formalized in
+`SimonDCP/Probability/LemmaThreeAdaptiveSectorCounterexample.lean`.
+
+A conservative replacement is formalized in
+`SimonDCP/Probability/LemmaThreeAdaptiveFibreUpperBound.lean`.  For an
+arbitrary outcome-dependent label map, complex Cauchy--Schwarz proves
+
+```text
+total adaptive energy <= (maximum fibre size) * total fine-path energy.
+```
+
+Consequently, an explicitly normalized fine-amplitude model with fine-space
+cardinality at most `2^(c*n)` gives a joint `2^(-n)` tail at squared threshold
+`2^((c+1)*n)`.  This closes the abstract Cauchy implication, but the paper
+application still has to identify its `u(M,z)` with that fine model and prove
+the fine-energy normalization; it also does not recover the paper's
+`2^(3*n)` threshold when `c = 12`.  The Boolean
+specialization in `LemmaThreeBooleanFinePathUpperBound.lean` proves the exact
+fine-space cardinality and gives squared threshold `2^(13*n)` at `c = 12`.
+Moreover,
+`SimonDCP/Probability/LemmaThreeConservativeThresholdImpact.lean` proves that
+substituting the corresponding amplitude exponent `(c+1)*n/2` into the
+corrected Lemma 4 calculation gives
+
+```text
+7*n/2 + faultLoss/2 + c*logN/2.
+```
+
+The `c*n` terms cancel, so increasing `c` cannot make this conservative route
+support the existing downstream argument.
+
+An alternative that avoids pointwise `alpha_z` control is machine-checked in
+`SimonDCP/Probability/LemmaThreeToFourL2.lean`.  For finite low-bit labels it
+proves
+
+```text
+normSq(sum_z (count_z - mean) * C_z)
+  <= (sum_z (count_z - mean)^2) * (sum_z normSq(C_z)).
+```
+
+It also uses `restricted_parseval` to express the coefficient-energy factor as
+a Walsh projection-collision energy.
+
+`SimonDCP/Probability/LemmaThreeStepSevenRegrouping.lean` supplies the next
+exact algebraic bridge.  It defines the direct A-side/B-side double path sum,
+proves that regrouping by the low residue is exactly
+
+```text
+sum_z count_z * C_z,
+```
+
+and propagates a raw common amplitude through the L2 error theorem.  It also
+expands `sum_z |C_z|^2` as the ordered collision sum of B-side terms sharing a
+residue.  This is a sound abstract structural alternative, but the paper
+application must still instantiate these
+finite sets/maps with the actual Step-5--7 fibres, prove an `L2` count-error
+estimate in the conditioned adaptive experiment, and bound the resulting
+coefficient-collision energy.  An additive `L2` bound alone also does not give
+a multiplicative ratio when the reference amplitude can cancel to zero.
+
+The A-side second moment is now isolated precisely in
+`SimonDCP/Probability/LemmaThreeCountEnergy.lean`.  For bucket counts `N_z`,
+total selected population `T`, bucket count `m`, and any external mean `mu`,
+it proves the exact centering identity
+
+```text
+sum_z (N_z-mu)^2
+  = sum_z (N_z-T/m)^2 + m*(T/m-mu)^2.
+```
+
+It also proves that *selection-aware* weighted pair-collision moment
+factorization gives actual-mean energy `(1-1/m) E[T]`.  Selection must be
+inside the pair-collision premise; interpreting the weights probabilistically
+additionally requires nonnegativity and normalization.  A machine-checked two-bit example starts
+with jointly uniform bucket labels, conditions on their equality, and changes
+the count energy from the independent baseline `1` to `2`.  Thus the paper
+cannot apply an unconditioned balls-in-bins variance after the complete
+transcript has fixed `Y`; it must prove the weighted selected-pair identity
+and separately control fluctuations of `T` when using a global mean.
+
+## Evidence about the missing energy budget
+
+The remaining estimate is not merely routine normalization.  An analytic
+frame-operator calculation separates two effects.  If each candidate block has `m` bits,
+`q = 2^m`, there are `G` blocks, and `A(D)` is the first `a` all-zero blocks,
+then the complete-label frame/surrogate admits the upper bound
+
+```text
+q^(-a) * choose(G,a) <= (e*G/(a*q))^a.
+```
+
+The exact incidence count and the corresponding diagonal-surrogate bound
+`choose(G,a)/q^a`, in cleared-denominator form, are machine-checked in
+`SimonDCP/Probability/LemmaThreeFirstZeroFrame.lean`.
+With the paper's parameters it is only `2^(O(n/log n))`.  This is consistent
+with controllability of the first-zero rule at the complete-label level.
+Connecting that diagonal weight to the concrete circuit frame remains a
+required model-identification bridge.
+The dangerous operation is the later
+coherent coarsening of the complete selected string into `(z,W)`: a fibre of
+size `r` can multiply the frame bound by `r`.
+
+The deterministic part of this obstruction is now machine-checked in
+`SimonDCP/Probability/LemmaThreeCoherentFibreObstruction.lean`.  For any map
+from a finite domain into a finite label set it proves
+
+```text
+|Domain|^2 <= |Label| * sum_label |fibre(label)|^2.
+```
+
+It also gives the corresponding equal-amplitude real-energy bound and a
+cleared-denominator specialization for a `2^(c*n)` domain and at most
+`2^(2*n)` labels.  This theorem does not assert a lower bound for the complete
+paper quantity: `B`-side signs and later filters can still cancel or remove the
+coherent contribution.
+
+In a simplified equal-Step-2-fibre model before the later `S/W` filters, an
+exact random-`Y` second-moment calculation gives expected sector energy
+
+```text
+Theta(P_accept * 2^((c-1)*n)).
+```
+
+The `B`-side dimension cancels against Step-2 normalization; the coherent
+`A`-fibre remains.  Counting the available `A`-side labels in Step 6 suggests
+that the complete experiment has natural scale
+`2^((c-2)*n) / poly(n)`.  For `c = 12` this is far above `2^(2*n)`.
+
+The first frame identity and the simplified second-moment calculation are
+mathematical statements about reduced models.  The last scale estimate is not
+yet a counterexample to the full paper experiment: a rigorous lower bound must
+still control the correlations introduced by `S`, `W`, the `l_(s*)`
+postselection, and `Y`.  The accurate status is therefore that the required
+budget remains open but is now strongly implausible.
+
+If this scale survives the remaining filters, the pointwise threshold needed
+for a `2^(-n)` joint tail is roughly
+`L >= 2^((c-1)*n/2)` (`2^(5.5*n)` at `c = 12`), rather than `2^(1.5*n)`.
+Possible repairs would have to retain roughly `(c-4)*n` additional independent
+`A`-side label bits, change incompatible parameters, or bypass the pointwise
+`alpha_z` bound and prove the final Lemma-4 comparison directly in `L2`.
+
+## Spectral obstruction to the decoder
+
+The energy-budget discussion above concerns the two standalone probability
+claims.  A newer two-copy Fourier calculation tests the downstream decoder
+directly on fault-free samples.  Work along a divisible subsequence with
+
+```text
+N = 2^n,
+q = n^c,
+a = n/log_2(n),
+G = lambda*a*q,
+lambda > 1.
+```
+
+For a Fourier mode `xi`, the exact zero-group kernel `p_xi` has interval
+Parseval budget `sum_xi a_xi = 1`.  Hence all but polynomially many of the
+`N` modes satisfy `p_xi = (1+o(1))/q`.  The adaptive first-`a`-zero rule has
+the exact transfer
+
+```text
+A_xi = Pr[Binomial(G,p_xi) >= a].
+```
+
+Since `G/q = lambda*a`, almost every typical diagonal mode is accepted with
+probability `1-exp(-Omega(a))`.
+
+For the no-guard modification that retains the low summary `u`, the exact
+all-frequency terminal kernels are
+
+```text
+w_wrong(xi)   = 1/(2*q),
+w_correct(xi) = p_xi - 1/(2*q).
+```
+
+After the first-zero transfer, both output masses equal `1/2+o(1)`.  Thus the
+`keep-u` proposal fixes the acceptance loss but not decoding: its conditional
+error tends to `1/2`.
+
+Before imposing the paper's safe-residue guard, the zero-low-Hadamard terminal
+wrong kernel is exactly `1/(2*q*L)`, with `L=n/2`.  A guard-restricted Parseval
+estimate is expected to give
+
+```text
+P_wrong   = g/(2*L) + o(1/n),
+P_correct = g/(2*L) + o(1/n),
+P_accept  = g/L + o(1/n),
+```
+
+where `g = 1-O(1/log n)` is the safe-set density.  The remaining estimate must
+control the preterminal failure factors, binomial-tail sensitivity, terminal
+coarsening, exceptional modes, and zero/nonzero cross terms.  It has not yet
+been formalized.  Consequently, the rigorous status is:
+
+- the no-guard `keep-u` decoder is refuted by the exact kernel calculation;
+- the guarded paper decoder has the same spectral obstruction conditional on
+  the explicit perturbation estimate;
+- neither isolated clause of Lemma 3 is directly refuted;
+- the intended Lemma-4-based decoding consequence cannot be obtained from the
+  presently analyzed architecture.
+
+The full calculation, including the exact `h*`-sector formula and the boundary
+between exact and pending estimates, is in
+[`LEMMA3_SPECTRAL_OBSTRUCTION.md`](LEMMA3_SPECTRAL_OBSTRUCTION.md).
+
+This changes the positive-repair priority.  The abstract L2 and budgeted tail
+lemmas remain sound, but another local collision, guard, or keep-all-outcomes
+lemma is not enough.  A genuinely different positive route would need a global
+half-turn fibre-erasure operation pairing subset sums `z` and `z+N/2` while
+erasing their which-path information with inverse-polynomial success.  No such
+polynomial construction is identified or supplied in this project.
 
 ## Conditioning convention
 
@@ -133,10 +392,47 @@ conditional probability given an earlier acceptance event of mass `rho`, the
 right-hand side must be divided by `rho` unless the refined experiment is
 normalized directly inside that accepted branch.
 
-This distinction is harmless for the `2^(-3*n)` and `n^(-3)` component tails
-when `rho` is inverse-polynomial, but it must be stated explicitly for the
-first `2^(-n)` bound.  The paper's phrase "over choices of M" does not specify
-this convention precisely.
+For example, a joint exact-sector bound `2^(-3*n)` remains exponentially small
+after inverse-polynomial postselection, while a joint `n^(-3)` bound and
+acceptance at least `n^(-1)` give a conditional `n^(-2)` bound.  These
+conversions apply only after the corresponding joint bound, including its
+sector-energy budget, has been established.  The paper's phrase "over choices
+of M" does not specify this convention precisely.
+
+`SimonDCP/Probability/LemmaThreePostselection.lean` formalizes the exact
+joint-to-conditional ratio and these two parameter conversions.
+`SimonDCP/Probability/LemmaThreePostselectionSlack.lean` proves the general
+exponent-slack rule and, in particular, converts a joint `2^(-n)` bound into a
+conditional `2^(-floor(n/2))` bound whenever the explicit inverse-polynomial
+acceptance lower bound fits in the complementary exponent.
+`SimonDCP/Probability/LemmaThreePaperFirstClause.lean` applies this conversion
+directly to the paper-shaped transcript weight and small-branch event.
+`SimonDCP/Probability/LemmaThreeBudgetedFirstClause.lean` retains the stronger
+joint factor `1/|Low|` and proves that an acceptance lower bound
+`kappa/|Low|` yields conditional bad mass at most `2^(-n)/kappa`.  A constant
+`kappa` preserves the `n`-bit exponent up to a constant factor.  An
+inverse-polynomial `kappa` costs `O(log n)` exponent bits, while still leaving
+an exponentially small bound.
+
+That lower bound does not follow from normalization.  The exact formula for a
+coherent low-register amplitude `a_x` is
+
+```text
+Pr[Hadamard output 0] = |Low|^(-1) * normSq(sum_x a_x).
+```
+
+`SimonDCP/Probability/LemmaThreeStepSixAcceptance.lean` proves this formula,
+a normalized `(1,-1)/sqrt(2)` input with zero all-zero mass, and a two-point
+environment example where the unconditional average is `1/2` but retaining
+one environment makes the joint all-zero mass zero.  Thus the paper's stated
+average `2/n` requires a conditional Walsh-twirl/independence theorem that is
+not presently available.  The same module proves the keep-all identity only
+for a one-bit/two-outcome Hadamard transform.  Keeping all outcomes preserves
+mass, but it is not a decoder repair: the exact no-guard spectral calculation
+above shows that the corresponding retained-`u` output is asymptotically
+unbiased.
+`SimonDCP/Probability/LemmaThreeFiniteRepair.lean` combines it with the
+compatible-path and explicit-sector-budget theorems.
 
 ## Fixed affine conditioning criterion
 
@@ -150,23 +446,57 @@ This criterion is useful for auditing conditional-independence claims, but it
 is not the main repair route for Lemma 3.  The actual selection rule `A(D)` is
 adaptive and need not define one fixed affine fibre.
 
-## Remaining formal bridge
+## Remaining mathematical and formal bridge
 
-The abstract probability inequalities are complete.  To close the repaired
-core Lemma 3 theorem for the paper's analytic experiment, the following
-identifications remain:
+The finite-model first-clause joint inequality and the general budgeted sector
+tail algebra are complete.  To close a repaired core Lemma 3 theorem for the
+paper's analytic experiment, the following obligations remain:
 
-1. define the complete finite transcript for Steps 3--7;
-2. identify the paper's `tPlus`, `tMinus`, and common path magnitude with the
-   coherent and incoherent energies used by the first theorem;
-3. prove that retaining the original path is a normalized refined experiment;
-4. after measuring `(Y,D)`, compute exact `z` and its high-bit bucket as
-   reversible orthogonal labels;
-5. identify the paper's implicit `alpha_z` with the normalized refined-sector
-   component;
-6. state explicitly whether the final probability is joint or conditioned on
-   reaching Step 7, and normalize accordingly.
+1. instantiate the concrete arithmetic types and functions inside the
+   existing paper-shaped finite transcript for Steps 3--7;
+2. identify the actual circuit finite coherent sum with the already
+   normalized model's `tPlus`, `tMinus`, common unnormalized joint path
+   amplitude, and orthogonal residual branches, and connect it to the actual
+   Born weight; the finite model's path injectivity and energy inequality are
+   now proved;
+3. identify the concrete Step-2 amplitude with the model input and discharge
+   its diagonal-energy premise from the actual analytic state;
+4. identify the paper's outcome-dependent path-restricted contribution
+   `u(M,z)` and prove an adaptive sector-energy budget
+   `C_n = O(2^(2*n))` for the joint statement, or the correspondingly stronger
+   acceptance-scaled budget for a conditional statement (and prove the
+   analogous high-bucket budget);
+   alternatively, use the already proved conservative maximum-fibre theorem,
+   accepting its larger `2^((c+1)*n)` squared threshold;
+   as an abstract alternative, the L2 bypass requires one to
+   instantiate the now-proved Step-7 double-sum regrouping, prove its
+   selection-aware conditioned count-error and coefficient-collision energy
+   bounds (including the extra total-population term for a global mean), and either
+   prove a noncancellation lower bound or state the conclusion in
+   additive/state-distance form;
+5. identify the paper's implicit `alpha_z` with `u(M,z) / sqrt(p(M))`;
+6. use the now-proved deterministic Step-6 carry/top-bit bridge for
+   `n = 2^ell`, the concrete group count
+   `a = floor(2^ell/ell)` (whose safety inequality is also proved), and
+   `tau = floor(log_2 ell)`:
+   `l_(s*) = 0` excludes both exact carry windows and gives the correct
+   complete-sum top bit.  The paper should state both rounding conventions
+   explicitly; upward `tau` rounding has a finite counterexample;
+7. state explicitly whether the final probability is joint or conditioned on
+   reaching Step 7, and normalize accordingly.  For the strongest first-clause
+   form, prove the Step-6 accepted mass lower bound at the matching
+   `kappa/|Low|` scale.  Retaining every low Hadamard outcome preserves mass but
+   is no longer a candidate decoding repair because its exact no-guard
+   two-copy kernel is asymptotically unbiased;
+8. formalize the spectral kernel and safe-guard perturbation estimate from
+   `LEMMA3_SPECTRAL_OBSTRUCTION.md`, then either record the resulting guarded
+   countertheorem or replace Steps 3--6 with a genuinely global half-turn
+   fibre-erasure primitive.
 
-Until these bridges are machine-checked, the correct status is: the original
-proof is invalid, the replacement finite bounds are proved, and the repaired
-Lemma 3 experiment-level theorem is in progress.
+The correct status is therefore: the original proof is invalid; the first
+clause is repaired in a paper-shaped finite analytic model but still needs the
+model-to-circuit Born identification; the second clause has a sharp budgeted
+tail theorem but its required adaptive energy budget is open; and the current
+decoder has an exact no-guard spectral obstruction plus a pending guarded
+extension.  Closing the standalone inequalities would not by itself repair the
+core algorithm.

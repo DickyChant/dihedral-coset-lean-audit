@@ -17,8 +17,10 @@ The second estimate concerns an implicit decomposition of an amplitude into
 labelled components.  If a component is large after normalization by the
 outcome mass, the outcome mass is bounded by that component energy divided by
 the squared threshold.  Summing over all labels gives a tail bound from the
-total labelled energy.  In an application, the labels can be made orthogonal
-by computing them reversibly before they are erased.
+total labelled energy.  The total-energy premise must be proved for the
+particular labels.  It is automatic for a fixed orthogonal refinement, but not
+for the paper's outcome-dependent label `z*(A(D))`; the latter is a coherent
+regrouping made before the conjugate-basis outcome `D` is known.
 
 Neither theorem assumes independence, identical distributions, or that the
 event was chosen independently of the amplitudes.
@@ -243,9 +245,11 @@ theorem largeNormalizedComponentMass_le
       (div_le_div_iff_of_pos_right hThreshold).2 hTotalComponent
 
 /--
-At the squared threshold `2^(3n)`, the component tail is at most
-`2^(-3n)`.  This is stronger than the `O(2^(-n))` scale requested by the
-paper's second Lemma 3 conclusion.
+At the squared threshold `2^(3n)`, a component family whose total energy is at
+most one has tail at most `2^(-3n)`.  This conditional estimate is stronger
+than the `O(2^(-n))` scale requested by the paper's second Lemma 3 conclusion;
+the adaptive paper component does not automatically satisfy the energy
+premise.
 -/
 theorem largeNormalizedComponentMass_le_paperThreshold
     {Omega Index : Type*} [Fintype Omega] [Fintype Index]
@@ -264,10 +268,10 @@ theorem largeNormalizedComponentMass_le_paperThreshold
   · exact hTotalComponent
 
 /--
-The same argument at squared threshold `n^3` gives the `n^(-3)` tail needed
-for the high-`log n`-bit bucket version in the corollary to Lemma 3.  The
-index type may directly represent those coarse buckets, so no union bound over
-their exact-residue members is required.
+The same conditional argument at squared threshold `n^3` gives an `n^(-3)`
+tail when the total coherent bucket energy is at most one.  The index type may
+directly represent coarse buckets, avoiding a union bound over their exact
+residue members, but the coherent bucket-energy premise remains substantive.
 -/
 theorem largeNormalizedComponentMass_le_bucketThreshold
     {Omega Index : Type*} [Fintype Omega] [Fintype Index]
