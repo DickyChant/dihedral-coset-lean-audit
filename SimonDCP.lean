@@ -25,6 +25,7 @@ import SimonDCP.Probability.LabelledBornProbability
 import SimonDCP.Probability.LabelledBornPairwiseTail
 import SimonDCP.Probability.LabelledParseval
 import SimonDCP.Probability.Lemma4Parameters
+import SimonDCP.Probability.Lemma4Repair
 import SimonDCP.Probability.LemmaOneChebyshevParameters
 import SimonDCP.Probability.LemmaOneExactParameters
 import SimonDCP.Probability.LemmaOneFaultEnvironmentAveraging

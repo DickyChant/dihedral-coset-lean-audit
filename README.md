@@ -261,6 +261,21 @@ that retaining the actual `n^(3/2)` bound gives polynomial exponent `-2` at
 `c = 12`.  These repairs are in
 [`Lemma4Parameters.lean`](SimonDCP/Probability/Lemma4Parameters.lean).
 
+[`Lemma4Repair.lean`](SimonDCP/Probability/Lemma4Repair.lean) now packages the
+valid deterministic conclusion of the proposed balls-in-bins step. If the two
+high-bit branches have bin counts within `error` of one common mean and every
+signed coefficient has magnitude at most `coefficientBound`, their amplitudes
+differ additively by at most
+
+```text
+2 * numberOfBins * error * coefficientBound.
+```
+
+The same file proves that this becomes a relative, multiplicative estimate
+only after assuming an explicit positive lower bound on one reference
+amplitude. That anti-cancellation lower bound, or a replacement such as phase
+alignment, is the precise additional obligation missing from the sketch.
+
 Even without correcting the extra `+n`, the printed exponent at `c = 12` is
 `-n/2 + o(n)`.  If this were first established as a simultaneous absolute
 error bound on normalized amplitudes, it would absorb every downstream
@@ -457,6 +472,9 @@ now a proved Lean result; the remaining headline-theorem gaps occur later.
 - `Probability/Lemma4Parameters.lean` repairs the page-14 exponent arithmetic,
   distinguishes `mu` from total cardinality, and propagates the stated
   `n^(3/2)` amplitude bound.
+- `Probability/Lemma4Repair.lean` derives the valid pairwise additive-amplitude
+  estimate from two near-uniform bin-count bounds and proves the claimed
+  relative estimate under an explicit positive anti-cancellation lower bound.
 
 The project deliberately separates the formalized and classically averaged
 analytic experiment from a gate/tensor-circuit implementation, a quantum

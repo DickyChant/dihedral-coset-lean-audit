@@ -24,6 +24,7 @@ import SimonDCP.Probability.LabelledBornProbability
 import SimonDCP.Probability.LabelledBornPairwiseTail
 import SimonDCP.Probability.LabelledParseval
 import SimonDCP.Probability.Lemma4Parameters
+import SimonDCP.Probability.Lemma4Repair
 import SimonDCP.Probability.LemmaOneChebyshevParameters
 import SimonDCP.Probability.LemmaOneExactParameters
 import SimonDCP.Probability.LemmaOneFaultEnvironmentAveraging
@@ -100,6 +101,7 @@ open SimonDCP.Probability.LabelledBornProbability
 open SimonDCP.Probability.LabelledBornPairwiseTail
 open SimonDCP.Probability.LabelledParseval
 open SimonDCP.Probability.Lemma4Parameters
+open SimonDCP.Probability.Lemma4Repair
 open SimonDCP.Probability.LemmaOneChebyshevParameters
 open SimonDCP.Probability.LemmaOneExactParameters
 open SimonDCP.Probability.LemmaOneFaultEnvironmentAveraging
@@ -311,6 +313,9 @@ open SimonDCP.Quantum.Step2Phase
 #print axioms uniformBinTotal
 #print axioms weightedSumErrorBound
 #print axioms aggregatePolynomialExponent_c12_three_halves
+#print axioms weightedAmplitude_pair_additive
+#print axioms relative_error_of_additive_error
+#print axioms weightedAmplitude_pair_relative
 #print axioms one_term_change_can_escape_any_multiplicative_zero_bound
 #print axioms afterPositionDftState_apply_eq_normalizedDft
 #print axioms probPositionOutcome_afterPositionDft

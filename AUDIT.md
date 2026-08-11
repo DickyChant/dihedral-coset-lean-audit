@@ -374,6 +374,21 @@ polynomial exponent is `-2`, so replacing it by the unsupported bound `n` is
 unnecessary.  Only additive signed-sum error control follows without a
 non-cancellation hypothesis.
 
+`Lemma4Repair.lean` makes that boundary exact. Two count functions that are
+each uniformly within `error` of the same mean yield weighted amplitudes whose
+absolute difference is at most
+
+```text
+2 * numberOfBins * error * coefficientBound.
+```
+
+Dividing by a reference amplitude is sound only after supplying a positive
+lower bound on its magnitude. Under that explicit anti-cancellation premise,
+Lean converts the additive bound into the corresponding relative-error bound.
+Thus a repaired Lemma 4 can target the additive conclusion directly, or prove
+the new lower-bound premise; conditional balls-in-bins control alone cannot
+establish the paper's multiplicative statement.
+
 ## Remaining invalid or missing obligations
 
 - The original proof of Lemma 1 assumes an unproved sign symmetry and
@@ -398,8 +413,8 @@ non-cancellation hypothesis.
   be asymptotically removable).
 - The repaired Lemma 4 parameter arithmetic still relies on unproved
   conditional balls-in-bins, variance, and union-bound premises, and additive
-  count control still does not imply a multiplicative amplitude ratio under
-  cancellation.
+  count control implies a multiplicative amplitude ratio only with the explicit
+  anti-cancellation lower bound isolated in `Lemma4Repair.lean`.
 - Step 6 postselection probabilities, recursive recovery of all bits, fault-rate
   preservation, amplification, and uniform circuit cost are not proved.
 - The lattice corollary relies on external Regev/BKSW reductions that are not
