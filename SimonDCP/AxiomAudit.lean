@@ -8,6 +8,7 @@ import SimonDCP.Probability.ActualStepFourBorn
 import SimonDCP.Probability.BoundedTail
 import SimonDCP.Probability.BooleanMaskBridge
 import SimonDCP.Probability.Conditioning
+import SimonDCP.Probability.ConditionalLinearForms
 import SimonDCP.Probability.CoordinateSubcubeBorn
 import SimonDCP.Probability.CoordinateSubcubeConditionalFamily
 import SimonDCP.Probability.CoordinateSubcubeConditionalInjectivity
@@ -34,6 +35,8 @@ import SimonDCP.Probability.LemmaOneOuterAveraging
 import SimonDCP.Probability.LemmaOneRoundedParameters
 import SimonDCP.Probability.LemmaOneRoundedFixedEnvironment
 import SimonDCP.Probability.LemmaOneRepaired
+import SimonDCP.Probability.LemmaThreeBornBounds
+import SimonDCP.Probability.LemmaThreePathRefinement
 import SimonDCP.Probability.LinearPhaseIndependence
 import SimonDCP.Probability.OneTimePadCounting
 import SimonDCP.Probability.PairwiseBernoulliTail
@@ -84,6 +87,7 @@ open SimonDCP.Probability.ActualStepFourBorn
 open SimonDCP.Probability.BoundedTail
 open SimonDCP.Probability.BooleanMaskBridge
 open SimonDCP.Probability.Conditioning
+open SimonDCP.Probability.ConditionalLinearForms
 open SimonDCP.Probability.CoordinateSubcubeBorn
 open SimonDCP.Probability.CoordinateSubcubeConditionalFamily
 open SimonDCP.Probability.CoordinateSubcubeConditionalInjectivity
@@ -110,6 +114,8 @@ open SimonDCP.Probability.LemmaOneOuterAveraging
 open SimonDCP.Probability.LemmaOneRoundedParameters
 open SimonDCP.Probability.LemmaOneRoundedFixedEnvironment
 open SimonDCP.Probability.LemmaOneRepaired
+open SimonDCP.Probability.LemmaThreeBornBounds
+open SimonDCP.Probability.LemmaThreePathRefinement
 open SimonDCP.Probability.LinearPhaseIndependence
 open SimonDCP.Probability.OneTimePadCounting
 open SimonDCP.Probability.PairwiseBernoulliTail
@@ -176,9 +182,15 @@ open SimonDCP.Quantum.Step2Phase
 #print axioms fiberCoefficient_translate_fixedXor
 #print axioms walshPhase_eq_of_eq_off_zero_set
 #print axioms coordinate_independence_destroyed_by_conditioning
+#print axioms binaryJointFiberCountsEqual_iff_conditionalDualMasks
 #print axioms correlated_overflow_can_destroy_balance
 #print axioms nonzero_dot_balanced
 #print axioms distinct_nonzero_joint_fiber_card_eq
+#print axioms countSmallBranchMass_le_paperThreshold
+#print axioms largeNormalizedComponentMass_le_paperThreshold
+#print axioms largeNormalizedComponentMass_le_bucketThreshold
+#print axioms totalIncoherentPathEnergy_eq
+#print axioms pathModel_smallBranchMass_le_paperThreshold
 #print axioms restricted_character_orthogonality
 #print axioms restricted_parseval
 #print axioms card_masksVanishingOn

@@ -9,6 +9,7 @@ import SimonDCP.Probability.ActualStepFourBorn
 import SimonDCP.Probability.BoundedTail
 import SimonDCP.Probability.BooleanMaskBridge
 import SimonDCP.Probability.Conditioning
+import SimonDCP.Probability.ConditionalLinearForms
 import SimonDCP.Probability.CoordinateSubcubeBorn
 import SimonDCP.Probability.CoordinateSubcubeConditionalFamily
 import SimonDCP.Probability.CoordinateSubcubeConditionalInjectivity
@@ -35,6 +36,8 @@ import SimonDCP.Probability.LemmaOneOuterAveraging
 import SimonDCP.Probability.LemmaOneRoundedParameters
 import SimonDCP.Probability.LemmaOneRoundedFixedEnvironment
 import SimonDCP.Probability.LemmaOneRepaired
+import SimonDCP.Probability.LemmaThreeBornBounds
+import SimonDCP.Probability.LemmaThreePathRefinement
 import SimonDCP.Probability.LinearPhaseIndependence
 import SimonDCP.Probability.OneTimePadCounting
 import SimonDCP.Probability.PairwiseBernoulliTail

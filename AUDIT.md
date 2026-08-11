@@ -12,8 +12,8 @@ corollaries can be reached.
 ## Lean formalization targets
 
 The source contains no `sorry`, `admit`, or handwritten project-local axioms.
-A clean Arch WSL build, including the Lemma 1 repair modules, completed all
-8640 jobs successfully on August 10, 2026.
+A clean Arch WSL build, including the Lemma 1 repair and initial Lemma 3 repair
+modules, completed all 8643 jobs successfully on August 11, 2026.
 `SimonDCP/AxiomAudit.lean` prints the axiom dependencies of the principal
 results.  Analytic theorems contain only `propext`, `Classical.choice`, and
 `Quot.sound`.  The six-coordinate exhaustive searches also expose their
@@ -290,6 +290,30 @@ depends only on `phi_B`. States with the same `B` part and different `A` parts
 therefore have identical phases. They are perfectly correlated, not pairwise
 independent as required by the variance argument in Lemma 3.
 
+This invalidates the published proof route but does not refute the final
+probability bounds.  `LemmaThreeBornBounds.lean` proves an
+independence-free replacement.  Outcomes for which both signed branch counts
+are below the squared threshold `2^(-n) * t` have Born mass at most `2^(-n)`,
+provided the refined incoherent path energy is normalized.  A normalized
+implicit exact-residue component larger than `2^(3n/2)` has mass at most
+`2^(-3n)`, and a high-bit bucket larger than `n^(3/2)` has mass at most
+`n^(-3)`.
+
+`LemmaThreePathRefinement.lean` proves the first normalization identity for an
+arbitrary map from paths to complete transcripts and residual branches.  Thus
+the transcript may include `D` and the adaptive value `A(D)`; no independence
+of that map is assumed.  `ConditionalLinearForms.lean` separately proves the
+necessary-and-sufficient rank-two kernel criterion for joint uniformity on a
+fixed reachable affine conditioning fibre, but the Born-energy repair does not
+need to establish that criterion for the adaptive experiment.
+
+The remaining Lemma 3 bridge is to instantiate these finite objects with the
+paper's Step-3--7 analytic computation: identify its common path magnitudes and
+signed counts, retain exact `z*` or its high-bit bucket as a reversible
+orthogonal sector, and specify whether probabilities are joint or conditioned
+on Step-6 acceptance.  The natural-language repair and this boundary are
+recorded in `LEMMA3_REPAIR.md`.
+
 ### Lemma 2 algebraic kernel
 
 Translation by `2^(n-1)` modulo `2^n` is an involution. This is the sound
@@ -386,7 +410,9 @@ non-cancellation hypothesis.
   a semantic strengthening, not a missing premise of this repaired probability
   theorem.  Later algorithmic steps remain open.
 - Lemma 3 varies `D` as if it changed only signs, although changing `D` can
-  change the adaptive `A/B` partition and later measurement records.
+  change the adaptive `A/B` partition and later measurement records.  The new
+  Born-energy bounds avoid that premise, but their concrete Step-3--7
+  transcript and reversible-sector bridge is not yet instantiated.
 - Lemma 4 reuses pairwise independence after conditioning on
   `z'`, `D`, `A`, `W'`, `S`, and `h'`; no preservation theorem is supplied.
 - The claim that the sets indexed by `q_(g_a)` have equal size ignores that
@@ -411,9 +437,12 @@ non-cancellation hypothesis.
 ## Formalization boundary
 
 The current development proves kernel-checkable algebraic identities,
-counterexamples, finite probability bounds, and the repaired core Lemma 1
+counterexamples, finite probability bounds, the repaired core Lemma 1
 constant-probability theorem for both fixed analytic fault environments and
-their arbitrary normalized finite classical mixtures.  It does not claim a
+their arbitrary normalized finite classical mixtures, and the
+independence-free finite Born/path bounds needed for the proposed Lemma 3
+repair.  It does not yet identify those Lemma 3 bounds with the complete
+Step-3--7 analytic transcript and reversible sector refinement.  It does not claim a
 gate/tensor-circuit equality or a density-matrix model; those are optional
 semantic strengthening for Lemma 1 rather than blockers to its core result.
 The paper's overall theorem still needs the unresolved conditional phase and

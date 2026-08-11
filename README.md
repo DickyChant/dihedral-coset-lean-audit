@@ -23,13 +23,15 @@ repair follows the draft's textual faulty-sample definition where its Step-1
 display is inconsistent, and supplies an explicit rounding convention where
 the schedule is underspecified; the goal is to prove the core mathematical
 claim, not to reproduce the draft line by line.
-The final claims of Lemmas 3 and 4 remain unproved and not refuted, and the
-paper's overall headline algorithm theorem remains open.
+The replacement finite probability bounds needed for Lemma 3 are now
+formalized, while their Step-3--7 transcript/instrument bridge remains in
+progress.  Lemma 4 remains unproved and not refuted, and the paper's overall
+headline algorithm theorem remains open.
 
 | Lemma | Status of the core claim | Published proof and repair status |
 | --- | --- | --- |
 | Lemma 1 | **Repaired and formalized** | The proposed low-part swap is invalid, so the repair replaces it rather than completing that argument. Restricted Parseval gives an unconditional inverse-polynomial bound, while the stronger route connects the corrected mixed correct/fault amplitudes, Step-2 joint law, complete Step-4 label, exact Born moments, collision-plus-Chebyshev bound, classical fault-environment averaging, and rounded parameters. For the padded repaired schedule with `k = 24`, `c = 12`, and every `n >= 1024`, the explicitly summed success event has mass at least `1/2`. This is the formalized constant-probability core needed from Lemma 1. |
-| Lemma 3 | Unproved, not refuted | The phases are not pairwise independent after the adaptive choice of `A`. |
+| Lemma 3 | **Repair in progress; core finite bounds formalized** | The published pairwise-independence argument fails after the adaptive choice of `A`. The replacement uses Born size bias and orthogonal path/sector refinements, proving exact `2^(-n)`, `2^(-3n)`, and `n^(-3)` bounds without independence. The remaining obligation is to identify the paper's complete Step-3--7 transcript and implicit amplitudes with those finite refinements. |
 | Lemma 4 | Unproved, not refuted | The exponent, `mu`, and `n^(3/2)` bookkeeping errors are repaired. Conditional independence, correlated overflow, and multiplicative amplitude control remain unresolved. |
 
 ### Lemma 1
@@ -225,6 +227,31 @@ a complete instance of the paper's conditioned experiment that violates the
 final "well-behaved" probability statement, so Lemma 3 itself remains unproved
 rather than refuted.
 
+A different proof route now bypasses that obstruction.  For each complete
+transcript and final branch, retain the original computational path as an
+orthogonal refinement.  If every signed branch count is below the squared
+well-behaved threshold `2^(-n) * t`, its actual Born mass is pointwise bounded
+by `2^(-n)` times its incoherent path energy.  Summing the refined path energy
+gives a total bad mass at most `2^(-n)`, with no restriction on how the
+transcript or `A(D)` depends on `D`.
+
+For the second claim, retain the implicit exact residue `z*` as a reversible
+sector label before it is erased.  A self-normalized component exceeding
+`2^(3n/2)` has total mass at most `2^(-3n)`.  Labelling directly by the high
+`log n` bits gives the corollary's `n^(-3)` tail at threshold `n^(3/2)`, without
+a union bound over exact residues.  These finite inequalities and the arbitrary
+adaptive transcript partition are machine-checked in
+[`LemmaThreeBornBounds.lean`](SimonDCP/Probability/LemmaThreeBornBounds.lean)
+and
+[`LemmaThreePathRefinement.lean`](SimonDCP/Probability/LemmaThreePathRefinement.lean).
+
+What remains is semantic rather than probabilistic: define the complete
+Step-3--7 finite transcript, prove that the paper's signed counts have the
+common path magnitude used by the model, and identify its implicit `alpha_z`
+with the normalized reversible-sector component.  Conditional versus joint
+probability after Step-6 postselection must also be stated explicitly.  The
+full argument and boundary are recorded in [`LEMMA3_REPAIR.md`](LEMMA3_REPAIR.md).
+
 ### Lemma 4
 
 The development gives finite counterexamples to three inference patterns used
@@ -305,6 +332,16 @@ now a proved Lean result; the remaining headline-theorem gaps occur later.
   `Quantum/AmplitudeCancellation.lean` isolate the failures in Lemmas 3 and 4.
 - `Probability/LinearPhaseIndependence.lean` proves the correct unconditioned
   joint-uniformity theorem for distinct nonzero binary linear forms.
+- `Probability/ConditionalLinearForms.lean` proves the exact fixed-affine
+  replacement criterion: conditional joint uniformity is equivalent, on a
+  reachable fibre, to rank-two surjectivity on the condition kernel.  This is
+  an audit interface rather than the main adaptive Lemma 3 repair.
+- `Probability/LemmaThreeBornBounds.lean` proves the independence-free Born
+  small-branch bound and the self-normalized exact-residue/high-bucket component
+  tails.  `Probability/LemmaThreePathRefinement.lean` proves that an arbitrary
+  adaptive transcript map partitions path energy exactly and instantiates the
+  `2^(-n)` well-behaved bound.  `LEMMA3_REPAIR.md` records the natural-language
+  proof and the remaining Step-3--7 instrument bridge.
 - `Arithmetic/SampleRecursion.lean` proves the arithmetic of deleting a known
   low bit and halving an ideal DCP sample.
 - `Arithmetic/SwapFiber.lean` gives an `n = 8` locally valid two-coordinate
