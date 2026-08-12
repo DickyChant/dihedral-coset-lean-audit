@@ -12,6 +12,13 @@ also finds a clean-oracle obstruction to the Steps 2--7 decoder: its exact
 no-guard `keep-u` variant is asymptotically unbiased, and the paper's guarded
 variant has the same predicted limit subject to one explicit Parseval
 perturbation estimate.  This negative calculation is not yet a Lean theorem.
+The strongest global replacement found is an exact half-turn/ParityPGM
+measurement.  Random subset-sum fibres make its whitening exponentially close
+to trivial on the occupied fibre-uniform support, but no polynomial
+implementation was found.  The standard routes examined either retain an
+exponential cost in their stated models or fail to supply the missing
+operation.  Thus the obstacle is now both a proof gap and an algorithmic
+implementation gap, not merely a missing concentration estimate.
 
 ## Lean formalization targets
 
@@ -452,13 +459,36 @@ The proposed global alternative has also been investigated rather than merely
 named.  For subset-sum fibre states `|F_t>`, the polar part of an explicit
 signed sum of product-state projectors maps `|F_t>` to `|F_(t+N/2)>` exactly.
 This proves information-theoretic existence of the required half-turn action.
-It does not provide an efficient circuit: the natural LCU, block-encoding,
-postselection, amplitude-amplification, and uniform-fibre-sampling routes all
-have a `sqrt(N)=2^(n/2)` scale.  The weaker two-outcome half-turn test may not
-be equivalent to full fibre sampling in an unrestricted circuit model, so the
-repository records an open algorithmic direction, not a lower bound.  The
-operator formula, high-density audit, local-relation bound, and fault-model
-caveat are in `LEMMA3_HALF_TURN_ERASER.md`.
+For random `m=c*n`, `c>2`, instances, an exact second-moment/union-bound
+calculation shows that all normalized fibre sizes are simultaneously close to
+one with overwhelming probability.  Consequently the frame whitening is
+close to the identity on the occupied fibre-uniform support (equivalently, on
+the input space of `W_Y^dagger*W_Y`).  This is a real positive simplification, but not an
+efficient circuit: the natural controlled product-state preparation exposes
+the synthesis map only with amplitude `1/sqrt(N)`.  LCU, PREP/QSVT,
+postselection, sampled projectors, FFT/Schur decomposition, tensor-network
+contraction, 2-adic recursion, hashing, lattice, and local-relation approaches
+all retain exponential cost in the analyzed models.  The best generic
+coherent scale found is `sqrt(N)=2^(n/2)`.
+
+The weaker two-outcome half-turn test need not be equivalent to full fibre
+sampling in an unrestricted circuit model, so this is not a general lower
+bound.  The remaining opening is a distribution-specific collective circuit
+that decodes only one parity bit.  Such a circuit would already constitute a
+new polynomial one-bit DCP algorithm, rather than a routine repair of the
+paper.  The operator formula, random-fibre estimate, implementation audit,
+high-density boundary, local-relation bound, and fault-model caveat are in
+`LEMMA3_HALF_TURN_ERASER.md`.
+
+The audit verdict on Lemma 3 is therefore negative at the level relevant to
+the headline theorem.  Sound finite inequalities have been recovered and are
+valuable independently, but Lemma 3 has not been repaired as a component of a
+polynomial-time DCP algorithm: its paper experiment is not fully identified
+with the finite model, the adaptive second-clause energy budget is open, the
+decoder is spectrally obstructed, and the only global replacement found lacks
+a polynomial implementation.  This does not prove that every interpretation
+of either isolated clause is false, nor that polynomial-time DCP is
+impossible.
 
 ### Lemma 2 algebraic kernel
 
@@ -605,7 +635,10 @@ their arbitrary normalized finite classical mixtures, and the
   normalization, but does not yet prove equality with the actual circuit Born
   sum or the adaptive sector-energy budget.  The separate natural-language
   spectral note identifies a decoder-level obstruction but is explicitly not
-  counted among the machine-checked results.  It does not claim a
+  counted among the machine-checked results.  The global half-turn note proves
+  its operator identities and random-fibre estimates only in natural language;
+  it finds no polynomial implementation and makes no general circuit lower-
+  bound claim.  It does not claim a
 gate/tensor-circuit equality or a density-matrix model; those are optional
 semantic strengthening for Lemma 1 rather than blockers to its core result.
 The paper's overall theorem still needs the unresolved conditional phase and

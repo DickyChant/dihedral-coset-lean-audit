@@ -449,8 +449,8 @@ adaptive and need not define one fixed affine fibre.
 ## Remaining mathematical and formal bridge
 
 The finite-model first-clause joint inequality and the general budgeted sector
-tail algebra are complete.  To close a repaired core Lemma 3 theorem for the
-paper's analytic experiment, the following obligations remain:
+tail algebra are complete.  To instantiate those standalone inequalities for
+the paper's analytic experiment, the following obligations remain:
 
 1. instantiate the concrete arithmetic types and functions inside the
    existing paper-shaped finite transcript for Steps 3--7;
@@ -497,16 +497,38 @@ The latter alternative has now been investigated at the natural-language
 level in [`LEMMA3_HALF_TURN_ERASER.md`](LEMMA3_HALF_TURN_ERASER.md).  An exact
 signed-frame operator has the desired half-turn swap as its polar part, so the
 primitive exists information-theoretically.  All generic implementations
-examined incur a `sqrt(2^n)` normalization or search cost.  A direct two-outcome
-test remains logically weaker than full fibre sampling, and no polynomial
-construction or impossibility theorem is claimed.  Consequently this route is
-a new subset-sum/DCP algorithmic problem, not a small completion of the
-published proof.
+examined incur a `sqrt(2^n)` normalization or search cost.  The follow-up
+random-instance calculation sharpens the diagnosis: with `m=c*n`, `c>2`, all
+normalized fibre sizes are simultaneously close to one with overwhelming
+probability, so the PGM's inverse-square-root whitening is essentially the
+identity on the occupied fibre-uniform support.  The hard step is instead
+coherent synthesis/index erasure.  The
+efficient controlled product-state preparation exposes that synthesis only
+with amplitude `1/sqrt(2^n)`.  FFT/Schur, tensor-network, 2-adic recursion,
+hashing, lattice, local-relation, projector-sampling, and ordinary or variable-
+time QSVT implementations did not remove this scale.
 
-The correct status is therefore: the original proof is invalid; the first
-clause is repaired in a paper-shaped finite analytic model but still needs the
-model-to-circuit Born identification; the second clause has a sharp budgeted
-tail theorem but its required adaptive energy budget is open; and the current
-decoder has an exact no-guard spectral obstruction plus a pending guarded
-extension.  Closing the standalone inequalities would not by itself repair the
-core algorithm.
+A direct two-outcome test remains logically weaker than full fibre sampling,
+and no polynomial construction or impossibility theorem is claimed.  The only
+remaining opening found is a distribution-specific collective parity decoder.
+A polynomial implementation would already give a new polynomial one-bit DCP
+algorithm, not a small completion of the published proof.
+
+## Verdict
+
+The correct status is therefore: **Lemma 3 is not repaired in the sense needed
+by the claimed polynomial-time algorithm.**  The original proof is invalid;
+the first clause has a sound replacement in a paper-shaped finite analytic
+model but still needs the model-to-circuit Born and concrete Step-2 energy
+identification; the second clause has a sharp budgeted tail theorem but its
+required adaptive energy budget is open; and the current decoder has an exact
+no-guard spectral obstruction plus a pending guarded extension.  The ideal
+global ParityPGM replacement exists algebraically, but no polynomial circuit
+is supplied or found.  Closing the standalone inequalities would therefore
+not repair the core algorithm.
+
+This verdict is deliberately narrower than a countertheorem to every possible
+reading of the two sentences called Lemma 3, and it is not a lower bound for
+all DCP algorithms.  It says that the repository currently contains neither a
+valid derivation of the paper's Lemma-3-to-decoder use nor a polynomial-time
+replacement for that use.

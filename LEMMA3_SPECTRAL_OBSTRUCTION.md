@@ -392,12 +392,19 @@ K_Y = sum_q (-1)^q |psi_q><psi_q|,
 is precisely the desired swap `|F_t> <-> |F_(t+N/2)>`.  Thus there is no
 information-theoretic existence obstruction.  The natural signed-sum,
 postselection, block-encoding, and polar-transform implementations all expose
-a `sqrt(N)` cost, however.  A weaker direct two-outcome `HalfTurnTest` might
-avoid constructing a complete uniform fibre sampler; no such polynomial
-implementation is currently known, and no equivalence or lower bound is
-claimed.  See
+a `sqrt(N)` cost, however.  The follow-up random-instance analysis proves a
+useful simplification: all normalized fibre sizes are simultaneously close to
+one with overwhelming probability for `m=c*n`, `c>2`, so the whitening matrix
+is nearly the identity on the occupied fibre-uniform support.  The remaining obstacle is coherent synthesis/index
+erasure, not fibre imbalance.  A weaker direct two-outcome `HalfTurnTest` might
+avoid constructing a complete uniform fibre sampler, but PREP/QSVT,
+projector-sampling, FFT/Schur, tensor-network, 2-adic, hashing, lattice, and
+local-relation routes did not yield a polynomial implementation.  Such an
+implementation would itself be a new one-bit DCP algorithm.  No equivalence to
+full fibre sampling or general circuit lower bound is claimed.  See
 [`LEMMA3_HALF_TURN_ERASER.md`](LEMMA3_HALF_TURN_ERASER.md) for the exact
-operator identity, density audit, fault caveat, and literature boundary.
+operator identity, fibre-flatness estimate, implementation audit, fault caveat,
+and literature boundary.
 
 ## Next formalization target
 

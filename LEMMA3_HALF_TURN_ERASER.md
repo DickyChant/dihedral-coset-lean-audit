@@ -16,6 +16,9 @@ The conclusion is therefore a research boundary, not a repaired theorem:
 
 - the desired operation exists as a partial isometry on the occupied
   fibre-uniform subspace;
+- random modular subset sum makes the frame normalization exponentially close
+  to the identity on the occupied fibre-uniform support when `m = c*n` and
+  `c > 2`, so fibre imbalance is not the computational obstruction;
 - generic postselection, amplitude amplification, and polar-decomposition
   implementations cost about `sqrt(N) = 2^(n/2)`;
 - the most explicit direct candidate is a signed sum of product-state frame
@@ -164,6 +167,62 @@ support projector.  Fibre balance is needed only to replace the normalized
 operator `T_Y` by the raw signed frame `K_Y`; it is not needed for this exact
 identity.
 
+## What random fibres actually buy
+
+Randomness gives a strong positive algebraic simplification.  Put
+
+```text
+W_Y = sum_q |psi_q><q|,
+B_Y = W_Y / sqrt(N).
+```
+
+Then `W_Y * W_Y^dagger = P_Y`, and in the Fourier basis on its `q` input,
+
+```text
+W_Y^dagger * W_Y = F_N^dagger * diag(p_t) * F_N,
+p_t = N*eta_t/2^m.
+```
+
+For uniform independent `Y_i`, two distinct nonzero Boolean masks have
+independent uniform subset sums.  After separating the deterministic zero
+mask, this gives
+
+```text
+E[eta_t] = 2^m/N + a zero-mask correction,
+Var(eta_t) <= 2^m/N,
+Pr[max_t |eta_t-2^m/N| > delta*2^m/N + 1]
+  <= N^2 / (delta^2 * 2^m).
+```
+
+For example, choose any `0 < alpha < (c-2)/2` and put
+`delta = 2^(-alpha*n)`.  The failure probability is at most
+`2^(-(c-2-2*alpha)*n)`, while
+
+```text
+max_t |p_t-1| <= 2^(-alpha*n) + 2^(-(c-1)*n).
+```
+
+Thus for `m = c*n` and `c > 2`, every `p_t` is simultaneously exponentially
+close to one with overwhelming probability.  If
+
+```text
+V_Y = W_Y * (W_Y^dagger * W_Y)^(-1/2)
+```
+
+is the polar isometry, then on this event
+
+```text
+||V_Y-W_Y|| <= max_t |sqrt(p_t)-1|.
+```
+
+So, on the occupied fibre-uniform support (equivalently, on the `q` input of
+`W_Y^dagger*W_Y`), the random instance makes the whitening step essentially free: the raw
+synthesis `W_Y` is already an approximate isometry, and the ideal parity
+observable `V_Y D_parity V_Y^dagger` is close to the raw signed frame `K_Y`.
+This resolves the *relative fibre-balance* issue.  It does not implement
+`W_Y`: the efficient controlled preparation still carries the input label
+`q`, and erasing or coherently decoding that label is the hard step.
+
 The obstacle is implementation rather than algebra.  The signed sum contains
 `N` terms and obtains its useful action through exponential cancellation.
 The natural LCU or block-encoding normalization is of order `N`; merely
@@ -197,12 +256,21 @@ unconditional circuit lower bound for random arithmetic subset sum.
 The block-encoding statement can be made precise in the natural
 product-preparation oracle model.  Controlled preparation of
 `|q>|psi_q>` followed by projection of `q` onto the uniform state encodes the
-analysis/synthesis map divided by `sqrt(N)`.  For balanced random fibres the
-unscaled nonzero singular values are of constant order, hence the encoded
-ones are of order `1/sqrt(N)`.  Generic singular-value amplification or polar
-QSVT therefore uses `Theta(sqrt(N))` oracle calls.  This is a lower bound for
-that PREP-only implementation model, not for circuits allowed to exploit the
-explicit modular arithmetic of the `Y_i` in some new way.
+analysis/synthesis map divided by `sqrt(N)`.  More explicitly, projecting the
+efficient state
+
+```text
+sum_q alpha_q |q>|psi_q>
+```
+
+onto a uniform `q` register produces `W_Y sum_q alpha_q|q> / sqrt(N)`.
+Even when `W_Y` is exponentially close to an isometry, this branch has
+probability `(1+o(1))/N`.  Generic singular-value amplification or polar QSVT
+therefore uses `Theta(sqrt(N))` oracle calls.  The good condition number of
+`W_Y` does not remove the common physical `1/sqrt(N)` access scale.  This is a
+lower bound for that PREP/block-encoding implementation model, not for
+circuits allowed to exploit the explicit modular arithmetic of the `Y_i` in
+some new way.
 
 ## A weaker target: `HalfTurnTest`
 
@@ -271,6 +339,58 @@ this investigation does **not** claim that the two-outcome test implies a
 uniform fibre sampler.  The sampler-to-test direction is clear; the converse
 is open and BCD's converse result concerns a more restricted implementation of
 the complete measurement, not this bare two-outcome oracle.
+
+## Structured implementation routes checked
+
+The random arithmetic structure was examined directly, rather than treating
+`W_Y` only as a black-box matrix.  It simplifies its spectrum but has not yet
+produced a polynomial circuit.
+
+1. A Fourier or circulant transform diagonalizes `W_Y^dagger*W_Y`.  This is
+   exactly why the whitening estimate above is easy; it does not synthesize
+   `W_Y` or erase the `q` index.
+2. Abelian Schur/Fourier decomposition extracts the character label `t`, but
+   its multiplicity space is precisely the subset-sum fibre.  Selecting the
+   canonical vector `|F_t>` in that space is the original erasure problem.
+3. Across a balanced split of the Boolean variables, the exact signed operator
+   has the form
+
+   ```text
+   K_Y = (N/2^m) * sum_(a in ZMod N) A_a tensor B_(H-a).
+   ```
+
+   For random high-density instances these `N` Schmidt components have
+   comparable size.  An exact tensor-network representation therefore has
+   bond dimension `N`, and a rank-`r` Frobenius approximation has relative
+   error of order `sqrt(1-r/N)`.  This blocks polynomial-bond-dimension MPO
+   contraction, not arbitrary circuits.
+4. A 2-adic recursion can compute `f_Y(x) mod N/2`, but inside each residue it
+   still has to erase the multiplicity and coherently distinguish the two
+   half-turn fibres.  The same problem reappears at the first recursive layer.
+5. Leftover-hash and decoupling estimates prove that the *forward* subset-sum
+   value is statistically close to uniform.  They do not invert the map or
+   clean the preimage index.  Sequentially choosing Boolean variables leaves
+   a final critical-density core; hash isolation makes a fibre small but still
+   requires finding and coherently cleaning its element.
+6. Lattice, meet-in-the-middle, Wagner, and local-relation approaches do not
+   become polynomial at the paper's parameters.  In particular, with only
+   polynomially many random coefficients, the expected number of signed
+   half-turn relations supported on `O(log n)` coordinates is
+   `2^(-n+O(log^2 n))`.  The identified high-density RMSS algorithms remain
+   subexponential here and find a solution rather than prepare a clean uniform
+   fibre state.
+
+The sample/time tradeoff tells the same story.  The ideal collective PGM needs
+only `Theta(n)` original DCP states above density one; the obstacle is its
+circuit implementation.  A single sampled rank-one frame test is heralded
+with probability `Theta(1/N)`, so independent repetition costs `Theta(N)`
+blocks.  Coherent amplitude amplification improves that family to
+`Theta(sqrt(N))`, but requires a re-preparable state and reflection; merely
+possessing independent copies does not provide the Grover interface.
+Polynomially increasing the block size only balances the fibres more sharply
+and does not alter the common `1/sqrt(N)` synthesis scale.  Variable-time QSVT
+also has no favourable tail to exploit because almost all relevant singular
+values lie at the same scale.
 
 ## Why high density is not already a polynomial solution
 
@@ -345,6 +465,7 @@ substantive algorithmic primitive rather than bookkeeping:
 - [How Hard Is Deciding Trivial Versus Nontrivial in the Dihedral Coset Problem?](https://doi.org/10.4230/LIPIcs.TQC.2016.6)
 - [Solving Medium-Density Subset Sum Problems in Expected Polynomial Time](https://crypto.ethz.ch/publications/FlaPrz05.html)
 - [Random Modular Subset Sum](https://eccc.weizmann.ac.il/eccc-reports/2005/TR05-007/index.html)
+- [Fast algorithm for quantum polar decomposition, pretty-good measurements, and the Procrustes problem](https://arxiv.org/abs/2106.07634)
 
 There is a complete subexponential fallback for DCP: the Kuperberg/Regev
 family of sieves runs in subexponential time, with variants trading time and
@@ -357,11 +478,23 @@ possible, but they do not give the polynomial-time repair sought here:
 ## Current verdict and next research question
 
 The ideal `HalfTurnEraser` is mathematically coherent, and `K_Y` gives an exact
-operator formula whose polar part is the desired swap.  The missing step is a
-polynomial implementation.  The investigation has not found one, and all
-generic constructions encountered cost `2^(n/2)` up to polynomial factors.
-This is not a no-go theorem: a direct two-outcome test could conceivably avoid
-full fibre preparation.
+operator formula whose polar part is the desired swap.  Random subset-sum
+fibres make the associated whitening matrix exponentially close to the
+identity on the occupied fibre-uniform support, so unequal fibre sizes are not
+the blocker.  The missing step is a
+polynomial implementation of the synthesis/parity action itself.  The
+investigation has not found one: PREP/QSVT, signed-projector sampling,
+FFT/Schur decomposition, tensor-network contraction, 2-adic recursion,
+hashing, lattice, and local-relation routes all retain an exponential cost in
+the parameter regime at issue.  The best generic coherent scale identified is
+`Theta(sqrt(N)) = 2^(n/2)`.
+
+This is not a no-go theorem.  A distribution-specific collective circuit
+could conceivably decode only the parity without exposing a reusable fibre
+eraser.  But such a circuit is not a small completion of Lemma 3: usable at
+successive dyadic moduli with fresh states, a polynomial one-bit decoder would
+give a polynomial DCP algorithm by bit recursion.  It would therefore be a new
+algorithmic breakthrough in exactly the problem the paper claims to solve.
 
 The narrowest remaining positive question is therefore:
 
@@ -370,6 +503,7 @@ The narrowest remaining positive question is therefore:
 > inverse-polynomial success, without paying the natural `sqrt(N)` signed-sum
 > normalization?
 
-A positive answer would be a new DCP/subset-sum algorithmic ingredient.  A
+A positive answer would be a new DCP/subset-sum algorithmic ingredient.  No
+such construction is supplied by the paper or found in this investigation.  A
 negative answer would require a circuit-model or average-case lower bound that
 is not presently available.

@@ -32,15 +32,31 @@ stronger obstruction: on a fault-free oracle, almost every Fourier mode of the
 actual first-`a`-zero schedule is diagonal, so both the proposed `keep-u`
 repair and, subject to one explicit guard estimate, the original Step-6
 postselection give asymptotically unbiased output.  This negative calculation
-is not yet formalized in Lean.  Lemma 4 and the paper's headline algorithm
-theorem therefore remain unproved, with their required decoder premise now
-under direct spectral challenge.
+is not yet formalized in Lean.  A global half-turn/ParityPGM replacement exists
+as an exact information-theoretic measurement, and random fibres make its
+whitening exponentially close to trivial on the occupied fibre-uniform
+support.  None of the analyzed realizations yields polynomial cost; the
+generic PREP/QSVT route has coherent scale `2^(n/2)`.  Lemma 4 and the paper's
+headline algorithm theorem therefore remain unproved.
 
 | Lemma | Status of the core claim | Published proof and repair status |
 | --- | --- | --- |
 | Lemma 1 | **Repaired and formalized** | The proposed low-part swap is invalid, so the repair replaces it rather than completing that argument. Restricted Parseval gives an unconditional inverse-polynomial bound, while the stronger route connects the corrected mixed correct/fault amplitudes, Step-2 joint law, complete Step-4 label, exact Born moments, collision-plus-Chebyshev bound, classical fault-environment averaging, and rounded parameters. For the padded repaired schedule with `k = 24`, `c = 12`, and every `n >= 1024`, the explicitly summed success event has mass at least `1/2`. This is the formalized constant-probability core needed from Lemma 1. |
-| Lemma 3 | **Finite first-clause inequality repaired; decoder has a clean-oracle spectral obstruction** | The published pairwise-independence argument fails after the adaptive choice of `A`. Lean proves an explicit paper-shaped signed-path identity and a joint `2^(-n)` finite-model bound under stated Step-2 energy and model-identification premises. It also proves the correct budgeted second-clause tail `C_n/L^2`. Separately, a natural-language all-frequency two-copy calculation shows that the no-guard `keep-u` decoder has correct and wrong masses `1/2+o(1)` each. For the paper's zero-low-Hadamard step it predicts masses `1/(2L)+o(1/n)` each and acceptance `1/L+o(1/n)`; the concrete guard conclusion still needs its explicit Parseval perturbation estimate. This does not directly refute either isolated Lemma 3 clause, but it blocks their intended use in the decoder. |
+| Lemma 3 | **Not repaired as support for the polynomial algorithm; standalone finite inequalities retained** | The published pairwise-independence argument fails after the adaptive choice of `A`. Lean proves an explicit paper-shaped signed-path identity and a joint `2^(-n)` finite-model bound under stated Step-2 energy and model-identification premises, plus the correct budgeted second-clause tail `C_n/L^2`; neither is yet an actual-circuit theorem with all paper premises discharged. Separately, a natural-language all-frequency two-copy calculation shows that the no-guard `keep-u` decoder has correct and wrong masses `1/2+o(1)` each. For the paper's zero-low-Hadamard step it predicts masses `1/(2L)+o(1/n)` each and acceptance `1/L+o(1/n)`; the concrete guard conclusion still needs its explicit Parseval perturbation estimate. The global ParityPGM candidate is information-theoretically sound but has no polynomial implementation. |
 | Lemma 4 | **Unproved; required decoder premise is spectrally challenged** | The exponent, `mu`, and `n^(3/2)` bookkeeping errors are repaired. The new clean-oracle calculation contradicts the branch-amplitude closeness needed by the proposed decoder, once the remaining guard estimate is completed. The calculation is currently natural language, not a Lean countertheorem. |
+
+**Verdict on Lemma 3.**  Lemma 3 is **not repaired in the sense needed by the
+paper's polynomial-time algorithm**.  What is complete is narrower: sound
+finite-energy inequalities replace parts of its probability algebra.  The
+original experiment still lacks the model-to-circuit/Step-2 energy bridge; the
+second clause still lacks its adaptive energy budget; and the decoder has a
+separate spectral obstruction.  The strongest positive replacement found is
+a distributional ParityPGM whose ideal action is exact and whose random-fibre
+normalization is benign.  Implementing it in polynomial time would itself
+constitute a new one-bit DCP algorithm, and no such implementation is supplied
+here.  This verdict does not claim that either isolated sentence of Lemma 3 is
+false in every interpretation, or that a polynomial DCP algorithm is
+impossible.
 
 ### Lemma 1
 
@@ -403,9 +419,15 @@ signed-frame operator whose polar part is the required half-turn swap, and the
 currently known implementation barriers are analyzed in
 [`LEMMA3_HALF_TURN_ERASER.md`](LEMMA3_HALF_TURN_ERASER.md).  Generic
 postselection, amplitude amplification, block encoding, and coherent fibre
-sampling all expose a `sqrt(2^n)` cost.  A direct two-outcome half-turn test may
-be strictly weaker than full fibre erasure, so this is an open algorithmic
-direction rather than an impossibility theorem.  Only the deterministic
+sampling all expose a `sqrt(2^n)` cost.  The follow-up random-instance analysis
+shows that fibre balance makes the PGM whitening nearly the identity; the
+remaining hard operation is coherent synthesis/index erasure, not matrix
+conditioning.  FFT/Schur, tensor-network, 2-adic recursion, hashing, lattice,
+local-relation, sampling, and ordinary or variable-time QSVT routes did not
+remove that cost.  A direct two-outcome half-turn test may be strictly weaker
+than full fibre erasure, so this is an open algorithmic direction rather than
+an impossibility theorem.  A polynomial implementation would already be a new
+one-bit DCP decoder.  Only the deterministic
 Step-6 carry/top-bit bridge is closed: for a power-of-two word width and the concrete
 schedule `a = floor(2^ell/ell)`, which is machine-checked to satisfy
 `a*ell <= 2^ell`, under the convention
