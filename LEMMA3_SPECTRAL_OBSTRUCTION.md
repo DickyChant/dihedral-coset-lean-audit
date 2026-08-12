@@ -381,6 +381,24 @@ construction is identified or supplied in this project.  It is therefore a
 possible new algorithmic research direction, not a completed repair of the
 proof.
 
+A follow-up investigation makes this boundary more explicit.  On normalized
+fibre states, the polar part of the exact signed-frame operator
+
+```text
+K_Y = sum_q (-1)^q |psi_q><psi_q|,
+|psi_q> = tensor_i (|0> + omega^(q*Y_i)|1>) / sqrt(2),
+```
+
+is precisely the desired swap `|F_t> <-> |F_(t+N/2)>`.  Thus there is no
+information-theoretic existence obstruction.  The natural signed-sum,
+postselection, block-encoding, and polar-transform implementations all expose
+a `sqrt(N)` cost, however.  A weaker direct two-outcome `HalfTurnTest` might
+avoid constructing a complete uniform fibre sampler; no such polynomial
+implementation is currently known, and no equivalence or lower bound is
+claimed.  See
+[`LEMMA3_HALF_TURN_ERASER.md`](LEMMA3_HALF_TURN_ERASER.md) for the exact
+operator identity, density audit, fault caveat, and literature boundary.
+
 ## Next formalization target
 
 Before adding more positive Lemma 3 repair lemmas, the next useful formal task

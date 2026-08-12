@@ -493,6 +493,16 @@ paper's analytic experiment, the following obligations remain:
    countertheorem or replace Steps 3--6 with a genuinely global half-turn
    fibre-erasure primitive.
 
+The latter alternative has now been investigated at the natural-language
+level in [`LEMMA3_HALF_TURN_ERASER.md`](LEMMA3_HALF_TURN_ERASER.md).  An exact
+signed-frame operator has the desired half-turn swap as its polar part, so the
+primitive exists information-theoretically.  All generic implementations
+examined incur a `sqrt(2^n)` normalization or search cost.  A direct two-outcome
+test remains logically weaker than full fibre sampling, and no polynomial
+construction or impossibility theorem is claimed.  Consequently this route is
+a new subset-sum/DCP algorithmic problem, not a small completion of the
+published proof.
+
 The correct status is therefore: the original proof is invalid; the first
 clause is repaired in a paper-shaped finite analytic model but still needs the
 model-to-circuit Born identification; the second clause has a sharp budgeted

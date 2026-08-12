@@ -10,6 +10,7 @@ IACR Cryptology ePrint Archive, Report 2026/1591 (2026).
   - [Lemma 1](#lemma-1)
   - [Lemma 3](#lemma-3)
   - [Lemma 3 spectral obstruction](LEMMA3_SPECTRAL_OBSTRUCTION.md)
+  - [Global half-turn repair investigation](LEMMA3_HALF_TURN_ERASER.md)
   - [Lemma 4](#lemma-4)
 - [Project scope](#project-scope)
 - [Formalization map](#formalization-map)
@@ -397,8 +398,15 @@ does not create decoding bias, and strongly indicates that the original
 postselection does not either.  The next negative formalization target is the
 exact two-copy kernel and guard estimate.  A positive algorithmic repair would
 need a genuinely global half-turn fibre-erasure primitive, not another local
-acceptance or collision lemma.  Only the deterministic Step-6 carry/top-bit
-bridge is closed: for a power-of-two word width and the concrete
+acceptance or collision lemma.  The information-theoretic primitive, an exact
+signed-frame operator whose polar part is the required half-turn swap, and the
+currently known implementation barriers are analyzed in
+[`LEMMA3_HALF_TURN_ERASER.md`](LEMMA3_HALF_TURN_ERASER.md).  Generic
+postselection, amplitude amplification, block encoding, and coherent fibre
+sampling all expose a `sqrt(2^n)` cost.  A direct two-outcome half-turn test may
+be strictly weaker than full fibre erasure, so this is an open algorithmic
+direction rather than an impossibility theorem.  Only the deterministic
+Step-6 carry/top-bit bridge is closed: for a power-of-two word width and the concrete
 schedule `a = floor(2^ell/ell)`, which is machine-checked to satisfy
 `a*ell <= 2^ell`, under the convention
 `tau = floor(log_2 ell)`: the paper's `l_(s*) = 0` test excludes both exact

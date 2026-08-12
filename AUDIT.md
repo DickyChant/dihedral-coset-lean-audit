@@ -448,6 +448,18 @@ the claimed inverse-polynomial decoding bias.  The full all-frequency formula,
 which retains the necessary `h*` sector indicators, is recorded in
 `LEMMA3_SPECTRAL_OBSTRUCTION.md`.
 
+The proposed global alternative has also been investigated rather than merely
+named.  For subset-sum fibre states `|F_t>`, the polar part of an explicit
+signed sum of product-state projectors maps `|F_t>` to `|F_(t+N/2)>` exactly.
+This proves information-theoretic existence of the required half-turn action.
+It does not provide an efficient circuit: the natural LCU, block-encoding,
+postselection, amplitude-amplification, and uniform-fibre-sampling routes all
+have a `sqrt(N)=2^(n/2)` scale.  The weaker two-outcome half-turn test may not
+be equivalent to full fibre sampling in an unrestricted circuit model, so the
+repository records an open algorithmic direction, not a lower bound.  The
+operator formula, high-density audit, local-relation bound, and fault-model
+caveat are in `LEMMA3_HALF_TURN_ERASER.md`.
+
 ### Lemma 2 algebraic kernel
 
 Translation by `2^(n-1)` modulo `2^n` is an involution. This is the sound
