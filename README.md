@@ -9,6 +9,8 @@ IACR Cryptology ePrint Archive, Report 2026/1591 (2026).
 - [Status of Lemmas 1, 3, and 4](#status-of-lemmas-1-3-and-4)
   - [Lemma 1](#lemma-1)
   - [Lemma 3](#lemma-3)
+  - [Lemma 3 spectral obstruction](LEMMA3_SPECTRAL_OBSTRUCTION.md)
+  - [Global half-turn repair investigation](LEMMA3_HALF_TURN_ERASER.md)
   - [Lemma 4](#lemma-4)
 - [Project scope](#project-scope)
 - [Formalization map](#formalization-map)
@@ -23,14 +25,38 @@ repair follows the draft's textual faulty-sample definition where its Step-1
 display is inconsistent, and supplies an explicit rounding convention where
 the schedule is underspecified; the goal is to prove the core mathematical
 claim, not to reproduce the draft line by line.
-The final claims of Lemmas 3 and 4 remain unproved and not refuted, and the
-paper's overall headline algorithm theorem remains open.
+The paper-shaped finite analytic replacement for the first probability bound
+of Lemma 3 and the correct energy-budgeted form of its second bound are now
+formalized.  A new natural-language two-copy Fourier calculation finds a
+stronger obstruction: on a fault-free oracle, almost every Fourier mode of the
+actual first-`a`-zero schedule is diagonal, so both the proposed `keep-u`
+repair and, subject to one explicit guard estimate, the original Step-6
+postselection give asymptotically unbiased output.  This negative calculation
+is not yet formalized in Lean.  A global half-turn/ParityPGM replacement exists
+as an exact information-theoretic measurement, and random fibres make its
+whitening exponentially close to trivial on the occupied fibre-uniform
+support.  None of the analyzed realizations yields polynomial cost; the
+generic PREP/QSVT route has coherent scale `2^(n/2)`.  Lemma 4 and the paper's
+headline algorithm theorem therefore remain unproved.
 
 | Lemma | Status of the core claim | Published proof and repair status |
 | --- | --- | --- |
 | Lemma 1 | **Repaired and formalized** | The proposed low-part swap is invalid, so the repair replaces it rather than completing that argument. Restricted Parseval gives an unconditional inverse-polynomial bound, while the stronger route connects the corrected mixed correct/fault amplitudes, Step-2 joint law, complete Step-4 label, exact Born moments, collision-plus-Chebyshev bound, classical fault-environment averaging, and rounded parameters. For the padded repaired schedule with `k = 24`, `c = 12`, and every `n >= 1024`, the explicitly summed success event has mass at least `1/2`. This is the formalized constant-probability core needed from Lemma 1. |
-| Lemma 3 | Unproved, not refuted | The phases are not pairwise independent after the adaptive choice of `A`. |
-| Lemma 4 | Unproved, not refuted | The exponent, `mu`, and `n^(3/2)` bookkeeping errors are repaired. Conditional independence, correlated overflow, and multiplicative amplitude control remain unresolved. |
+| Lemma 3 | **Not repaired as support for the polynomial algorithm; standalone finite inequalities retained** | The published pairwise-independence argument fails after the adaptive choice of `A`. Lean proves an explicit paper-shaped signed-path identity and a joint `2^(-n)` finite-model bound under stated Step-2 energy and model-identification premises, plus the correct budgeted second-clause tail `C_n/L^2`; neither is yet an actual-circuit theorem with all paper premises discharged. Separately, a natural-language all-frequency two-copy calculation shows that the no-guard `keep-u` decoder has correct and wrong masses `1/2+o(1)` each. For the paper's zero-low-Hadamard step it predicts masses `1/(2L)+o(1/n)` each and acceptance `1/L+o(1/n)`; the concrete guard conclusion still needs its explicit Parseval perturbation estimate. The global ParityPGM candidate is information-theoretically sound but has no polynomial implementation. |
+| Lemma 4 | **Unproved; required decoder premise is spectrally challenged** | The exponent, `mu`, and `n^(3/2)` bookkeeping errors are repaired. The new clean-oracle calculation contradicts the branch-amplitude closeness needed by the proposed decoder, once the remaining guard estimate is completed. The calculation is currently natural language, not a Lean countertheorem. |
+
+**Verdict on Lemma 3.**  Lemma 3 is **not repaired in the sense needed by the
+paper's polynomial-time algorithm**.  What is complete is narrower: sound
+finite-energy inequalities replace parts of its probability algebra.  The
+original experiment still lacks the model-to-circuit/Step-2 energy bridge; the
+second clause still lacks its adaptive energy budget; and the decoder has a
+separate spectral obstruction.  The strongest positive replacement found is
+a distributional ParityPGM whose ideal action is exact and whose random-fibre
+normalization is benign.  Implementing it in polynomial time would itself
+constitute a new one-bit DCP algorithm, and no such implementation is supplied
+here.  This verdict does not claim that either isolated sentence of Lemma 3 is
+false in every interpretation, or that a polynomial DCP algorithm is
+impossible.
 
 ### Lemma 1
 
@@ -220,10 +246,200 @@ identical phases.  They are perfectly correlated rather than pairwise
 independent, contrary to the variance argument in the proof sketch; see
 [`PhaseCorrelation.lean`](SimonDCP/Quantum/PhaseCorrelation.lean).
 
-This directly refutes the claimed phase-independence step.  It does not yet give
-a complete instance of the paper's conditioned experiment that violates the
-final "well-behaved" probability statement, so Lemma 3 itself remains unproved
-rather than refuted.
+This directly refutes the claimed phase-independence step.  It does not by
+itself refute either isolated probability statement in Lemma 3.
+
+A subsequent natural-language two-copy Fourier analysis reaches a stronger,
+decoder-level conclusion in the fault-free model.  If `p_xi` is the exact
+zero-group kernel in Fourier mode `xi`, then the first-`a`-zero rule has the
+exact transfer
+
+```text
+A_xi = Pr[Binomial(G, p_xi) >= a].
+```
+
+All but polynomially many of the `N = 2^n` modes satisfy
+`p_xi = (1+o(1))/q`, and the paper chooses `G/q > a`; hence almost every
+diagonal mode is accepted.  In the proposed no-guard `keep-u` repair, the
+exact terminal correct/wrong kernels are `p_xi-1/(2*q)` and `1/(2*q)`, so
+their total masses are both `1/2+o(1)`.  For the original zero-low-Hadamard
+postselection, the corresponding working asymptotics are
+
+```text
+P_correct = 1/(2*L) + o(1/n),
+P_wrong   = 1/(2*L) + o(1/n),
+P_accept  = 1/L + o(1/n),
+```
+
+where `L=n/2`.  The latter conclusion still needs the concrete guard's
+Parseval perturbation estimate written out and formalized.  This does not
+directly refute the weak first clause or isolated `alpha_z` bound, but it does
+challenge the branch closeness required by Lemma 4 and the claimed
+inverse-polynomial decoding bias.  The exact formulas, rigor boundary, and
+local-repair tradeoff are recorded in
+[`LEMMA3_SPECTRAL_OBSTRUCTION.md`](LEMMA3_SPECTRAL_OBSTRUCTION.md).
+
+A different finite-model route bypasses only the earlier
+pairwise-independence obstruction for the standalone first-clause inequality;
+it does not bypass the decoder-level spectral obstruction.  For each
+complete transcript and final branch, keep the original computational path in
+the signed path expansion.  If every signed branch count is below the squared
+well-behaved threshold `2^(-n) * t`, its model Born mass is pointwise bounded
+by `2^(-n)` times its incoherent path energy.  The paper-shaped model now
+proves that every compatible path injects into `(hidden,D)` and that the two
+Hadamard factors turn normalized Step-2 diagonal energy into total common-path
+energy at most `1/|Low| <= 1`.  This yields a joint bad mass at most `2^(-n)`
+with no restriction on how the transcript or `A(D)` depends on `D`.  The
+paper-shaped interface defines the record `(Y,D,W',S,h')`, its
+compatibility relation, `h*` branch label, raw Hadamard factor, and model
+`tPlus-tMinus` factorization.  It also defines the explicit finite coherent
+sum over a transcript/branch fibre and proves that sum equals the signed-count
+formula.  Equality of this finite analytic Born model with the concrete
+circuit amplitude and circuit-level orthogonality of the residual branches,
+together with the concrete Step-2 diagonal-energy premise, remain required
+model-identification obligations.  Inserting the paper's outcome-dependent
+conditional normalization `nu4` at this stage would be incorrect.
+
+If the displayed probability is conditioned on an acceptance event of
+inverse-polynomial mass, the literal exponent changes.  The formalized slack
+theorem shows, for example, that a joint `2^(-n)` bound becomes a conditional
+`2^(-floor(n/2))` bound once the explicit polynomial-versus-dyadic inequality
+is supplied.  This paper-shaped conditional theorem is also formalized
+directly.  Thus exponential negligibility survives even though the exact
+`2^(-n)` scale need not.  A sharper budgeted theorem retains the common
+`1/|Low|` factor: if the accepted mass is at least `kappa/|Low|`, then the
+conditional bad mass is at most `2^(-n)/kappa`.  A constant lower bound on
+`kappa` preserves the `n`-bit exponent up to a constant factor; an
+inverse-polynomial `kappa` instead gives `poly(n) * 2^(-n)`, equivalently an
+`n - O(log n)` exponent.  Proving a concrete Step-6 acceptance lower bound
+needs a new hypothesis or repair: normalized input
+mass alone does not imply it.  Lean proves that the normalized two-term low
+state `(1,-1)/sqrt(2)` has zero all-zero Hadamard mass, and that an
+environment-dependent retained event can turn an unconditional average
+`1/2` into retained joint mass `0`.  In the formalized one-bit/two-outcome
+case, retaining both Hadamard outcomes preserves total mass by Parseval.  That
+fact repairs acceptance bookkeeping but does not repair decoding: the new
+exact no-guard two-copy calculation shows that the multi-bit `keep-u` decoder
+retains the diagonal modes and has conditional error `1/2+o(1)`.
+
+For the second claim, let `C_n` be the total squared magnitude of the paper's
+unnormalized adaptive `z*` contributions.  Born size bias gives the exact tail
+`C_n / L^2` as a joint bound; hence the claimed joint scale at
+`L = 2^(3n/2)` follows from the still unproved estimate
+`C_n = O(2^(2*n))`.  Conditioning on acceptance mass `rho` adds a factor
+`1/rho`.  Measurement completeness does not give
+`C_n <= 1`: the paper restricts the pre-Hadamard paths using `A(D)` before
+coherently forming outcome `D`, whereas measuring `D` first gives the opposite
+operator order and a different sector.  An equal-amplitude four-bit
+Walsh toy model inspired by the Step-2 fibre has normalized coarse mass `1`
+but adaptive sector energy `4/3`.  It refutes the generic normalization
+inference, not the paper-specific asymptotic bound.  The general finite
+inequalities and arbitrary adaptive transcript
+partition are machine-checked in
+[`LemmaThreeBornBounds.lean`](SimonDCP/Probability/LemmaThreeBornBounds.lean)
+and
+[`LemmaThreePathRefinement.lean`](SimonDCP/Probability/LemmaThreePathRefinement.lean).
+
+The high-bit bucket version has the same normalization issue: at squared
+threshold `n^3`, a conditional `O(1/n)` tail needs conditional bucket energy
+`O(n^2)`, or a joint budget `O(rho * n^2)` before conditioning on acceptance
+mass `rho`.
+
+There is now also a conservative abstract theorem that requires no
+independence or orthogonality of the adaptive labels.  Complex
+Cauchy--Schwarz bounds their total coherent energy by the largest
+outcome-dependent fibre times an explicitly normalized fine-amplitude energy.
+Thus, once that normalization is supplied, a fine space of size at most
+`2^(c*n)` is safe at squared threshold `2^((c+1)*n)`, giving a joint `2^(-n)`
+tail.  The paper-facing bridge must still identify its actual `u(M,z)` with
+such a Boolean fine-amplitude model and prove the fine-energy premise.  For
+`c = 12` the machine-checked abstract specialization uses squared threshold
+`2^(13*n)`, far larger than the paper's `2^(3*n)`.  Substituting
+the conservative amplitude exponent into the corrected Lemma 4 calculation
+is also machine-checked: all `c*n` terms cancel and the aggregate exponent is
+`7*n/2 + faultLoss/2 + c*logN/2`, so this conservative repair cannot establish
+the downstream algorithm.
+
+An abstract route that avoids the incompatible pointwise threshold is
+formalized at the analytic core.  A complex Cauchy--Schwarz theorem bounds
+the squared error of `sum_z (count_z-mean) * C_z` by the product of the total
+count `L2` error and the total coefficient energy.  A restricted-Parseval
+specialization rewrites that coefficient energy as a Walsh
+projection-collision energy, so no `max_z |alpha_z|` premise is needed.  The
+next algebraic bridge is now also proved: the explicit A-side/B-side double
+path sum regroups exactly as `sum_z count_z * C_z`, and its raw-scale error has
+the expected L2 product bound.  The coefficient energy is expanded exactly as
+a within-residue ordered-collision sum.  The paper application still must
+instantiate the concrete Step-5--7 path/residue maps and prove the conditioned
+count-energy and collision-energy bounds.  For the count side, Lean now proves
+the exact selection-aware theorem: if every distinct pair's weighted
+selected-and-colliding moment is `1/m` times its weighted selected-pair moment,
+then the weighted actual-mean count energy is `(1-1/m) E[T]`.  A probability
+interpretation additionally needs nonnegative normalized transcript weights.
+It also proves a two-bit example
+where unconditioned hashes are jointly uniform but conditioning them to be
+equal raises the count energy from the independent baseline `1` to `2`.
+Therefore bare pairwise independence before fixing the transcript is not
+enough.  The application also needs an ideal-amplitude
+lower bound for the paper's multiplicative conclusion, or a global
+state-distance replacement.  The new spectral calculation shows that these
+premises are not satisfied by the present decoder merely by retaining `u` or
+all low Walsh outcomes; the general L2 lemmas remain valid, but they are not a
+repair of the current circuit.
+
+Further frame analysis localizes the obstruction.  The adaptive first-zero
+choice is controllable in a diagonal complete-label surrogate, whose
+combinatorial weight is at most `choose(G,a) / q^a`, hence
+`2^(O(n/log n))` at the paper's parameters.  The exact finite incidence and
+cleared-denominator surrogate bound are machine-checked; identifying it with
+the actual circuit frame operator remains open.  Coherently merging that
+string into `(z,W)` is
+the expensive step.  A machine-checked Cauchy bound shows that a domain of
+size `2^(c*n)` compressed into at most `2^(2*n)` equal-phase labels must have
+large squared fibre mass; this isolates the coherent `A`-fibre factor without
+claiming that later `B`-side signs and filters preserve it.  An exact random-`Y`
+calculation in the reduced model
+before the later `S/W` filters gives energy
+`Theta(P_accept * 2^((c-1)*n))`; accounting heuristically for the available
+`A`-side Step-6 labels leaves `2^((c-2)*n)/poly(n)`.  At `c = 12` this makes the
+required `O(2^(2*n))` budget strongly implausible.  It is not yet a full
+counterexample because the complete `S/W` correlations and postselection have
+not been included in a rigorous lower bound.
+
+The remaining work now splits in two.  The standalone finite inequalities
+still need the stated model-identification, Step-2 energy, adaptive-sector
+budget, and normalization bridges.  The core algorithm needs more than those
+bridges: the new spectral calculation shows that retaining all low outcomes
+does not create decoding bias, and strongly indicates that the original
+postselection does not either.  The next negative formalization target is the
+exact two-copy kernel and guard estimate.  A positive algorithmic repair would
+need a genuinely global half-turn fibre-erasure primitive, not another local
+acceptance or collision lemma.  The information-theoretic primitive, an exact
+signed-frame operator whose polar part is the required half-turn swap, and the
+currently known implementation barriers are analyzed in
+[`LEMMA3_HALF_TURN_ERASER.md`](LEMMA3_HALF_TURN_ERASER.md).  Generic
+postselection, amplitude amplification, block encoding, and coherent fibre
+sampling all expose a `sqrt(2^n)` cost.  The follow-up random-instance analysis
+shows that fibre balance makes the PGM whitening nearly the identity; the
+remaining hard operation is coherent synthesis/index erasure, not matrix
+conditioning.  FFT/Schur, tensor-network, 2-adic recursion, hashing, lattice,
+local-relation, sampling, and ordinary or variable-time QSVT routes did not
+remove that cost.  A direct two-outcome half-turn test may be strictly weaker
+than full fibre erasure, so this is an open algorithmic direction rather than
+an impossibility theorem.  A polynomial implementation would already be a new
+one-bit DCP decoder.  Only the deterministic
+Step-6 carry/top-bit bridge is closed: for a power-of-two word width and the concrete
+schedule `a = floor(2^ell/ell)`, which is machine-checked to satisfy
+`a*ell <= 2^ell`, under the convention
+`tau = floor(log_2 ell)`: the paper's `l_(s*) = 0` test excludes both exact
+carry windows, so the computed top bit equals the complete subset-sum top bit.
+Upward rounding is not interchangeable; a machine-checked `n = 32`
+counterexample passes the narrower test while a legal carry flips the top bit.
+Conditional versus joint probability after Step-6 postselection is now stated
+explicitly in the finite API, but the acceptance lower bound is open and does
+not follow from normalization alone.  The full
+argument and boundary are recorded in
+[`LEMMA3_REPAIR.md`](LEMMA3_REPAIR.md).
 
 ### Lemma 4
 
@@ -305,6 +521,76 @@ now a proved Lean result; the remaining headline-theorem gaps occur later.
   `Quantum/AmplitudeCancellation.lean` isolate the failures in Lemmas 3 and 4.
 - `Probability/LinearPhaseIndependence.lean` proves the correct unconditioned
   joint-uniformity theorem for distinct nonzero binary linear forms.
+- `Probability/ConditionalLinearForms.lean` proves the exact fixed-affine
+  replacement criterion: conditional joint uniformity is equivalent, on a
+  reachable fibre, to rank-two surjectivity on the condition kernel.  This is
+  an audit interface rather than the main adaptive Lemma 3 repair.
+- `Probability/LemmaThreeBornBounds.lean`,
+  `Probability/LemmaThreePathRefinement.lean`, and
+  `Probability/LemmaThreeUniformWalshPaths.lean` prove the independence-free
+  `2^(-n)` joint small-branch bound, including equal-amplitude Step-2/Walsh
+  path normalization for later filters encoded as compatibility subsets.
+  Additional coherent transforms must be represented by additional fine-path
+  coordinates in the paper-facing instantiation.
+  `Probability/LemmaThreeTranscriptModel.lean` expresses fine paths as
+  compatible `(transcript, hidden selection)` pairs.
+  `Probability/LemmaThreePaperPathBridge.lean` instantiates the paper-shaped
+  Step-3--7 records, signs, raw common factor, and an explicit finite-fibre
+  sum with a proved `tPlus-tMinus` factorization.
+  `Probability/LemmaThreePaperPathEnergy.lean` proves compatible-path
+  injectivity, the exact Hadamard energy factor, total common-path energy at
+  most `1/|Low|`, and the direct joint `2^(-n)` theorem.  Actual
+  circuit-amplitude/Born identification and residual-branch orthogonality
+  remain required application obligations, along with the concrete Step-2
+  diagonal-energy theorem.
+  `Probability/LemmaThreeToFourL2.lean` gives the Cauchy/Parseval `L2` route
+  from count errors to additive amplitude error without any pointwise
+  implicit-amplitude maximum.
+  `Probability/LemmaThreeStepSevenRegrouping.lean` proves the exact finite
+  A/B double-sum regrouping into `sum_z count_z*C_z`, its raw-scale L2 error
+  bound, and the coefficient-energy collision identity.
+  `Probability/LemmaThreeCountEnergy.lean` proves the exact centering and
+  collision identities for the A-side counts, the correct selection-aware
+  weighted second-moment theorem, and a conditioning counterexample to using
+  unconditioned pairwise independence.
+  `Probability/LemmaThreeSectorRefinement.lean` proves the correct `C/L^2`
+  adaptive-sector tail, while
+  `Probability/LemmaThreeAdaptiveFibreUpperBound.lean` proves the conditional
+  maximum-fibre upper bound from normalized fine energy and the conservative squared threshold
+  `2^((c+1)*n)`.  `Probability/LemmaThreeConservativeThresholdImpact.lean`
+  proves that this larger threshold is incompatible with the existing
+  Lemma-4 exponent calculation.
+  `Probability/LemmaThreeBooleanFinePathUpperBound.lean` instantiates the
+  bound for `Fin (c*n) -> Bool`, including the explicit `c = 12` threshold.
+  `Probability/LemmaThreeAdaptiveSectorCounterexample.lean` proves exact
+  coarse mass `1` versus adaptive energy `4/3` in a four-bit
+  Walsh toy/operator-order model.  `Probability/LemmaThreeCoherentFibreObstruction.lean`
+  proves the deterministic Cauchy lower bound on equal-phase fibre energy.
+  `Probability/LemmaThreeFirstZeroFrame.lean` proves the exact incidence and
+  `choose(G,a)/q^a` diagonal-surrogate bound for the first-zero rule.
+  `Probability/LemmaThreePostselection.lean`,
+  `Probability/LemmaThreePostselectionSlack.lean`, and
+  `Probability/LemmaThreePaperFirstClause.lean` package the exact acceptance
+  loss, its exponent-slack absorption, and the direct conditional
+  paper-shaped first-clause theorem.  `Probability/LemmaThreeFiniteRepair.lean`
+  packages the more general combined conditional finite theorem.
+  `Probability/LemmaThreeBudgetedFirstClause.lean` retains the sharper
+  `1/|Low|` energy and proves its cancellation against an acceptance lower
+  bound of the same scale.
+  `Probability/LemmaThreeStepSixAcceptance.lean` gives the exact all-zero
+  Hadamard formula, normalized destructive-interference and conditioning
+  counterexamples, and the two-outcome Parseval identity.  The identity fixes
+  acceptance accounting, but the natural-language two-copy calculation in
+  `LEMMA3_SPECTRAL_OBSTRUCTION.md` shows that keeping all low outcomes does
+  not fix the decoder bias.
+  `LEMMA3_REPAIR.md` records the
+  natural-language proof and the remaining adaptive energy/Step-3--7 bridge.
+- `Arithmetic/LemmaThreeStepSixCarry.lean` proves the exact omitted-low-part
+  carry, its two vulnerable boundary windows, and top-bit correctness outside
+  them.  `Arithmetic/LemmaThreeStepSixBitBridge.lean` proves that the
+  floor-rounded paper bit test excludes those windows for `n = 2^ell`; its
+  end-to-end corollary instantiates `a = floor(2^ell/ell)`.  It also gives a
+  finite counterexample to using upward rounding instead.
 - `Arithmetic/SampleRecursion.lean` proves the arithmetic of deleting a known
   low bit and halving an ideal DCP sample.
 - `Arithmetic/SwapFiber.lean` gives an `n = 8` locally valid two-coordinate
@@ -490,9 +776,9 @@ The checked environment uses Elan 4.2.3 and Lean 4.31.0.  For faster builds on
 Windows-mounted drives, copy the repository to a WSL-native directory before
 running `scripts/build-wsl.sh`; the source tree remains authoritative.
 
-The full project, including the Lemma 1 repair modules, was verified in Arch
-Linux under WSL on August 10, 2026.  The command `lake build` completed all
-8640 jobs successfully.
+The full project, including the Lemma 1 repair and current Lemma 3 repair
+modules, was verified in Arch Linux under WSL on August 11, 2026.  The command
+`lake build` completed all 8665 jobs successfully.
 
 ## Verification policy
 
@@ -501,10 +787,11 @@ from the paper are recorded as named obligations or refuted by explicit
 counterexamples; they are never silently promoted to assumptions. Final claims
 are checked with `#print axioms`.  The analytic repair theorems report only the
 standard Lean dependencies `propext`, `Classical.choice`, and `Quot.sound`.
-The explicitly executable six-coordinate searches additionally report the
+The explicitly executable finite searches, including the six-coordinate
+prototypes and four-bit adaptive-sector toy model, additionally report the
 generated certificates named `*.native_decide.ax_*`, which record reliance on
-Lean's native evaluator.  The audit reports no `sorryAx` and the source declares
-no project-specific mathematical axiom.
+Lean's native evaluator.  The audit reports no `sorryAx` and the source
+declares no project-specific mathematical axiom.
 
 See [AUDIT.md](AUDIT.md) for the proof-status map and
 [LIBRARIES.md](LIBRARIES.md) for the TCS/quantum-library survey.
