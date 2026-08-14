@@ -24,8 +24,8 @@ implementation gap, not merely a missing concentration estimate.
 
 The source contains no `sorry`, `admit`, or handwritten project-local axioms.
 A clean build, including the Lemma 1 repair, current Lemma 3 repair, and
-conditional Lemma 4 repair modules, completed all 8666 jobs successfully on
-August 14, 2026.
+decoder-facing conditional Lemma 4 repair modules, completed all 8668 jobs
+successfully on August 14, 2026.
 `SimonDCP/AxiomAudit.lean` prints the axiom dependencies of the principal
 results.  Analytic theorems contain only `propext`, `Classical.choice`, and
 `Quot.sound`.  The finite exhaustive searches, including the six-coordinate
@@ -590,6 +590,44 @@ Thus a repaired Lemma 4 can target the additive conclusion directly, or prove
 the new lower-bound premise; conditional balls-in-bins control alone cannot
 establish the paper's multiplicative statement.
 
+The decoder does not, however, require a multiplicative ratio.
+`ApproximateReadout.lean` computes the concrete Hadamard Born probability for
+an arbitrary normalized one-qubit state.  If its two amplitudes are `a` and
+`b`, with target sign `s = (-1)^d`, then
+
+```text
+Pr[wrong bit] = normSq(b - s*a) / 2.
+```
+
+Consequently additive mismatch norm at most `epsilon` gives correct-bit
+probability at least `1 - epsilon^2/2`, even when either reference amplitude
+cancels.  `Lemma4Decoder.lean` then uses Cauchy--Schwarz to prove the
+decoder-facing bound
+
+```text
+Pr[correct bit] >=
+  1 - normSq(scale) * countBudget * coefficientBudget / 2,
+```
+
+where `countBudget` bounds the squared L2 distance of the two count functions
+and `coefficientBudget` bounds the squared energy of the complex coefficient
+family.  Uniform pointwise count error `error` supplies the explicit budget
+`4 * numberOfBins * error^2`.  This removes anti-cancellation from the final
+readout repair while leaving the paper's literal multiplicative claim
+unproved.
+
+The same file lifts the result through the finite union bound.  If every bin
+in both branches has deviation-event mass at most `tail`, the records whose
+final qubit satisfies this quantitative readout guarantee have mass at least
+
+```text
+1 - 2 * numberOfBins * tail.
+```
+
+This probabilistic statement is complete inside the explicitly conditioned
+finite interface; its per-bin tails, coordinate identities, and coefficient
+energy bound remain application hypotheses.
+
 The same module now proves a complete finite probabilistic repair. On a
 normalized nonnegative finite space, if every low-part bin in both high-bit
 branches has deviation-event mass at most `tail`, the additive comparison has
@@ -605,6 +643,11 @@ by the existing pairwise-Bernoulli Chebyshev theorem once conditional first and
 second moments are proved. This separates a formalized corrected Lemma 4 from
 the still-open task of connecting its hypotheses to the paper's adaptive,
 conditioned experiment.
+
+For the decoder-facing route, the corresponding open connection is more
+precise: identify the actual conditioned Step-7 qubit coordinates with the two
+scaled weighted amplitudes, then prove a paired count-error energy budget and
+a coefficient-energy budget.  No reference-amplitude lower bound is needed.
 
 ## Remaining invalid or missing obligations
 
@@ -641,9 +684,12 @@ conditioned experiment.
   independence over all `q_(g_a)` values (although this isolated exception may
   be asymptotically removable).
 - The repaired Lemma 4 parameter arithmetic still relies on unproved
-  conditional balls-in-bins, variance, and union-bound premises, and additive
-  count control implies a multiplicative amplitude ratio only with the explicit
-  anti-cancellation lower bound isolated in `Lemma4Repair.lean`.
+  conditional balls-in-bins, variance, and union-bound premises.  Its literal
+  multiplicative amplitude ratio needs the anti-cancellation lower bound in
+  `Lemma4Repair.lean`; the decoder-facing additive replacement avoids that
+  premise but still needs the conditioned Step-7 coordinate identification,
+  paired count-error energy, and coefficient-energy bounds isolated in
+  `Lemma4Decoder.lean`.
 - Only the deterministic Step-6 carry/top-bit arithmetic is closed.  Its
   postselection probability and decoding bias are not proved; keeping all low
   outcomes preserves mass but is spectrally unbiased in the analyzed clean
@@ -673,8 +719,8 @@ their arbitrary normalized finite classical mixtures, and the
   bound claim.  It does not claim a
 gate/tensor-circuit equality or a density-matrix model; those are optional
 semantic strengthening for Lemma 1 rather than blockers to its core result.
-The paper's overall theorem still needs the unresolved conditional phase and
-amplitude claims in Lemmas 3 and 4, later adaptive measurement and
+The paper's overall theorem still needs the unresolved conditioned
+model-identification and energy claims in Lemmas 3 and 4, later adaptive measurement and
 postselection semantics, error amplification, a suitable polynomial-cost
 implementation argument, and the external lattice reductions.  Until those
 obligations are supplied, the paper's overall polynomial-time theorem and its

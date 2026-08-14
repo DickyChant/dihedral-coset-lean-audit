@@ -43,7 +43,7 @@ headline algorithm theorem therefore remain unproved.
 | --- | --- | --- |
 | Lemma 1 | **Repaired and formalized** | The proposed low-part swap is invalid, so the repair replaces it rather than completing that argument. Restricted Parseval gives an unconditional inverse-polynomial bound, while the stronger route connects the corrected mixed correct/fault amplitudes, Step-2 joint law, complete Step-4 label, exact Born moments, collision-plus-Chebyshev bound, classical fault-environment averaging, and rounded parameters. For the padded repaired schedule with `k = 24`, `c = 12`, and every `n >= 1024`, the explicitly summed success event has mass at least `1/2`. This is the formalized constant-probability core needed from Lemma 1. |
 | Lemma 3 | **Not repaired as support for the polynomial algorithm; standalone finite inequalities retained** | The published pairwise-independence argument fails after the adaptive choice of `A`. Lean proves an explicit paper-shaped signed-path identity and a joint `2^(-n)` finite-model bound under stated Step-2 energy and model-identification premises, plus the correct budgeted second-clause tail `C_n/L^2`; neither is yet an actual-circuit theorem with all paper premises discharged. Separately, a natural-language all-frequency two-copy calculation shows that the no-guard `keep-u` decoder has correct and wrong masses `1/2+o(1)` each. For the paper's zero-low-Hadamard step it predicts masses `1/(2L)+o(1/n)` each and acceptance `1/L+o(1/n)`; the concrete guard conclusion still needs its explicit Parseval perturbation estimate. The global ParityPGM candidate is information-theoretically sound but has no polynomial implementation. |
-| Lemma 4 | **Conditional repair formalized; paper claim unproved and spectrally challenged** | The exponent, `mu`, and `n^(3/2)` bookkeeping errors are repaired. A finite corrected theorem gives high-probability additive control from explicit per-bin tails and relative control under an anti-cancellation lower bound. Establishing those hypotheses for the conditioned experiment remains open, while the new clean-oracle calculation challenges the branch-amplitude closeness needed by the proposed decoder once its remaining guard estimate is completed. |
+| Lemma 4 | **Decoder-facing conditional repair formalized; paper premises open and spectrally challenged** | The exponent, `mu`, and `n^(3/2)` bookkeeping errors are repaired. A finite corrected theorem gives high-probability additive control from explicit per-bin tails and relative control under an anti-cancellation lower bound. More directly, a new Hadamard theorem converts squared additive branch mismatch into wrong-bit probability without any amplitude denominator, and a Cauchy--Schwarz bridge derives that mismatch from count and coefficient energies. Establishing those conditioned budgets and the concrete Step-7 coordinate identification remains open, while the clean-oracle calculation challenges the required branch closeness once its remaining guard estimate is completed. |
 
 **Verdict on Lemma 3.**  Lemma 3 is **not repaired in the sense needed by the
 paper's polynomial-time algorithm**.  What is complete is narrower: sound
@@ -492,6 +492,46 @@ only after assuming an explicit positive lower bound on one reference
 amplitude. That anti-cancellation lower bound, or a replacement such as phase
 alignment, is the precise additional obligation missing from the sketch.
 
+The literal multiplicative comparison is not needed by the final decoder.
+[`ApproximateReadout.lean`](SimonDCP/Quantum/ApproximateReadout.lean) proves
+against the concrete Hadamard gate that, for any normalized surviving qubit,
+the wrong-bit probability is exactly one half of the squared additive mismatch
+between its two signed branch amplitudes.  Thus mismatch norm at most
+`epsilon` gives correct-bit probability at least
+
+```text
+1 - epsilon^2 / 2.
+```
+
+[`Lemma4Decoder.lean`](SimonDCP/Probability/Lemma4Decoder.lean) composes this
+identity with the existing complex Cauchy--Schwarz route.  If
+`countBudget` bounds the squared L2 distance between the two branch-count
+functions and `coefficientBudget` bounds the total squared coefficient energy,
+then the final readout succeeds with probability at least
+
+```text
+1 - normSq(scale) * countBudget * coefficientBudget / 2.
+```
+
+For uniform pointwise count error `error`, Lean supplies
+`countBudget = 4 * numberOfBins * error^2`.  This is a decoder-facing repaired
+Lemma 4 with no anti-cancellation assumption.  Applying it to the paper still
+requires a proof that the actual conditioned Step-7 qubit has the stated
+weighted-amplitude coordinates and that its count and coefficient energy
+budgets hold.
+
+The decoder theorem is also lifted through the finite union bound: if every
+bin in both branches has deviation-event mass at most `tail`, then records
+whose final qubit satisfies the displayed readout guarantee have total mass at
+least
+
+```text
+1 - 2 * numberOfBins * tail.
+```
+
+This is an end-to-end conditional probability statement within the finite
+model, not merely a deterministic estimate.
+
 The repair is also lifted to a normalized finite probability space. If every
 bin in each of the two branches has deviation-event mass at most `tail`, Lean
 proves additive success mass at least
@@ -512,10 +552,12 @@ error bound on normalized amplitudes, it would absorb every downstream
 polynomial factor.  Thus the exponent typo is repairable and is not the
 decisive obstruction to Lemma 4.
 
-The repaired finite theorem does not establish its conditional concentration
-or anti-cancellation hypotheses for the paper's actual experiment. The
-original multiplicative-amplitude claim of Lemma 4 therefore remains unproved,
-not refuted. The detailed audit is in [`AUDIT.md`](AUDIT.md).
+The repaired finite theorems do not establish conditional concentration,
+coefficient energy, or the Step-7 coordinate identification for the paper's
+actual experiment. The original multiplicative-amplitude claim of Lemma 4
+therefore remains unproved, but the final decoder no longer needs that claim:
+the new additive route isolates strictly weaker premises. The detailed audit
+is in [`AUDIT.md`](AUDIT.md).
 
 ## Project scope
 
@@ -776,6 +818,12 @@ now a proved Lean result; the remaining headline-theorem gaps occur later.
   estimate from two near-uniform bin-count bounds, lifts it through a finite
   union bound to success mass `1 - 2 * numberOfBins * tail`, and proves the
   relative form under an explicit positive anti-cancellation lower bound.
+- `Quantum/ApproximateReadout.lean` proves that the Hadamard wrong-bit
+  probability is exactly half the squared additive branch mismatch.
+- `Probability/Lemma4Decoder.lean` combines that identity with L2 count and
+  coefficient-energy budgets, giving a direct decoder-success theorem and a
+  uniform balls-in-bins specialization without anti-cancellation, then lifts
+  the readout guarantee to mass `1 - 2 * numberOfBins * tail`.
 
 The project deliberately separates the formalized and classically averaged
 analytic experiment from a gate/tensor-circuit implementation, a quantum
@@ -810,8 +858,8 @@ Windows-mounted drives, copy the repository to a WSL-native directory before
 running `scripts/build-wsl.sh`; the source tree remains authoritative.
 
 The full project, including the Lemma 1 repair, current Lemma 3 repair, and
-conditional Lemma 4 repair modules, was verified on August 14, 2026. The
-command `lake build` completed all 8666 jobs successfully.
+decoder-facing conditional Lemma 4 repair modules, was verified on August 14,
+2026. The command `lake build` completed all 8668 jobs successfully.
 
 ## Verification policy
 

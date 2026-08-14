@@ -26,6 +26,7 @@ import SimonDCP.Probability.GroupUnionFamily
 import SimonDCP.Probability.LabelledBornProbability
 import SimonDCP.Probability.LabelledBornPairwiseTail
 import SimonDCP.Probability.LabelledParseval
+import SimonDCP.Probability.Lemma4Decoder
 import SimonDCP.Probability.Lemma4Parameters
 import SimonDCP.Probability.Lemma4Repair
 import SimonDCP.Probability.LemmaOneChebyshevParameters
@@ -77,6 +78,7 @@ import SimonDCP.Probability.StepTwoUniformMarginals
 import SimonDCP.Probability.TernaryProjectionBridge
 import SimonDCP.Probability.TernarySubsetSumBound
 import SimonDCP.Quantum.AmplitudeCancellation
+import SimonDCP.Quantum.ApproximateReadout
 import SimonDCP.Quantum.BitReadout
 import SimonDCP.Quantum.ConditionalReadout
 import SimonDCP.Quantum.FaultyBasisSample
@@ -128,6 +130,7 @@ open SimonDCP.Probability.GroupUnionFamily
 open SimonDCP.Probability.LabelledBornProbability
 open SimonDCP.Probability.LabelledBornPairwiseTail
 open SimonDCP.Probability.LabelledParseval
+open SimonDCP.Probability.Lemma4Decoder
 open SimonDCP.Probability.Lemma4Parameters
 open SimonDCP.Probability.Lemma4Repair
 open SimonDCP.Probability.LemmaOneChebyshevParameters
@@ -179,6 +182,7 @@ open SimonDCP.Probability.StepTwoUniformMarginals
 open SimonDCP.Probability.TernaryProjectionBridge
 open SimonDCP.Probability.TernarySubsetSumBound
 open SimonDCP.Quantum.AmplitudeCancellation
+open SimonDCP.Quantum.ApproximateReadout
 open SimonDCP.Quantum.BitReadout
 open SimonDCP.Quantum.ConditionalReadout
 open SimonDCP.Quantum.FaultyBasisSample
@@ -436,6 +440,11 @@ open SimonDCP.Quantum.Step2Phase
 #print axioms weightedAmplitude_pair_additive
 #print axioms relative_error_of_additive_error
 #print axioms weightedAmplitude_pair_relative
+#print axioms weightedAmplitude_pair_error_normSq_le
+#print axioms lemmaFour_additive_readout
+#print axioms lemmaFour_uniform_counts_readout
+#print axioms lemmaFour_decoder_failure_mass_le
+#print axioms lemmaFour_decoder_success_mass_ge
 #print axioms eventMass_finset_exists_le
 #print axioms pairedCountDeviationBad_mass_le
 #print axioms repairedLemmaFour_additive_success_mass_ge
@@ -455,6 +464,8 @@ open SimonDCP.Quantum.Step2Phase
 #print axioms mixedPostPositionDftProductAmplitude_ne_zero_iff
 #print axioms sum_selection_normSq_mixedPostPositionDftProductAmplitude
 #print axioms SimonDCP.Quantum.BitReadout.probOutcome_encodedBit
+#print axioms wrong_probability_eq_mismatch
+#print axioms correct_probability_ge_of_mismatch_norm_le
 #print axioms readout_of_exact_balancedRelativePhase
 #print axioms dft_twoPoint
 #print axioms probOutcome_idealCosetState
