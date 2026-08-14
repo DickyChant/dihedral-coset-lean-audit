@@ -441,8 +441,13 @@ open SimonDCP.Quantum.Step2Phase
 #print axioms relative_error_of_additive_error
 #print axioms weightedAmplitude_pair_relative
 #print axioms weightedAmplitude_pair_error_normSq_le
+#print axioms pairedWeightedAmplitudeMismatchEnergy_le_budget
 #print axioms lemmaFour_additive_readout
 #print axioms lemmaFour_uniform_counts_readout
+#print axioms lemmaFour_labelled_additive_readout
+#print axioms lemmaFour_labelled_uniform_counts_readout
+#print axioms lemmaFour_state_labelled_additive_readout
+#print axioms lemmaFour_state_labelled_uniform_counts_readout
 #print axioms lemmaFour_decoder_failure_mass_le
 #print axioms lemmaFour_decoder_success_mass_ge
 #print axioms eventMass_finset_exists_le
@@ -466,6 +471,12 @@ open SimonDCP.Quantum.Step2Phase
 #print axioms SimonDCP.Quantum.BitReadout.probOutcome_encodedBit
 #print axioms wrong_probability_eq_mismatch
 #print axioms correct_probability_ge_of_mismatch_norm_le
+#print axioms pairedCorrectMass_add_pairedWrongMass
+#print axioms pairedCorrectMass_ge_of_mismatchEnergy_le
+#print axioms pairedCorrectMass_ge_of_sum_mismatch_norm_le
+#print axioms probQubit0_hadamardFirst_wrong_eq
+#print axioms probQubit0_hadamardFirst_correct_eq
+#print axioms probQubit0_hadamardFirst_correct_ge_of_sum_mismatch_norm_le
 #print axioms readout_of_exact_balancedRelativePhase
 #print axioms dft_twoPoint
 #print axioms probOutcome_idealCosetState

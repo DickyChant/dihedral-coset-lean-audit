@@ -16,15 +16,17 @@ two weighted branch amplitudes is controlled by Cauchy--Schwarz using
 * the squared L2 distance between the two count functions; and
 * the squared energy of the complex coefficient family.
 
-When those weighted amplitudes are the two coordinates of the surviving
-qubit, the wrong-bit Born probability is at most one half of that mismatch
-energy, including the squared normalization scale.  A pointwise
-balls-in-bins specialization is also supplied.
+The first form treats two coordinates of a surviving qubit.  The stronger
+labelled form keeps every residual amplitude pair, sums their mismatch
+energies, and connects the result to the actual QuantumAlg operation `H ⊗ I`
+and first-qubit marginal.  Pointwise balls-in-bins specializations are supplied
+for both forms.
 
-An application to the paper must still identify its concrete Step-7 amplitudes
-with the coordinates below and prove the conditioned count and coefficient
-energy bounds.  The theorem removes anti-cancellation from the final readout
-step; it does not manufacture those probabilistic or semantic premises.
+An application to the paper must still identify its concrete Step-7 amplitude
+pairs with the families below and prove the conditioned count and coefficient
+energy bounds.  The theorem removes anti-cancellation and pure-qubit
+factorization from the final readout step; it does not manufacture those
+probabilistic or semantic premises.
 -/
 
 namespace SimonDCP.Probability.Lemma4Decoder
@@ -155,6 +157,221 @@ theorem branchMismatch_eq_scaled_pair_error
           weightedAmplitude leftCount coefficient) := by
   rw [branchMismatch, hZero, hOne]
   cases dBit <;> norm_num [targetSign] <;> ring
+
+/--
+The same coordinate identity without collapsing the residual label register to
+one pure qubit.  This is the pointwise form needed for the pairs of high-part
+amplitudes in the paper's final paragraph.
+-/
+theorem amplitudeMismatch_eq_scaled_pair_error
+    [Fintype Label]
+    (zeroAmplitude oneAmplitude : ℂ) (dBit : Bool) (scale : ℂ)
+    (leftCount rightCount : Label → ℝ)
+    (coefficient : Label → ℂ)
+    (hZero : zeroAmplitude =
+      scale * weightedAmplitude leftCount coefficient)
+    (hOne : oneAmplitude = targetSign dBit * scale *
+      weightedAmplitude rightCount coefficient) :
+    oneAmplitude - targetSign dBit * zeroAmplitude =
+      targetSign dBit * scale *
+        (weightedAmplitude rightCount coefficient -
+          weightedAmplitude leftCount coefficient) := by
+  rw [hZero, hOne]
+  cases dBit <;> norm_num [targetSign] <;> ring
+
+/--
+Sum the two-branch Cauchy--Schwarz estimate over every unmeasured residual
+label.  This avoids the unjustified assumption that the state has already
+factorized as one pure qubit.
+-/
+theorem pairedWeightedAmplitudeMismatchEnergy_le_budget
+    {Outer : Type*} [Fintype Outer] [Fintype Label]
+    (zeroBranch oneBranch : Outer → ℂ) (dBit : Bool)
+    (scale : Outer → ℂ)
+    (leftCount rightCount : Outer → Label → ℝ)
+    (coefficient : Outer → Label → ℂ)
+    (countBudget coefficientBudget : Outer → ℝ)
+    (hZero : ∀ outer, zeroBranch outer =
+      scale outer * weightedAmplitude (leftCount outer) (coefficient outer))
+    (hOne : ∀ outer, oneBranch outer = targetSign dBit * scale outer *
+      weightedAmplitude (rightCount outer) (coefficient outer))
+    (hCountBudget : ∀ outer,
+      pairCountErrorEnergy (leftCount outer) (rightCount outer) ≤
+        countBudget outer)
+    (hCoefficientBudget : ∀ outer,
+      coefficientEnergy (coefficient outer) ≤ coefficientBudget outer)
+    (hCountBudgetNonneg : ∀ outer, 0 ≤ countBudget outer) :
+    pairedMismatchEnergy zeroBranch oneBranch dBit ≤
+      ∑ outer, Complex.normSq (scale outer) * countBudget outer *
+        coefficientBudget outer := by
+  classical
+  unfold pairedMismatchEnergy
+  apply Finset.sum_le_sum
+  intro outer _
+  rw [amplitudeMismatch_eq_scaled_pair_error
+    (zeroBranch outer) (oneBranch outer) dBit (scale outer)
+    (leftCount outer) (rightCount outer) (coefficient outer)
+    (hZero outer) (hOne outer)]
+  rw [Complex.normSq_mul, Complex.normSq_mul, targetSign_normSq, one_mul]
+  simpa only [mul_assoc] using
+    mul_le_mul_of_nonneg_left
+      (weightedAmplitude_pair_error_normSq_le_budget
+        (leftCount outer) (rightCount outer) (coefficient outer)
+        (countBudget outer) (coefficientBudget outer)
+        (hCountBudget outer) (hCoefficientBudget outer)
+        (hCountBudgetNonneg outer))
+      (Complex.normSq_nonneg (scale outer))
+
+/--
+Labelled decoder-facing Lemma 4.  The distinguished bit may remain entangled
+with an arbitrary finite residual register: only the summed mismatch energy
+matters for the Hadamard readout.
+-/
+theorem lemmaFour_labelled_additive_readout
+    {Outer : Type*} [Fintype Outer] [Fintype Label]
+    (zeroBranch oneBranch : Outer → ℂ) (dBit : Bool)
+    (scale : Outer → ℂ)
+    (leftCount rightCount : Outer → Label → ℝ)
+    (coefficient : Outer → Label → ℂ)
+    (countBudget coefficientBudget : Outer → ℝ)
+    (hNormalized : pairedBranchMass zeroBranch oneBranch = 1)
+    (hZero : ∀ outer, zeroBranch outer =
+      scale outer * weightedAmplitude (leftCount outer) (coefficient outer))
+    (hOne : ∀ outer, oneBranch outer = targetSign dBit * scale outer *
+      weightedAmplitude (rightCount outer) (coefficient outer))
+    (hCountBudget : ∀ outer,
+      pairCountErrorEnergy (leftCount outer) (rightCount outer) ≤
+        countBudget outer)
+    (hCoefficientBudget : ∀ outer,
+      coefficientEnergy (coefficient outer) ≤ coefficientBudget outer)
+    (hCountBudgetNonneg : ∀ outer, 0 ≤ countBudget outer) :
+    1 - (∑ outer, Complex.normSq (scale outer) * countBudget outer *
+          coefficientBudget outer) / 2 ≤
+      pairedCorrectMass zeroBranch oneBranch dBit := by
+  apply pairedCorrectMass_ge_of_mismatchEnergy_le
+    zeroBranch oneBranch dBit _ hNormalized
+  exact pairedWeightedAmplitudeMismatchEnergy_le_budget
+    zeroBranch oneBranch dBit scale leftCount rightCount coefficient
+    countBudget coefficientBudget hZero hOne hCountBudget
+    hCoefficientBudget hCountBudgetNonneg
+
+/--
+Pointwise balls-in-bins specialization of the labelled decoder theorem.  It
+matches the paper's collection of high-part amplitude pairs while keeping all
+unmeasured labels explicit.
+-/
+theorem lemmaFour_labelled_uniform_counts_readout
+    {Outer : Type*} [Fintype Outer] [Fintype Label]
+    (zeroBranch oneBranch : Outer → ℂ) (dBit : Bool)
+    (scale : Outer → ℂ)
+    (leftCount rightCount : Outer → Label → ℝ)
+    (coefficient : Outer → Label → ℂ)
+    (mean error coefficientBudget : Outer → ℝ)
+    (hNormalized : pairedBranchMass zeroBranch oneBranch = 1)
+    (hZero : ∀ outer, zeroBranch outer =
+      scale outer * weightedAmplitude (leftCount outer) (coefficient outer))
+    (hOne : ∀ outer, oneBranch outer = targetSign dBit * scale outer *
+      weightedAmplitude (rightCount outer) (coefficient outer))
+    (hError : ∀ outer, 0 ≤ error outer)
+    (hLeft : ∀ outer label,
+      |leftCount outer label - mean outer| ≤ error outer)
+    (hRight : ∀ outer label,
+      |rightCount outer label - mean outer| ≤ error outer)
+    (hCoefficientBudget : ∀ outer,
+      coefficientEnergy (coefficient outer) ≤ coefficientBudget outer) :
+    1 - (∑ outer, Complex.normSq (scale outer) *
+          (4 * (Fintype.card Label : ℝ) * error outer ^ 2) *
+          coefficientBudget outer) / 2 ≤
+      pairedCorrectMass zeroBranch oneBranch dBit := by
+  apply lemmaFour_labelled_additive_readout zeroBranch oneBranch dBit scale
+    leftCount rightCount coefficient
+    (fun outer => 4 * (Fintype.card Label : ℝ) * error outer ^ 2)
+    coefficientBudget hNormalized hZero hOne
+  · intro outer
+    exact pairCountErrorEnergy_le_of_uniform
+      (leftCount outer) (rightCount outer) (mean outer) (error outer)
+      (hError outer) (hLeft outer) (hRight outer)
+  · exact hCoefficientBudget
+  · intro outer
+    positivity
+
+/--
+Gate-level labelled decoder repair for an actual normalized `1+n` qubit
+state.  This composes the count/coefficient estimate with the concrete
+QuantumAlg operation `H ⊗ I` and its first-qubit marginal Born probability.
+-/
+theorem lemmaFour_state_labelled_additive_readout
+    {n : ℕ} [Fintype Label]
+    (state : PureState (Qubits (1 + n))) (dBit : Bool)
+    (scale : Fin (2 ^ n) → ℂ)
+    (leftCount rightCount : Fin (2 ^ n) → Label → ℝ)
+    (coefficient : Fin (2 ^ n) → Label → ℂ)
+    (countBudget coefficientBudget : Fin (2 ^ n) → ℝ)
+    (hZero : ∀ outer,
+      state (prodEquiv ((0 : Fin (2 ^ 1)), outer)) =
+        scale outer * weightedAmplitude (leftCount outer) (coefficient outer))
+    (hOne : ∀ outer,
+      state (prodEquiv ((1 : Fin (2 ^ 1)), outer)) =
+        targetSign dBit * scale outer *
+          weightedAmplitude (rightCount outer) (coefficient outer))
+    (hCountBudget : ∀ outer,
+      pairCountErrorEnergy (leftCount outer) (rightCount outer) ≤
+        countBudget outer)
+    (hCoefficientBudget : ∀ outer,
+      coefficientEnergy (coefficient outer) ≤ coefficientBudget outer)
+    (hCountBudgetNonneg : ∀ outer, 0 ≤ countBudget outer) :
+    1 - (∑ outer, Complex.normSq (scale outer) * countBudget outer *
+          coefficientBudget outer) / 2 ≤
+      PureState.probQubit0
+        ((Gate.tensor Gate.H (1 : Gate (Qubits n))).apply state)
+        (SimonDCP.Quantum.BitReadout.bitIndex dBit) := by
+  rw [probQubit0_hadamardFirst_correct_eq]
+  exact lemmaFour_labelled_additive_readout
+    (fun outer : Fin (2 ^ n) =>
+      state (prodEquiv ((0 : Fin (2 ^ 1)), outer)))
+    (fun outer : Fin (2 ^ n) =>
+      state (prodEquiv ((1 : Fin (2 ^ 1)), outer)))
+    dBit scale leftCount rightCount coefficient countBudget coefficientBudget
+    (pairedBranchMass_state_eq_one state) hZero hOne hCountBudget
+    hCoefficientBudget hCountBudgetNonneg
+
+/-- Pointwise balls-in-bins specialization of the gate-level labelled repair. -/
+theorem lemmaFour_state_labelled_uniform_counts_readout
+    {n : ℕ} [Fintype Label]
+    (state : PureState (Qubits (1 + n))) (dBit : Bool)
+    (scale : Fin (2 ^ n) → ℂ)
+    (leftCount rightCount : Fin (2 ^ n) → Label → ℝ)
+    (coefficient : Fin (2 ^ n) → Label → ℂ)
+    (mean error coefficientBudget : Fin (2 ^ n) → ℝ)
+    (hZero : ∀ outer,
+      state (prodEquiv ((0 : Fin (2 ^ 1)), outer)) =
+        scale outer * weightedAmplitude (leftCount outer) (coefficient outer))
+    (hOne : ∀ outer,
+      state (prodEquiv ((1 : Fin (2 ^ 1)), outer)) =
+        targetSign dBit * scale outer *
+          weightedAmplitude (rightCount outer) (coefficient outer))
+    (hError : ∀ outer, 0 ≤ error outer)
+    (hLeft : ∀ outer label,
+      |leftCount outer label - mean outer| ≤ error outer)
+    (hRight : ∀ outer label,
+      |rightCount outer label - mean outer| ≤ error outer)
+    (hCoefficientBudget : ∀ outer,
+      coefficientEnergy (coefficient outer) ≤ coefficientBudget outer) :
+    1 - (∑ outer, Complex.normSq (scale outer) *
+          (4 * (Fintype.card Label : ℝ) * error outer ^ 2) *
+          coefficientBudget outer) / 2 ≤
+      PureState.probQubit0
+        ((Gate.tensor Gate.H (1 : Gate (Qubits n))).apply state)
+        (SimonDCP.Quantum.BitReadout.bitIndex dBit) := by
+  rw [probQubit0_hadamardFirst_correct_eq]
+  exact lemmaFour_labelled_uniform_counts_readout
+    (fun outer : Fin (2 ^ n) =>
+      state (prodEquiv ((0 : Fin (2 ^ 1)), outer)))
+    (fun outer : Fin (2 ^ n) =>
+      state (prodEquiv ((1 : Fin (2 ^ 1)), outer)))
+    dBit scale leftCount rightCount coefficient mean error coefficientBudget
+    (pairedBranchMass_state_eq_one state) hZero hOne hError hLeft hRight
+    hCoefficientBudget
 
 /--
 Decoder-facing repaired Lemma 4.  Count-error and coefficient-energy budgets

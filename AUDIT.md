@@ -601,7 +601,24 @@ Pr[wrong bit] = normSq(b - s*a) / 2.
 
 Consequently additive mismatch norm at most `epsilon` gives correct-bit
 probability at least `1 - epsilon^2/2`, even when either reference amplitude
-cancels.  `Lemma4Decoder.lean` then uses Cauchy--Schwarz to prove the
+cancels.
+
+The final paragraph of the paper still has other high-part labels present
+when it applies Hadamard to `h*`, so a pure-one-qubit theorem alone would not
+model that step.  `ApproximateReadout.lean` now also proves the exact labelled
+identity for normalized paired amplitude families `a_x, b_x`, and identifies
+it with the concrete QuantumAlg first-qubit marginal after `H ⊗ I`:
+
+```text
+Pr[wrong bit] = (sum_x normSq(b_x - (-1)^d*a_x)) / 2.
+```
+
+It proves that the paper's stated L1 premise
+`sum_x norm(b_x - (-1)^d*a_x) <= epsilon` would imply correct mass at least
+`1 - epsilon^2/2`.  This removes any factorization assumption while retaining
+all unmeasured labels.  `Lemma4Decoder.lean` then uses Cauchy--Schwarz to prove
+both the single-pair and labelled decoder-facing bounds.  The single-pair
+bound is
 decoder-facing bound
 
 ```text
@@ -614,7 +631,11 @@ and `coefficientBudget` bounds the squared energy of the complex coefficient
 family.  Uniform pointwise count error `error` supplies the explicit budget
 `4 * numberOfBins * error^2`.  This removes anti-cancellation from the final
 readout repair while leaving the paper's literal multiplicative claim
-unproved.
+unproved.  The labelled version sums the scaled count/coefficient-energy
+budget over every residual amplitude pair, exactly matching the structure of
+the paper's final Hadamard argument.  A composed theorem starts from an actual
+normalized `1+n` qubit state, applies `H ⊗ I`, and bounds its correct
+first-qubit marginal directly.
 
 The same file lifts the result through the finite union bound.  If every bin
 in both branches has deviation-event mass at most `tail`, the records whose
@@ -645,9 +666,10 @@ the still-open task of connecting its hypotheses to the paper's adaptive,
 conditioned experiment.
 
 For the decoder-facing route, the corresponding open connection is more
-precise: identify the actual conditioned Step-7 qubit coordinates with the two
-scaled weighted amplitudes, then prove a paired count-error energy budget and
-a coefficient-energy budget.  No reference-amplitude lower bound is needed.
+precise: identify each actual conditioned Step-7 amplitude pair with the two
+scaled weighted amplitudes, then prove the resulting labelled count-error and
+coefficient-energy budgets.  No pure-qubit factorization or
+reference-amplitude lower bound is needed.
 
 ## Remaining invalid or missing obligations
 
@@ -687,9 +709,9 @@ a coefficient-energy budget.  No reference-amplitude lower bound is needed.
   conditional balls-in-bins, variance, and union-bound premises.  Its literal
   multiplicative amplitude ratio needs the anti-cancellation lower bound in
   `Lemma4Repair.lean`; the decoder-facing additive replacement avoids that
-  premise but still needs the conditioned Step-7 coordinate identification,
-  paired count-error energy, and coefficient-energy bounds isolated in
-  `Lemma4Decoder.lean`.
+  premise but still needs the conditioned Step-7 amplitude-family
+  identification and the labelled count-error and coefficient-energy bounds
+  isolated in `Lemma4Decoder.lean`.
 - Only the deterministic Step-6 carry/top-bit arithmetic is closed.  Its
   postselection probability and decoding bias are not proved; keeping all low
   outcomes preserves mass but is spectrally unbiased in the analyzed clean
