@@ -730,6 +730,19 @@ B-residue map therefore incurs no extra cardinality factor.  This narrows the
 coefficient-side obligation to an actual conditioned fibre-multiplicity bound
 or a Parseval/orthogonality identity.
 
+The same module proves the converse counting obstruction
+
+```text
+#BPaths <= #Residues * maximum B-residue fibre size.
+```
+
+When all B terms are the same complex number, it also identifies the
+coefficient energy exactly with `normSq(common) * sum_z #(B_z)^2` and proves the lower bound
+`normSq(common) * #BPaths^2 / #Residues`.  Thus the bounded-fibre route is not
+automatically polynomial when the number of compatible B paths greatly
+exceeds the number of residues.  A concrete proof must obtain a small fibre
+from structure or exploit genuine cancellation/orthogonality.
+
 The final composed theorem therefore assumes: actual state coordinates equal
 to the displayed direct path sums with a common B-side path/residue/term
 family in both branches; equal selected A-branch populations; selected-pair

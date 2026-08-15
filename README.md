@@ -605,6 +605,14 @@ largest cardinality of any B-residue fibre.  This estimate is propagated all
 the way through the selected-pair collision decoder, and has factor one when
 the B-residue map is injective.
 
+There is a matching obstruction: Lean proves
+`#BPaths <= #Residues * maximum fibre size`.  When all B terms are the same
+complex number, it also proves that coefficient energy is exactly that term's
+squared magnitude times the sum of squared fibre sizes, and hence is at least
+`normSq(common) * #BPaths^2 / #Residues`.  The sharper upper bound therefore
+helps only when the concrete conditioned B-side construction has genuinely
+small fibres; otherwise cancellation or orthogonality is essential.
+
 Consequently the fully composed finite theorem needs no separately postulated
 coefficient family or per-bin concentration event.  Its remaining hypotheses
 are that the actual state coordinates equal the direct path sums with a common
