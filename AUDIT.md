@@ -25,7 +25,7 @@ implementation gap, not merely a missing concentration estimate.
 The source contains no `sorry`, `admit`, or handwritten project-local axioms.
 A clean build, including the Lemma 1 repair, current Lemma 3 repair, and
 decoder-facing conditional and expectation-level Lemma 4 repair modules,
-completed all 8670 jobs successfully on August 15, 2026.
+completed all 8672 jobs successfully on August 15, 2026.
 `SimonDCP/AxiomAudit.lean` prints the axiom dependencies of the principal
 results.  Analytic theorems contain only `propext`, `Classical.choice`, and
 `Quot.sound`.  The finite exhaustive searches, including the six-coordinate
@@ -764,6 +764,40 @@ paper-path/circuit coordinate identification, normalization, and—most
 importantly—a bound on this Walsh-signed branch mismatch in the fully
 conditioned adaptive experiment.  Bare pairwise independence before fixing
 `W'`, `S`, and `h'` does not establish that bound.
+
+`Lemma4AdaptiveWalshEnergy.lean` makes the remaining second-moment premise
+exact.  It reindexes each transcript's signed branch difference as a sum over
+the fixed ambient hidden-state type, then expands the squared mismatch over
+ordered hidden-state pairs.  For fixed hidden states `phi` and `psi`, their
+correlation still contains the complete transcript weight and both adaptive
+compatibility indicators.  Thus `D`, acceptance, `W'`, `S`, `h'`, and the
+outcome-dependent normalization are all inside the correlation sum rather
+than treated as a fixed support after conditioning.
+
+Lean proves the exact identity
+
+```text
+Walsh mismatch energy
+  = sum_phi correlation(phi,phi)
+    + sum_(phi != psi) correlation(phi,psi).
+```
+
+The diagonal sum is globally—not pointwise—equal to the compatible common-
+path energy: one hidden state may survive for several values of `D`.  The
+existing path-energy theorem bounds it by
+`normalizationBound / card(Low)`.  Therefore a quantitative upper bound
+`delta` on the signed adaptive off-diagonal sum yields
+
+```text
+Pr[correct after H tensor I]
+  >= 1 - (normalizationBound / card(Low) + delta) / 2.
+```
+
+Exact adaptive pair orthogonality is the special case `delta = 0`.  The new
+module does not claim that this premise follows from the paper's unconditioned
+pairwise independence.  Rather, it isolates the exact weighted conditional
+correlation statement that a repaired Lemma 4 must prove or replace with a
+quantitative cancellation estimate.
 
 The final composed theorem therefore assumes: actual state coordinates equal
 to the displayed direct path sums with a common B-side path/residue/term

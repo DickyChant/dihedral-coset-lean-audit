@@ -632,6 +632,27 @@ quantity: the remaining mathematical task is precisely to bound this
 Walsh-signed L2 branch mismatch after the full adaptive transcript has been
 fixed, and to identify the finite path amplitudes with the circuit state.
 
+[`Lemma4AdaptiveWalshEnergy.lean`](SimonDCP/Probability/Lemma4AdaptiveWalshEnergy.lean)
+expands that exact mismatch over ordered pairs of fixed hidden states.  The
+complete transcript selection—including `D`, acceptance, `W'`, `S`, and
+`h'`—and the transcript-dependent normalization remain inside every pair
+correlation.  Lean proves the exact decomposition
+
+```text
+Walsh mismatch energy
+  = compatible common-path diagonal energy
+    + adaptive off-diagonal hidden-pair correlation.
+```
+
+The diagonal term is bounded by
+`normalizationBound / card(Low)` using the existing Step-2 path-energy theorem.
+Consequently an off-diagonal upper bound `delta` gives decoder success at
+least `1 - (normalizationBound / card(Low) + delta)/2`; exact adaptive pair
+orthogonality is the case `delta = 0`.  This identifies rather than assumes
+away the remaining probabilistic premise.  Fixed-support Parseval or bare
+pairwise independence before adaptive transcript selection does not by itself
+establish it.
+
 Consequently the fully composed finite theorem needs no separately postulated
 coefficient family or per-bin concentration event.  Its remaining hypotheses
 are that the actual state coordinates equal the direct path sums with a common
@@ -987,7 +1008,7 @@ running `scripts/build-wsl.sh`; the source tree remains authoritative.
 
 The full project, including the Lemma 1 repair, current Lemma 3 repair, and
 decoder-facing conditional and expectation-level Lemma 4 repair modules, was
-verified on August 15, 2026. The command `lake build` completed all 8670 jobs
+verified on August 15, 2026. The command `lake build` completed all 8672 jobs
 successfully.
 
 ## Verification policy

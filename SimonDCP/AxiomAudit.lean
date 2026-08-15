@@ -26,6 +26,7 @@ import SimonDCP.Probability.GroupUnionFamily
 import SimonDCP.Probability.LabelledBornProbability
 import SimonDCP.Probability.LabelledBornPairwiseTail
 import SimonDCP.Probability.LabelledParseval
+import SimonDCP.Probability.Lemma4AdaptiveWalshEnergy
 import SimonDCP.Probability.Lemma4AverageDecoder
 import SimonDCP.Probability.Lemma4Decoder
 import SimonDCP.Probability.Lemma4PaperDecoder
@@ -133,6 +134,7 @@ open SimonDCP.Probability.GroupUnionFamily
 open SimonDCP.Probability.LabelledBornProbability
 open SimonDCP.Probability.LabelledBornPairwiseTail
 open SimonDCP.Probability.LabelledParseval
+open SimonDCP.Probability.Lemma4AdaptiveWalshEnergy
 open SimonDCP.Probability.Lemma4AverageDecoder
 open SimonDCP.Probability.Lemma4Decoder
 open SimonDCP.Probability.Lemma4PaperDecoder
@@ -479,6 +481,13 @@ open SimonDCP.Quantum.Step2Phase
 #print axioms paperSignedMismatchEnergy_eq_paperWalshMismatchEnergy
 #print axioms pairedMismatchEnergy_scaledPaperBranchAmplitude_eq_walsh
 #print axioms paper_decoder_success_ge_of_walsh_mismatch_energy
+#print axioms weightedAdaptiveSignedEnergy_eq_diagonal_add_offDiagonal
+#print axioms paperWalshSignedBranchCount_true_sub_false_eq_sum_contribution
+#print axioms paperWalshMismatchEnergy_eq_sum_pairCorrelation
+#print axioms sum_paperWalshPairCorrelation_self_eq_pathEnergy
+#print axioms paperWalshMismatchEnergy_eq_pathEnergy_add_offDiagonal
+#print axioms paperWalshMismatchEnergy_le_normalizationBound_add_offDiagonal
+#print axioms paper_decoder_success_ge_of_adaptive_offDiagonal_bound
 #print axioms lemmaFour_decoder_failure_mass_le
 #print axioms lemmaFour_decoder_success_mass_ge
 #print axioms eventMass_finset_exists_le
