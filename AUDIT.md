@@ -723,13 +723,21 @@ energy of the coherently residue-grouped B coefficients
   <= #BPaths * total diagonal B-path energy.
 ```
 
+The sharper bounded-fibre form replaces `#BPaths` by
+`max_z #(BPaths with residue z)`.  It is carried through both the averaged
+count-energy theorem and the selected-pair collision theorem; an injective
+B-residue map therefore incurs no extra cardinality factor.  This narrows the
+coefficient-side obligation to an actual conditioned fibre-multiplicity bound
+or a Parseval/orthogonality identity.
+
 The final composed theorem therefore assumes: actual state coordinates equal
 to the displayed direct path sums with a common B-side path/residue/term
 family in both branches; equal selected A-branch populations; selected-pair
 collision uniformity after conditioning; and a record-uniform bound on the
-displayed diagonal B-side expression.  The last estimate may be exponentially
-loose because of `#BPaths`; a concrete Parseval or orthogonality argument is
-still needed if that factor is not absorbed by normalization.
+displayed diagonal B-side expression.  The universal estimate may be
+exponentially loose because of `#BPaths`; the bounded-fibre theorem is useful
+only if the concrete conditioned experiment supplies a small fibre bound.
+Otherwise a Parseval or orthogonality argument is still needed.
 
 ## Remaining invalid or missing obligations
 

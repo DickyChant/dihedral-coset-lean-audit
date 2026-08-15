@@ -204,18 +204,19 @@ theorem coefficientEnergy_bResidueCoefficient_eq_collisionSum
     (bPaths.filter fun b => bResidue b = z) term
 
 /--
-A universal coefficient-energy bound requiring no cancellation or
-independence: coherently grouping the right paths by residue costs at most the
-number of right paths times their total diagonal energy.  A Parseval or
-orthogonality argument can improve this bound, but is not needed for its
-validity.
+A coefficient-energy bound in terms of the largest right-path residue fibre.
+No cancellation or independence is required.  In particular, an injective
+residue map has `fiberCardBound = 1` and loses no factor beyond the diagonal
+path energy.
 -/
-theorem coefficientEnergy_bResidueCoefficient_le_card_mul_sum_normSq
+theorem coefficientEnergy_bResidueCoefficient_le_fiberCard_mul_sum_normSq
     [Fintype Residue] [DecidableEq Residue]
     (bPaths : Finset BPath) (bResidue : BPath -> Residue)
-    (term : BPath -> Complex) :
+    (term : BPath -> Complex) (fiberCardBound : Nat)
+    (hFiberCard : ∀ z,
+      (bPaths.filter fun b => bResidue b = z).card ≤ fiberCardBound) :
     coefficientEnergy (bResidueCoefficient bPaths bResidue term) ≤
-      (bPaths.card : Real) *
+      (fiberCardBound : Real) *
         ∑ b ∈ bPaths, Complex.normSq (term b) := by
   classical
   unfold coefficientEnergy bResidueCoefficient
@@ -230,16 +231,15 @@ theorem coefficientEnergy_bResidueCoefficient_le_card_mul_sum_normSq
       simpa using normSq_sum_real_mul_le
         (bPaths.filter fun b => bResidue b = z)
         (fun _ => (1 : Real)) term
-    _ ≤ ∑ z, (bPaths.card : Real) *
+    _ ≤ ∑ z, (fiberCardBound : Real) *
         ∑ b ∈ bPaths.filter (fun b => bResidue b = z),
           Complex.normSq (term b) := by
       apply Finset.sum_le_sum
       intro z _
       apply mul_le_mul_of_nonneg_right
-      · exact_mod_cast Finset.card_filter_le bPaths
-          (fun b => bResidue b = z)
+      · exact_mod_cast hFiberCard z
       · exact Finset.sum_nonneg fun b _ => Complex.normSq_nonneg (term b)
-    _ = (bPaths.card : Real) *
+    _ = (fiberCardBound : Real) *
         ∑ b ∈ bPaths, Complex.normSq (term b) := by
       rw [← Finset.mul_sum]
       simp_rw [Finset.sum_filter]
@@ -252,5 +252,23 @@ theorem coefficientEnergy_bResidueCoefficient_le_card_mul_sum_normSq
       · intro z _ hz
         simp [Ne.symm hz]
       · simp
+
+/--
+A universal specialization of the fibre-cardinality estimate: coherently
+grouping the right paths by residue costs at most the total number of right
+paths times their diagonal energy.  A sharper fibre bound, Parseval identity,
+or orthogonality argument can improve this factor.
+-/
+theorem coefficientEnergy_bResidueCoefficient_le_card_mul_sum_normSq
+    [Fintype Residue] [DecidableEq Residue]
+    (bPaths : Finset BPath) (bResidue : BPath -> Residue)
+    (term : BPath -> Complex) :
+    coefficientEnergy (bResidueCoefficient bPaths bResidue term) ≤
+      (bPaths.card : Real) *
+        ∑ b ∈ bPaths, Complex.normSq (term b) := by
+  apply coefficientEnergy_bResidueCoefficient_le_fiberCard_mul_sum_normSq
+    bPaths bResidue term bPaths.card
+  intro z
+  exact Finset.card_filter_le bPaths (fun b => bResidue b = z)
 
 end SimonDCP.Probability.LemmaThreeStepSevenRegrouping

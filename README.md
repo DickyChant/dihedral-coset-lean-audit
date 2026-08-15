@@ -600,15 +600,20 @@ coefficient energy
   <= number of compatible B-paths * total diagonal B-path energy.
 ```
 
+More sharply, a second theorem replaces the total number of B paths by the
+largest cardinality of any B-residue fibre.  This estimate is propagated all
+the way through the selected-pair collision decoder, and has factor one when
+the B-residue map is injective.
+
 Consequently the fully composed finite theorem needs no separately postulated
 coefficient family or per-bin concentration event.  Its remaining hypotheses
 are that the actual state coordinates equal the direct path sums with a common
 B-side path/residue/term family in both branches, the selected A-side pairs
 have the required collision moment and equal branch populations, and the
-displayed diagonal B-side budget is uniformly small.  The cardinality factor
-can be exponential, so this universal bound exposes rather than solves the
-need for a sharper Parseval or orthogonality estimate in the concrete
-experiment.
+displayed diagonal B-side budget is uniformly small.  The universal
+cardinality factor can be exponential; the sharper route instead requires a
+small conditioned B-residue fibre bound.  If neither is available, the need
+for a Parseval or orthogonality estimate in the concrete experiment remains.
 
 The repair is also lifted to a normalized finite probability space. If every
 bin in each of the two branches has deviation-event mass at most `tail`, Lean
@@ -916,9 +921,10 @@ now a proved Lean result; the remaining headline-theorem gaps occur later.
 - `Probability/Lemma4StepSevenAverage.lean` specializes that theorem to the
   explicit Step-7 double path sums, derives their weighted-amplitude
   coordinates by regrouping, and replaces an abstract coefficient budget by
-  the universal `#BPaths * diagonal path energy` estimate.  Its fully composed
-  form isolates the remaining circuit-to-path, selected-collision, and uniform
-  diagonal-budget obligations.
+  both the universal `#BPaths * diagonal path energy` estimate and the sharper
+  `maximum residue-fibre size * diagonal path energy` estimate.  Its fully
+  composed forms isolate the remaining circuit-to-path, selected-collision,
+  fibre-multiplicity, and uniform diagonal-budget obligations.
 
 The project deliberately separates the formalized and classically averaged
 analytic experiment from a gate/tensor-circuit implementation, a quantum
