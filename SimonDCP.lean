@@ -32,6 +32,7 @@ import SimonDCP.Probability.Lemma4AverageDecoder
 import SimonDCP.Probability.Lemma4Decoder
 import SimonDCP.Probability.Lemma4Parameters
 import SimonDCP.Probability.Lemma4Repair
+import SimonDCP.Probability.Lemma4StepSevenAverage
 import SimonDCP.Probability.LemmaOneChebyshevParameters
 import SimonDCP.Probability.LemmaOneExactParameters
 import SimonDCP.Probability.LemmaOneFaultEnvironmentAveraging

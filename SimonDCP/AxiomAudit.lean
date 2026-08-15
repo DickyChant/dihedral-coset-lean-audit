@@ -30,6 +30,7 @@ import SimonDCP.Probability.Lemma4AverageDecoder
 import SimonDCP.Probability.Lemma4Decoder
 import SimonDCP.Probability.Lemma4Parameters
 import SimonDCP.Probability.Lemma4Repair
+import SimonDCP.Probability.Lemma4StepSevenAverage
 import SimonDCP.Probability.LemmaOneChebyshevParameters
 import SimonDCP.Probability.LemmaOneExactParameters
 import SimonDCP.Probability.LemmaOneFaultEnvironmentAveraging
@@ -135,6 +136,7 @@ open SimonDCP.Probability.Lemma4AverageDecoder
 open SimonDCP.Probability.Lemma4Decoder
 open SimonDCP.Probability.Lemma4Parameters
 open SimonDCP.Probability.Lemma4Repair
+open SimonDCP.Probability.Lemma4StepSevenAverage
 open SimonDCP.Probability.LemmaOneChebyshevParameters
 open SimonDCP.Probability.LemmaOneExactParameters
 open SimonDCP.Probability.LemmaOneFaultEnvironmentAveraging
@@ -301,6 +303,7 @@ open SimonDCP.Quantum.Step2Phase
 #print axioms directDoubleSum_eq_weightedAmplitude
 #print axioms scaledDirect_sub_scaledMean_normSq_le_budget
 #print axioms coefficientEnergy_bResidueCoefficient_eq_collisionSum
+#print axioms coefficientEnergy_bResidueCoefficient_le_card_mul_sum_normSq
 #print axioms allZeroHadamardMass_eq
 #print axioms diagonalInputMass_destructiveBoolAmplitude
 #print axioms allZeroHadamardMass_destructiveBoolAmplitude_eq_zero
@@ -459,6 +462,9 @@ open SimonDCP.Quantum.Step2Phase
 #print axioms average_state_labelled_decoder_success_ge_of_branch_count_energy
 #print axioms average_state_labelled_decoder_success_ge_of_selected_pair_collision
 #print axioms equalBitCondition_not_weightedPairCollisionUniform
+#print axioms average_decoder_success_ge_of_stepSeven_exact_energy
+#print axioms average_decoder_success_ge_of_stepSeven_diagonal_energy
+#print axioms average_decoder_success_ge_of_stepSeven_selected_pair_collision
 #print axioms lemmaFour_decoder_failure_mass_le
 #print axioms lemmaFour_decoder_success_mass_ge
 #print axioms eventMass_finset_exists_le

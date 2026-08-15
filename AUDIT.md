@@ -25,7 +25,7 @@ implementation gap, not merely a missing concentration estimate.
 The source contains no `sorry`, `admit`, or handwritten project-local axioms.
 A clean build, including the Lemma 1 repair, current Lemma 3 repair, and
 decoder-facing conditional and expectation-level Lemma 4 repair modules,
-completed all 8669 jobs successfully on August 15, 2026.
+completed all 8670 jobs successfully on August 15, 2026.
 `SimonDCP/AxiomAudit.lean` prints the axiom dependencies of the principal
 results.  Analytic theorems contain only `propext`, `Classical.choice`, and
 `Quot.sound`.  The finite exhaustive searches, including the six-coordinate
@@ -711,6 +711,25 @@ the exponential two-layer union bound entirely.  The same module proves that
 the equal-bit conditioning counterexample violates
 `WeightedPairCollisionUniform`, even though its two underlying Boolean bucket
 labels are jointly uniform before conditioning.
+
+`Lemma4StepSevenAverage.lean` closes the next algebraic interface.  It feeds
+the explicit finite Step-7 double sums from
+`LemmaThreeStepSevenRegrouping.lean` into the averaged `H ⊗ I` theorem, so the
+count-weighted coordinate identities are derived rather than assumed inside
+that path model.  The accompanying universal estimate proves
+
+```text
+energy of the coherently residue-grouped B coefficients
+  <= #BPaths * total diagonal B-path energy.
+```
+
+The final composed theorem therefore assumes: actual state coordinates equal
+to the displayed direct path sums with a common B-side path/residue/term
+family in both branches; equal selected A-branch populations; selected-pair
+collision uniformity after conditioning; and a record-uniform bound on the
+displayed diagonal B-side expression.  The last estimate may be exponentially
+loose because of `#BPaths`; a concrete Parseval or orthogonality argument is
+still needed if that factor is not absorbed by normalization.
 
 ## Remaining invalid or missing obligations
 

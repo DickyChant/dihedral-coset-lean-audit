@@ -203,4 +203,54 @@ theorem coefficientEnergy_bResidueCoefficient_eq_collisionSum
   exact normSq_finsetSum_eq_collisionSum
     (bPaths.filter fun b => bResidue b = z) term
 
+/--
+A universal coefficient-energy bound requiring no cancellation or
+independence: coherently grouping the right paths by residue costs at most the
+number of right paths times their total diagonal energy.  A Parseval or
+orthogonality argument can improve this bound, but is not needed for its
+validity.
+-/
+theorem coefficientEnergy_bResidueCoefficient_le_card_mul_sum_normSq
+    [Fintype Residue] [DecidableEq Residue]
+    (bPaths : Finset BPath) (bResidue : BPath -> Residue)
+    (term : BPath -> Complex) :
+    coefficientEnergy (bResidueCoefficient bPaths bResidue term) ≤
+      (bPaths.card : Real) *
+        ∑ b ∈ bPaths, Complex.normSq (term b) := by
+  classical
+  unfold coefficientEnergy bResidueCoefficient
+  calc
+    (∑ z, Complex.normSq
+        (∑ b ∈ bPaths.filter (fun b => bResidue b = z), term b)) ≤
+      ∑ z, ((bPaths.filter fun b => bResidue b = z).card : Real) *
+        ∑ b ∈ bPaths.filter (fun b => bResidue b = z),
+          Complex.normSq (term b) := by
+      apply Finset.sum_le_sum
+      intro z _
+      simpa using normSq_sum_real_mul_le
+        (bPaths.filter fun b => bResidue b = z)
+        (fun _ => (1 : Real)) term
+    _ ≤ ∑ z, (bPaths.card : Real) *
+        ∑ b ∈ bPaths.filter (fun b => bResidue b = z),
+          Complex.normSq (term b) := by
+      apply Finset.sum_le_sum
+      intro z _
+      apply mul_le_mul_of_nonneg_right
+      · exact_mod_cast Finset.card_filter_le bPaths
+          (fun b => bResidue b = z)
+      · exact Finset.sum_nonneg fun b _ => Complex.normSq_nonneg (term b)
+    _ = (bPaths.card : Real) *
+        ∑ b ∈ bPaths, Complex.normSq (term b) := by
+      rw [← Finset.mul_sum]
+      simp_rw [Finset.sum_filter]
+      rw [Finset.sum_comm]
+      congr 1
+      apply Finset.sum_congr rfl
+      intro b _
+      rw [Finset.sum_eq_single (bResidue b)]
+      · simp
+      · intro z _ hz
+        simp [Ne.symm hz]
+      · simp
+
 end SimonDCP.Probability.LemmaThreeStepSevenRegrouping
