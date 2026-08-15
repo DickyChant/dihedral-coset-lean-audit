@@ -43,7 +43,7 @@ headline algorithm theorem therefore remain unproved.
 | --- | --- | --- |
 | Lemma 1 | **Repaired and formalized** | The proposed low-part swap is invalid, so the repair replaces it rather than completing that argument. Restricted Parseval gives an unconditional inverse-polynomial bound, while the stronger route connects the corrected mixed correct/fault amplitudes, Step-2 joint law, complete Step-4 label, exact Born moments, collision-plus-Chebyshev bound, classical fault-environment averaging, and rounded parameters. For the padded repaired schedule with `k = 24`, `c = 12`, and every `n >= 1024`, the explicitly summed success event has mass at least `1/2`. This is the formalized constant-probability core needed from Lemma 1. |
 | Lemma 3 | **Not repaired as support for the polynomial algorithm; standalone finite inequalities retained** | The published pairwise-independence argument fails after the adaptive choice of `A`. Lean proves an explicit paper-shaped signed-path identity and a joint `2^(-n)` finite-model bound under stated Step-2 energy and model-identification premises, plus the correct budgeted second-clause tail `C_n/L^2`; neither is yet an actual-circuit theorem with all paper premises discharged. Separately, a natural-language all-frequency two-copy calculation shows that the no-guard `keep-u` decoder has correct and wrong masses `1/2+o(1)` each. For the paper's zero-low-Hadamard step it predicts masses `1/(2L)+o(1/n)` each and acceptance `1/L+o(1/n)`; the concrete guard conclusion still needs its explicit Parseval perturbation estimate. The global ParityPGM candidate is information-theoretically sound but has no polynomial implementation. |
-| Lemma 4 | **Decoder-facing conditional repair formalized; paper premises open and spectrally challenged** | The exponent, `mu`, and `n^(3/2)` bookkeeping errors are repaired. A finite corrected theorem gives high-probability additive control from explicit per-bin tails and relative control under an anti-cancellation lower bound. More directly, new Hadamard theorems convert squared additive mismatch into wrong-bit probability without any amplitude denominator, both for one qubit and for a distinguished bit entangled with arbitrary finite residual labels. A Cauchy--Schwarz bridge derives the labelled mismatch from count and coefficient energies. Establishing those conditioned budgets and the concrete Step-7 amplitude-family identification remains open, while the clean-oracle calculation challenges the required branch closeness once its remaining guard estimate is completed. |
+| Lemma 4 | **Decoder-facing conditional repair formalized; paper premises open and spectrally challenged** | The exponent, `mu`, and `n^(3/2)` bookkeeping errors are repaired. A finite corrected theorem gives high-probability additive control from explicit per-bin tails and relative control under an anti-cancellation lower bound. More directly, new Hadamard theorems convert squared additive mismatch into wrong-bit probability without any amplitude denominator, both for one qubit and for a distinguished bit entangled with arbitrary finite residual labels. Cauchy--Schwarz gives both finite high-probability and stronger expectation-level decoder repairs. The latter avoids a union bound over residual pairs and bins and reduces the probabilistic gap to a selected-pair collision moment. Establishing that moment and the concrete Step-7 amplitude-family identification remains open, while the clean-oracle calculation challenges the required branch closeness once its remaining guard estimate is completed. |
 
 **Verdict on Lemma 3.**  Lemma 3 is **not repaired in the sense needed by the
 paper's polynomial-time algorithm**.  What is complete is narrower: sound
@@ -564,6 +564,29 @@ This union bound assumes no independence between pairs, bins, or branches.  It
 does not prove the required conditional tail premises for the paper's adaptive
 experiment.
 
+[`Lemma4AverageDecoder.lean`](SimonDCP/Probability/Lemma4AverageDecoder.lean)
+proves a stronger repair targeted at the algorithm's actual objective.  The
+algorithm needs the decoded bit to be correct on average over its classical
+measurement records; it does not need every record and every bin to be good
+simultaneously.  If the expected scaled Cauchy--Schwarz mismatch budget is at
+most `epsilon`, Lean proves directly for the concrete `H ⊗ I` gate that the
+overall correct-bit probability is at least
+
+```text
+1 - epsilon / 2.
+```
+
+The same module bounds paired count distance by twice the two branches'
+count-error energies about a common centre.  Its paper-facing theorem then
+uses the exact adaptive balls-in-bins second moment already formalized in
+`LemmaThreeCountEnergy.lean`.  The required hypothesis is selected-pair
+collision uniformity: selection belongs inside the collision moment.  Bare
+pairwise independence before the paper's adaptive conditioning does not imply
+this premise.  This expectation route removes the exponential two-layer union
+bound and pointwise maximum deviations; the remaining Step-7 coordinate,
+selected-collision, equal-population, and scale/coefficient-energy premises
+are explicit.
+
 The repair is also lifted to a normalized finite probability space. If every
 bin in each of the two branches has deviation-event mass at most `tail`, Lean
 proves additive success mass at least
@@ -862,6 +885,11 @@ now a proved Lean result; the remaining headline-theorem gaps occur later.
   mass `1 - 2 * numberOfBins * tail` for one pair and
   `1 - 2 * numberOfPairs * numberOfBins * tail` for the labelled actual-state
   decoder.
+- `Probability/Lemma4AverageDecoder.lean` averages the actual gate-level
+  decoder directly over finite classical records.  Expected mismatch budget
+  `epsilon` gives overall success at least `1 - epsilon/2`; a stronger
+  paper-facing composition replaces simultaneous per-bin tails by the exact
+  selected-pair collision-uniformity moment for the two branch count energies.
 
 The project deliberately separates the formalized and classically averaged
 analytic experiment from a gate/tensor-circuit implementation, a quantum
@@ -896,8 +924,9 @@ Windows-mounted drives, copy the repository to a WSL-native directory before
 running `scripts/build-wsl.sh`; the source tree remains authoritative.
 
 The full project, including the Lemma 1 repair, current Lemma 3 repair, and
-decoder-facing conditional Lemma 4 repair modules, was verified on August 14,
-2026. The command `lake build` completed all 8668 jobs successfully.
+decoder-facing conditional and expectation-level Lemma 4 repair modules, was
+verified on August 15, 2026. The command `lake build` completed all 8669 jobs
+successfully.
 
 ## Verification policy
 

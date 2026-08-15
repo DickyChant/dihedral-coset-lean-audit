@@ -26,6 +26,7 @@ import SimonDCP.Probability.GroupUnionFamily
 import SimonDCP.Probability.LabelledBornProbability
 import SimonDCP.Probability.LabelledBornPairwiseTail
 import SimonDCP.Probability.LabelledParseval
+import SimonDCP.Probability.Lemma4AverageDecoder
 import SimonDCP.Probability.Lemma4Decoder
 import SimonDCP.Probability.Lemma4Parameters
 import SimonDCP.Probability.Lemma4Repair
@@ -130,6 +131,7 @@ open SimonDCP.Probability.GroupUnionFamily
 open SimonDCP.Probability.LabelledBornProbability
 open SimonDCP.Probability.LabelledBornPairwiseTail
 open SimonDCP.Probability.LabelledParseval
+open SimonDCP.Probability.Lemma4AverageDecoder
 open SimonDCP.Probability.Lemma4Decoder
 open SimonDCP.Probability.Lemma4Parameters
 open SimonDCP.Probability.Lemma4Repair
@@ -451,6 +453,11 @@ open SimonDCP.Quantum.Step2Phase
 #print axioms labelledPairedCountDeviationBad_mass_le
 #print axioms lemmaFour_state_labelled_decoder_failure_mass_le
 #print axioms lemmaFour_state_labelled_decoder_success_mass_ge
+#print axioms pairCountErrorEnergy_le_two_countErrorEnergy
+#print axioms average_state_labelled_decoder_success_ge
+#print axioms expectedBranchCountBudget_selected_eq
+#print axioms average_state_labelled_decoder_success_ge_of_branch_count_energy
+#print axioms average_state_labelled_decoder_success_ge_of_selected_pair_collision
 #print axioms lemmaFour_decoder_failure_mass_le
 #print axioms lemmaFour_decoder_success_mass_ge
 #print axioms eventMass_finset_exists_le

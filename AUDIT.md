@@ -24,8 +24,8 @@ implementation gap, not merely a missing concentration estimate.
 
 The source contains no `sorry`, `admit`, or handwritten project-local axioms.
 A clean build, including the Lemma 1 repair, current Lemma 3 repair, and
-decoder-facing conditional Lemma 4 repair modules, completed all 8668 jobs
-successfully on August 14, 2026.
+decoder-facing conditional and expectation-level Lemma 4 repair modules,
+completed all 8669 jobs successfully on August 15, 2026.
 `SimonDCP/AxiomAudit.lean` prints the axiom dependencies of the principal
 results.  Analytic theorems contain only `propext`, `Classical.choice`, and
 `Quot.sound`.  The finite exhaustive searches, including the six-coordinate
@@ -686,6 +686,28 @@ coefficient-energy budgets.  No pure-qubit factorization or
 reference-amplitude lower bound is needed.  Once per-pair/per-bin conditional
 tails are supplied, the formalized two-layer union bound already propagates
 them to the actual gate-level decoder event.
+
+`Lemma4AverageDecoder.lean` removes the need for this simultaneous event when
+the goal is the algorithm's overall decoding probability.  For a normalized
+finite classical record distribution, it proves
+
+```text
+expected scaled mismatch energy <= epsilon
+  ==> overall Pr[correct after H ⊗ I] >= 1 - epsilon/2.
+```
+
+It also proves that the paired count distance is at most twice the sum of the
+two branches' L2 count energies around a common centre, with no factor equal
+to the number of bins.  Composing this with
+`expected_selectedCountErrorEnergy_actualMean_eq` gives an explicit
+paper-facing theorem under `WeightedPairCollisionUniform` for every residual
+pair and both branches.  Importantly, selection is inside this collision
+moment.  Thus the theorem neither assumes nor concludes that the paper's bare
+pre-conditioning pairwise independence survives its adaptive transcript.
+The remaining obligations are now the actual Step-7 coordinate identities,
+equal selected branch populations, the selected-pair collision identities,
+and a scale-times-coefficient-energy bound.  This expectation route avoids
+the exponential two-layer union bound entirely.
 
 ## Remaining invalid or missing obligations
 
