@@ -448,6 +448,9 @@ open SimonDCP.Quantum.Step2Phase
 #print axioms lemmaFour_labelled_uniform_counts_readout
 #print axioms lemmaFour_state_labelled_additive_readout
 #print axioms lemmaFour_state_labelled_uniform_counts_readout
+#print axioms labelledPairedCountDeviationBad_mass_le
+#print axioms lemmaFour_state_labelled_decoder_failure_mass_le
+#print axioms lemmaFour_state_labelled_decoder_success_mass_ge
 #print axioms lemmaFour_decoder_failure_mass_le
 #print axioms lemmaFour_decoder_success_mass_ge
 #print axioms eventMass_finset_exists_le

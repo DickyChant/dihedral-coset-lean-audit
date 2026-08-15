@@ -26,7 +26,8 @@ An application to the paper must still identify its concrete Step-7 amplitude
 pairs with the families below and prove the conditioned count and coefficient
 energy bounds.  The theorem removes anti-cancellation and pure-qubit
 factorization from the final readout step; it does not manufacture those
-probabilistic or semantic premises.
+probabilistic or semantic premises.  A two-layer finite union bound propagates
+explicit per-pair/per-bin tails to the labelled gate-level decoder event.
 -/
 
 namespace SimonDCP.Probability.Lemma4Decoder
@@ -560,6 +561,228 @@ theorem lemmaFour_decoder_success_mass_ge
   have hPartition := Lemma4Repair.eventMass_complement_add weight (fun ω =>
     decoderReadoutGood (Fintype.card Label) (state ω) dBit (scale ω)
       error coefficientBudget)
+  rw [hNormalized] at hPartition
+  linarith
+
+/-! ## Labelled finite probabilistic decoder repair -/
+
+/--
+At least one residual amplitude pair has a low-part count outside its allowed
+radius in either distinguished-bit branch.
+-/
+def labelledPairedCountDeviationBad
+    {Ω Outer Bin : Type*} [Fintype Outer] [Fintype Bin]
+    (leftCount rightCount : Ω → Outer → Bin → ℝ)
+    (mean error : Outer → ℝ) (ω : Ω) : Prop :=
+  ∃ outer ∈ (Finset.univ : Finset Outer),
+    Lemma4Repair.pairedCountDeviationBad
+      (Finset.univ : Finset Bin)
+      (fun record label => leftCount record outer label)
+      (fun record label => rightCount record outer label)
+      (mean outer) (error outer) ω
+
+/--
+Union bound simultaneously over residual amplitude pairs, low-part bins, and
+the two distinguished-bit branches.  No independence between these events is
+assumed.
+-/
+theorem labelledPairedCountDeviationBad_mass_le
+    {Ω Outer Bin : Type*} [Fintype Ω] [Fintype Outer] [Fintype Bin]
+    (weight : Ω → ℚ)
+    (leftCount rightCount : Ω → Outer → Bin → ℝ)
+    (mean error : Outer → ℝ) (tail : ℚ)
+    (hWeight : ∀ ω, 0 ≤ weight ω)
+    (hLeftTail : ∀ outer label,
+      Lemma4Repair.eventMass weight
+        (fun ω => error outer <
+          |leftCount ω outer label - mean outer|) ≤ tail)
+    (hRightTail : ∀ outer label,
+      Lemma4Repair.eventMass weight
+        (fun ω => error outer <
+          |rightCount ω outer label - mean outer|) ≤ tail) :
+    Lemma4Repair.eventMass weight
+        (labelledPairedCountDeviationBad leftCount rightCount mean error) ≤
+      2 * (Fintype.card Outer : ℚ) * (Fintype.card Bin : ℚ) * tail := by
+  classical
+  let outers : Finset Outer := Finset.univ
+  have hPerOuter : ∀ outer ∈ outers,
+      Lemma4Repair.eventMass weight
+          (Lemma4Repair.pairedCountDeviationBad
+            (Finset.univ : Finset Bin)
+            (fun record label => leftCount record outer label)
+            (fun record label => rightCount record outer label)
+            (mean outer) (error outer)) ≤
+        2 * (Fintype.card Bin : ℚ) * tail := by
+    intro outer _
+    simpa using Lemma4Repair.pairedCountDeviationBad_mass_le
+      (Finset.univ : Finset Bin) weight
+      (fun record label => leftCount record outer label)
+      (fun record label => rightCount record outer label)
+      (mean outer) (error outer) tail hWeight
+      (fun label _ => hLeftTail outer label)
+      (fun label _ => hRightTail outer label)
+  calc
+    Lemma4Repair.eventMass weight
+        (labelledPairedCountDeviationBad leftCount rightCount mean error) ≤
+        ∑ outer ∈ outers,
+          Lemma4Repair.eventMass weight
+            (Lemma4Repair.pairedCountDeviationBad
+              (Finset.univ : Finset Bin)
+              (fun record label => leftCount record outer label)
+              (fun record label => rightCount record outer label)
+              (mean outer) (error outer)) := by
+      change Lemma4Repair.eventMass weight (fun ω =>
+        ∃ outer ∈ (Finset.univ : Finset Outer),
+          Lemma4Repair.pairedCountDeviationBad
+            (Finset.univ : Finset Bin)
+            (fun record label => leftCount record outer label)
+            (fun record label => rightCount record outer label)
+            (mean outer) (error outer) ω) ≤ _
+      simpa only [outers] using
+        Lemma4Repair.eventMass_finset_exists_le weight
+          (Finset.univ : Finset Outer)
+          (fun outer => Lemma4Repair.pairedCountDeviationBad
+            (Finset.univ : Finset Bin)
+            (fun record label => leftCount record outer label)
+            (fun record label => rightCount record outer label)
+            (mean outer) (error outer)) hWeight
+    _ ≤ ∑ _outer ∈ outers,
+          (2 * (Fintype.card Bin : ℚ) * tail) :=
+      Finset.sum_le_sum fun outer hOuter => hPerOuter outer hOuter
+    _ = 2 * (Fintype.card Outer : ℚ) *
+          (Fintype.card Bin : ℚ) * tail := by
+      simp [outers]
+      ring
+
+/--
+The gate-level labelled readout guarantee attached to one classical
+measurement record.
+-/
+def stateLabelledDecoderReadoutGood {n : ℕ}
+    (numberOfBins : ℕ) (state : PureState (Qubits (1 + n)))
+    (dBit : Bool) (scale : Fin (2 ^ n) → ℂ)
+    (error coefficientBudget : Fin (2 ^ n) → ℝ) : Prop :=
+  1 - (∑ outer, Complex.normSq (scale outer) *
+        (4 * (numberOfBins : ℝ) * error outer ^ 2) *
+        coefficientBudget outer) / 2 ≤
+    PureState.probQubit0
+      ((Gate.tensor Gate.H (1 : Gate (Qubits n))).apply state)
+      (SimonDCP.Quantum.BitReadout.bitIndex dBit)
+
+/--
+Finite probabilistic labelled Lemma 4 in actual-gate form.  Per-pair, per-bin
+tail bounds imply that records violating the concrete `H ⊗ I` readout
+guarantee have mass at most
+`2 * numberOfPairs * numberOfBins * tail`.
+-/
+theorem lemmaFour_state_labelled_decoder_failure_mass_le
+    {Ω : Type*} [Fintype Ω] {n : ℕ} [Fintype Label]
+    (weight : Ω → ℚ) (state : Ω → PureState (Qubits (1 + n)))
+    (dBit : Bool) (scale : Ω → Fin (2 ^ n) → ℂ)
+    (leftCount rightCount : Ω → Fin (2 ^ n) → Label → ℝ)
+    (coefficient : Ω → Fin (2 ^ n) → Label → ℂ)
+    (mean error coefficientBudget : Fin (2 ^ n) → ℝ) (tail : ℚ)
+    (hWeight : ∀ ω, 0 ≤ weight ω)
+    (hError : ∀ outer, 0 ≤ error outer)
+    (hZero : ∀ ω outer,
+      state ω (prodEquiv ((0 : Fin (2 ^ 1)), outer)) =
+        scale ω outer *
+          weightedAmplitude (leftCount ω outer) (coefficient ω outer))
+    (hOne : ∀ ω outer,
+      state ω (prodEquiv ((1 : Fin (2 ^ 1)), outer)) =
+        targetSign dBit * scale ω outer *
+          weightedAmplitude (rightCount ω outer) (coefficient ω outer))
+    (hCoefficientBudget : ∀ ω outer,
+      coefficientEnergy (coefficient ω outer) ≤ coefficientBudget outer)
+    (hLeftTail : ∀ outer label,
+      Lemma4Repair.eventMass weight
+        (fun ω => error outer <
+          |leftCount ω outer label - mean outer|) ≤ tail)
+    (hRightTail : ∀ outer label,
+      Lemma4Repair.eventMass weight
+        (fun ω => error outer <
+          |rightCount ω outer label - mean outer|) ≤ tail) :
+    Lemma4Repair.eventMass weight (fun ω =>
+        ¬ stateLabelledDecoderReadoutGood (Fintype.card Label)
+          (state ω) dBit (scale ω) error coefficientBudget) ≤
+      2 * (Fintype.card (Fin (2 ^ n)) : ℚ) *
+        (Fintype.card Label : ℚ) * tail := by
+  have hBadMass := labelledPairedCountDeviationBad_mass_le weight
+    leftCount rightCount mean error tail hWeight hLeftTail hRightTail
+  calc
+    Lemma4Repair.eventMass weight (fun ω =>
+        ¬ stateLabelledDecoderReadoutGood (Fintype.card Label)
+          (state ω) dBit (scale ω) error coefficientBudget) ≤
+        Lemma4Repair.eventMass weight
+          (labelledPairedCountDeviationBad
+            leftCount rightCount mean error) := by
+      apply Lemma4Repair.eventMass_mono weight _ _ hWeight
+      intro ω hFailure
+      by_contra hGoodCounts
+      apply hFailure
+      unfold stateLabelledDecoderReadoutGood
+      apply lemmaFour_state_labelled_uniform_counts_readout
+        (state ω) dBit (scale ω) (leftCount ω) (rightCount ω)
+        (coefficient ω) mean error coefficientBudget
+      · exact hZero ω
+      · exact hOne ω
+      · exact hError
+      · intro outer label
+        exact le_of_not_gt fun hDeviation =>
+          hGoodCounts ⟨outer, Finset.mem_univ outer,
+            Or.inl ⟨label, Finset.mem_univ label, hDeviation⟩⟩
+      · intro outer label
+        exact le_of_not_gt fun hDeviation =>
+          hGoodCounts ⟨outer, Finset.mem_univ outer,
+            Or.inr ⟨label, Finset.mem_univ label, hDeviation⟩⟩
+      · exact hCoefficientBudget ω
+    _ ≤ 2 * (Fintype.card (Fin (2 ^ n)) : ℚ) *
+        (Fintype.card Label : ℚ) * tail := hBadMass
+
+/--
+Probability-at-least form of the gate-level labelled repair on a normalized
+finite classical record space.
+-/
+theorem lemmaFour_state_labelled_decoder_success_mass_ge
+    {Ω : Type*} [Fintype Ω] {n : ℕ} [Fintype Label]
+    (weight : Ω → ℚ) (state : Ω → PureState (Qubits (1 + n)))
+    (dBit : Bool) (scale : Ω → Fin (2 ^ n) → ℂ)
+    (leftCount rightCount : Ω → Fin (2 ^ n) → Label → ℝ)
+    (coefficient : Ω → Fin (2 ^ n) → Label → ℂ)
+    (mean error coefficientBudget : Fin (2 ^ n) → ℝ) (tail : ℚ)
+    (hWeight : ∀ ω, 0 ≤ weight ω)
+    (hNormalized : (∑ ω, weight ω) = 1)
+    (hError : ∀ outer, 0 ≤ error outer)
+    (hZero : ∀ ω outer,
+      state ω (prodEquiv ((0 : Fin (2 ^ 1)), outer)) =
+        scale ω outer *
+          weightedAmplitude (leftCount ω outer) (coefficient ω outer))
+    (hOne : ∀ ω outer,
+      state ω (prodEquiv ((1 : Fin (2 ^ 1)), outer)) =
+        targetSign dBit * scale ω outer *
+          weightedAmplitude (rightCount ω outer) (coefficient ω outer))
+    (hCoefficientBudget : ∀ ω outer,
+      coefficientEnergy (coefficient ω outer) ≤ coefficientBudget outer)
+    (hLeftTail : ∀ outer label,
+      Lemma4Repair.eventMass weight
+        (fun ω => error outer <
+          |leftCount ω outer label - mean outer|) ≤ tail)
+    (hRightTail : ∀ outer label,
+      Lemma4Repair.eventMass weight
+        (fun ω => error outer <
+          |rightCount ω outer label - mean outer|) ≤ tail) :
+    1 - 2 * (Fintype.card (Fin (2 ^ n)) : ℚ) *
+          (Fintype.card Label : ℚ) * tail ≤
+      Lemma4Repair.eventMass weight (fun ω =>
+        stateLabelledDecoderReadoutGood (Fintype.card Label)
+          (state ω) dBit (scale ω) error coefficientBudget) := by
+  have hFailure := lemmaFour_state_labelled_decoder_failure_mass_le
+    weight state dBit scale leftCount rightCount coefficient
+    mean error coefficientBudget tail hWeight hError hZero hOne
+    hCoefficientBudget hLeftTail hRightTail
+  have hPartition := Lemma4Repair.eventMass_complement_add weight (fun ω =>
+    stateLabelledDecoderReadoutGood (Fintype.card Label)
+      (state ω) dBit (scale ω) error coefficientBudget)
   rw [hNormalized] at hPartition
   linarith
 

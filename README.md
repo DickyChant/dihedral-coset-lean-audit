@@ -551,6 +551,19 @@ least
 This is an end-to-end conditional probability statement within the finite
 model, not merely a deterministic estimate.
 
+The labelled actual-state theorem now has its own finite probabilistic lift.
+If every residual amplitude pair and every low-part bin in both branches has
+deviation-event mass at most `tail`, then the records whose concrete `H ⊗ I`
+first-qubit marginal satisfies the labelled decoder bound have mass at least
+
+```text
+1 - 2 * numberOfPairs * numberOfBins * tail.
+```
+
+This union bound assumes no independence between pairs, bins, or branches.  It
+does not prove the required conditional tail premises for the paper's adaptive
+experiment.
+
 The repair is also lifted to a normalized finite probability space. If every
 bin in each of the two branches has deviation-event mass at most `tail`, Lean
 proves additive success mass at least
@@ -845,8 +858,10 @@ now a proved Lean result; the remaining headline-theorem gaps occur later.
   coefficient-energy budgets, giving direct single-pair and labelled
   decoder-success theorems, including a gate-level `H ⊗ I` theorem for an
   actual normalized multi-qubit state, and uniform balls-in-bins
-  specializations without anti-cancellation.  It then lifts the single-pair
-  readout guarantee to mass `1 - 2 * numberOfBins * tail`.
+  specializations without anti-cancellation.  Its finite lifts give good-record
+  mass `1 - 2 * numberOfBins * tail` for one pair and
+  `1 - 2 * numberOfPairs * numberOfBins * tail` for the labelled actual-state
+  decoder.
 
 The project deliberately separates the formalized and classically averaged
 analytic experiment from a gate/tensor-circuit implementation, a quantum

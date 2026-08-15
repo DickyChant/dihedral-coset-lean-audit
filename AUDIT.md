@@ -649,6 +649,20 @@ This probabilistic statement is complete inside the explicitly conditioned
 finite interface; its per-bin tails, coordinate identities, and coefficient
 energy bound remain application hypotheses.
 
+The actual-state labelled theorem is also lifted through a second union bound.
+If each residual pair and each low-part bin in both branches has deviation
+event mass at most `tail`, then the classical records whose concrete `H ⊗ I`
+first-qubit marginal satisfies the labelled readout guarantee have mass at
+least
+
+```text
+1 - 2 * numberOfPairs * numberOfBins * tail.
+```
+
+No independence between these events is used.  The bound makes the paper's
+needed simultaneous concentration premise explicit across both indexing
+layers; it does not derive that premise after the adaptive conditioning.
+
 The same module now proves a complete finite probabilistic repair. On a
 normalized nonnegative finite space, if every low-part bin in both high-bit
 branches has deviation-event mass at most `tail`, the additive comparison has
@@ -669,7 +683,9 @@ For the decoder-facing route, the corresponding open connection is more
 precise: identify each actual conditioned Step-7 amplitude pair with the two
 scaled weighted amplitudes, then prove the resulting labelled count-error and
 coefficient-energy budgets.  No pure-qubit factorization or
-reference-amplitude lower bound is needed.
+reference-amplitude lower bound is needed.  Once per-pair/per-bin conditional
+tails are supplied, the formalized two-layer union bound already propagates
+them to the actual gate-level decoder event.
 
 ## Remaining invalid or missing obligations
 
