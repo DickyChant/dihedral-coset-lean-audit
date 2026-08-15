@@ -458,6 +458,7 @@ open SimonDCP.Quantum.Step2Phase
 #print axioms expectedBranchCountBudget_selected_eq
 #print axioms average_state_labelled_decoder_success_ge_of_branch_count_energy
 #print axioms average_state_labelled_decoder_success_ge_of_selected_pair_collision
+#print axioms equalBitCondition_not_weightedPairCollisionUniform
 #print axioms lemmaFour_decoder_failure_mass_le
 #print axioms lemmaFour_decoder_success_mass_ge
 #print axioms eventMass_finset_exists_le

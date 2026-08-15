@@ -482,6 +482,44 @@ theorem
       leftSelected rightSelected leftBucket rightBucket hSameTotal
       hLeftPair hRightPair]
 
+/-! ## The selected collision premise is not inherited through conditioning -/
+
+/-- Select both candidate balls on every postselected equal-bit record. -/
+def equalBitSelectAll (_seed : EqualBitSeed) (_ball : Bool) : Bool := true
+
+/-- The two-bit hash restricted to the postselected equal-bit seed space. -/
+def equalBitConditionBucket (seed : EqualBitSeed) (ball : Bool) : Bool :=
+  twoBitHash seed.1 ball
+
+theorem equalBitConditionBucket_false_eq_true (seed : EqualBitSeed) :
+    equalBitConditionBucket seed false =
+      equalBitConditionBucket seed true := by
+  rcases seed with ⟨⟨left, right⟩, hEqual⟩
+  change left = right at hEqual
+  subst right
+  cases left <;> rfl
+
+/--
+The exact selected-pair collision premise used by the expectation-level repair
+fails after conditioning the two formerly independent Boolean labels to be
+equal.  This turns the paper's qualitative warning into the same formal
+predicate required by the repaired theorem.
+-/
+theorem equalBitCondition_not_weightedPairCollisionUniform
+    (weight : EqualBitSeed → ℝ)
+    (hNormalized : (∑ seed, weight seed) = 1) :
+    ¬ WeightedPairCollisionUniform weight equalBitSelectAll
+      equalBitConditionBucket := by
+  intro hUniform
+  have hPair := hUniform false true (by decide)
+  unfold weightedMeanReal selectedPairCollisionIndicator
+    selectedPairIndicator equalBitSelectAll at hPair
+  simp only [and_self, if_true] at hPair
+  simp_rw [equalBitConditionBucket_false_eq_true] at hPair
+  simp only [and_self, if_true, mul_one] at hPair
+  rw [hNormalized] at hPair
+  norm_num at hPair
+
 end
 
 end SimonDCP.Probability.Lemma4AverageDecoder

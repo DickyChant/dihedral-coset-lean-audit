@@ -585,7 +585,10 @@ pairwise independence before the paper's adaptive conditioning does not imply
 this premise.  This expectation route removes the exponential two-layer union
 bound and pointwise maximum deviations; the remaining Step-7 coordinate,
 selected-collision, equal-population, and scale/coefficient-energy premises
-are explicit.
+are explicit.  The module also instantiates the earlier equal-bit conditioning
+example and proves that its selected process violates
+`WeightedPairCollisionUniform`, despite the two underlying bucket labels being
+jointly uniform before conditioning.
 
 The repair is also lifted to a normalized finite probability space. If every
 bin in each of the two branches has deviation-event mass at most `tail`, Lean

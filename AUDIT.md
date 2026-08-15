@@ -707,7 +707,10 @@ pre-conditioning pairwise independence survives its adaptive transcript.
 The remaining obligations are now the actual Step-7 coordinate identities,
 equal selected branch populations, the selected-pair collision identities,
 and a scale-times-coefficient-energy bound.  This expectation route avoids
-the exponential two-layer union bound entirely.
+the exponential two-layer union bound entirely.  The same module proves that
+the equal-bit conditioning counterexample violates
+`WeightedPairCollisionUniform`, even though its two underlying Boolean bucket
+labels are jointly uniform before conditioning.
 
 ## Remaining invalid or missing obligations
 
