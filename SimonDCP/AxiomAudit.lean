@@ -27,6 +27,7 @@ import SimonDCP.Probability.LabelledBornProbability
 import SimonDCP.Probability.LabelledBornPairwiseTail
 import SimonDCP.Probability.LabelledParseval
 import SimonDCP.Probability.Lemma4AdaptiveWalshEnergy
+import SimonDCP.Probability.Lemma4AdaptiveWalshFibre
 import SimonDCP.Probability.Lemma4AverageDecoder
 import SimonDCP.Probability.Lemma4Decoder
 import SimonDCP.Probability.Lemma4PaperDecoder
@@ -135,6 +136,7 @@ open SimonDCP.Probability.LabelledBornProbability
 open SimonDCP.Probability.LabelledBornPairwiseTail
 open SimonDCP.Probability.LabelledParseval
 open SimonDCP.Probability.Lemma4AdaptiveWalshEnergy
+open SimonDCP.Probability.Lemma4AdaptiveWalshFibre
 open SimonDCP.Probability.Lemma4AverageDecoder
 open SimonDCP.Probability.Lemma4Decoder
 open SimonDCP.Probability.Lemma4PaperDecoder
@@ -488,6 +490,14 @@ open SimonDCP.Quantum.Step2Phase
 #print axioms paperWalshMismatchEnergy_eq_pathEnergy_add_offDiagonal
 #print axioms paperWalshMismatchEnergy_le_normalizationBound_add_offDiagonal
 #print axioms paper_decoder_success_ge_of_adaptive_offDiagonal_bound
+#print axioms sum_paperWalshDifferenceContribution_sq_le_fibreCount_sq
+#print axioms paperWalshMismatchEnergy_le_sum_weight_mul_fibreCount_sq
+#print axioms sum_weight_mul_paperCompatibleHiddenCount_eq_pathEnergy
+#print axioms paperWalshMismatchEnergy_le_fibreCard_mul_pathEnergy
+#print axioms paperWalshMismatchEnergy_le_card_hidden_mul_pathEnergy
+#print axioms paperWalshMismatchEnergy_le_fibreCard_mul_normalizationBound
+#print axioms paper_decoder_success_ge_of_compatibleHiddenFibreCard
+#print axioms paper_decoder_success_ge_of_completeTranscriptSeparatesHidden
 #print axioms lemmaFour_decoder_failure_mass_le
 #print axioms lemmaFour_decoder_success_mass_ge
 #print axioms eventMass_finset_exists_le

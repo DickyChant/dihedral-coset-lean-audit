@@ -25,7 +25,7 @@ implementation gap, not merely a missing concentration estimate.
 The source contains no `sorry`, `admit`, or handwritten project-local axioms.
 A clean build, including the Lemma 1 repair, current Lemma 3 repair, and
 decoder-facing conditional and expectation-level Lemma 4 repair modules,
-completed all 8672 jobs successfully on August 15, 2026.
+completed all 8673 jobs successfully on August 16, 2026.
 `SimonDCP/AxiomAudit.lean` prints the axiom dependencies of the principal
 results.  Analytic theorems contain only `propext`, `Classical.choice`, and
 `Quot.sound`.  The finite exhaustive searches, including the six-coordinate
@@ -798,6 +798,34 @@ module does not claim that this premise follows from the paper's unconditioned
 pairwise independence.  Rather, it isolates the exact weighted conditional
 correlation statement that a repaired Lemma 4 must prove or replace with a
 quantitative cancellation estimate.
+
+`Lemma4AdaptiveWalshFibre.lean` proves one deterministic replacement for that
+cancellation estimate.  For a complete transcript `M`, let `K_M` be the
+number of hidden states satisfying the full compatibility predicate, including
+acceptance and every recorded value.  Since each compatible state contributes
+one sign, finite Cauchy--Schwarz gives
+
+```text
+(WalshSignedCount(M,1) - WalshSignedCount(M,0))^2 <= K_M^2.
+```
+
+The weighted first moment `sum_M weight(M) * K_M` is exactly the common-path
+diagonal energy already bounded by the Step-2 theorem.  Hence a uniform
+`K_M <= K` implies
+
+```text
+Walsh mismatch energy <= K * normalizationBound / card(Low),
+Pr[correct after H tensor I]
+  >= 1 - K * normalizationBound / card(Low) / 2.
+```
+
+No independence or phase cancellation is used.  Lean also proves the
+structural specialization `K = 1` when the complete transcript separates
+compatible hidden states, and the unconditional fallback
+`K = card(Hidden)`.  The latter may be exponential, so a useful application
+still needs a polynomial complete-transcript fibre bound.  This is a distinct,
+explicit alternative to bounding the signed adaptive off-diagonal
+correlation.
 
 The final composed theorem therefore assumes: actual state coordinates equal
 to the displayed direct path sums with a common B-side path/residue/term

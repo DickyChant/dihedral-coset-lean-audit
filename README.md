@@ -653,6 +653,25 @@ away the remaining probabilistic premise.  Fixed-support Parseval or bare
 pairwise independence before adaptive transcript selection does not by itself
 establish it.
 
+[`Lemma4AdaptiveWalshFibre.lean`](SimonDCP/Probability/Lemma4AdaptiveWalshFibre.lean)
+gives a cancellation-free sufficient condition for that remaining term.  Let
+`K` bound the number of hidden states compatible with any one complete
+transcript after all filters.  Each survivor contributes only a sign, so
+Cauchy--Schwarz and the exact diagonal identity give
+
+```text
+Walsh mismatch energy
+  <= K * compatible common-path diagonal energy
+  <= K * normalizationBound / card(Low).
+```
+
+The corresponding concrete decoder succeeds with probability at least
+`1 - K * normalizationBound / card(Low) / 2`.  If the complete transcript
+separates compatible hidden states, `K = 1`; unconditionally Lean can only use
+`K = card(Hidden)`, which may be exponential.  Thus this route replaces the
+adaptive cancellation premise by a precise conditioned-fibre bound, but does
+not claim that the paper proves that bound.
+
 Consequently the fully composed finite theorem needs no separately postulated
 coefficient family or per-bin concentration event.  Its remaining hypotheses
 are that the actual state coordinates equal the direct path sums with a common
@@ -1008,7 +1027,7 @@ running `scripts/build-wsl.sh`; the source tree remains authoritative.
 
 The full project, including the Lemma 1 repair, current Lemma 3 repair, and
 decoder-facing conditional and expectation-level Lemma 4 repair modules, was
-verified on August 15, 2026. The command `lake build` completed all 8672 jobs
+verified on August 16, 2026. The command `lake build` completed all 8673 jobs
 successfully.
 
 ## Verification policy
