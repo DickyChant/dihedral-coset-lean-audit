@@ -613,6 +613,25 @@ squared magnitude times the sum of squared fibre sizes, and hence is at least
 helps only when the concrete conditioned B-side construction has genuinely
 small fibres; otherwise cancellation or orthogonality is essential.
 
+[`Lemma4PaperDecoder.lean`](SimonDCP/Probability/Lemma4PaperDecoder.lean)
+specializes the additive decoder to the paper-facing complete transcript
+`M = (Y,D,W',S,h')`.  The existing finite path bridge gives the two `hStar`
+branches one common raw amplitude, so Lean computes their total decoder
+mismatch exactly.  Using `h xor hStar = h'`, it then factors out both the
+secret-bit phase and the measured-`h'` phase.  The exact remaining quantity is
+
+```text
+sum_M normSq(normalization(M) * commonAmplitude(M)) *
+  (WalshSignedCount(M,1) - WalshSignedCount(M,0))^2.
+```
+
+This removes the separately postulated coefficient family inside the
+paper-path model and avoids any amplitude denominator.  It does not assume
+that the paper's pre-conditioning pairwise independence controls this
+quantity: the remaining mathematical task is precisely to bound this
+Walsh-signed L2 branch mismatch after the full adaptive transcript has been
+fixed, and to identify the finite path amplitudes with the circuit state.
+
 Consequently the fully composed finite theorem needs no separately postulated
 coefficient family or per-bin concentration event.  Its remaining hypotheses
 are that the actual state coordinates equal the direct path sums with a common

@@ -28,6 +28,7 @@ import SimonDCP.Probability.LabelledBornPairwiseTail
 import SimonDCP.Probability.LabelledParseval
 import SimonDCP.Probability.Lemma4AverageDecoder
 import SimonDCP.Probability.Lemma4Decoder
+import SimonDCP.Probability.Lemma4PaperDecoder
 import SimonDCP.Probability.Lemma4Parameters
 import SimonDCP.Probability.Lemma4Repair
 import SimonDCP.Probability.Lemma4StepSevenAverage
@@ -134,6 +135,7 @@ open SimonDCP.Probability.LabelledBornPairwiseTail
 open SimonDCP.Probability.LabelledParseval
 open SimonDCP.Probability.Lemma4AverageDecoder
 open SimonDCP.Probability.Lemma4Decoder
+open SimonDCP.Probability.Lemma4PaperDecoder
 open SimonDCP.Probability.Lemma4Parameters
 open SimonDCP.Probability.Lemma4Repair
 open SimonDCP.Probability.Lemma4StepSevenAverage
@@ -472,6 +474,11 @@ open SimonDCP.Quantum.Step2Phase
 #print axioms average_decoder_success_ge_of_stepSeven_fiber_energy
 #print axioms average_decoder_success_ge_of_stepSeven_selected_pair_collision_of_fiber_bound
 #print axioms average_decoder_success_ge_of_stepSeven_selected_pair_collision
+#print axioms paperPositive_eq_branchSecretPhase_mul_walsh
+#print axioms paperSignedBranchCount_eq_targetSign_mul_walshSignedCount
+#print axioms paperSignedMismatchEnergy_eq_paperWalshMismatchEnergy
+#print axioms pairedMismatchEnergy_scaledPaperBranchAmplitude_eq_walsh
+#print axioms paper_decoder_success_ge_of_walsh_mismatch_energy
 #print axioms lemmaFour_decoder_failure_mass_le
 #print axioms lemmaFour_decoder_success_mass_ge
 #print axioms eventMass_finset_exists_le

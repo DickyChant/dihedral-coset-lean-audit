@@ -737,11 +737,33 @@ The same module proves the converse counting obstruction
 ```
 
 When all B terms are the same complex number, it also identifies the
-coefficient energy exactly with `normSq(common) * sum_z #(B_z)^2` and proves the lower bound
-`normSq(common) * #BPaths^2 / #Residues`.  Thus the bounded-fibre route is not
-automatically polynomial when the number of compatible B paths greatly
-exceeds the number of residues.  A concrete proof must obtain a small fibre
-from structure or exploit genuine cancellation/orthogonality.
+coefficient energy exactly with `normSq(common) * sum_z #(B_z)^2` and proves
+the lower bound `normSq(common) * #BPaths^2 / #Residues`.  Thus the
+bounded-fibre route is not automatically polynomial when the number of
+compatible B paths greatly exceeds the number of residues.  A concrete proof
+must obtain a small fibre from structure or exploit genuine
+cancellation/orthogonality.
+
+`Lemma4PaperDecoder.lean` takes a complementary paper-facing route through
+the complete transcript model `M = (Y,D,W',S,h')`.  Because
+`LemmaThreePaperPathBridge.lean` already gives both residual `hStar` branches
+the same raw path amplitude within each transcript, the final Hadamard
+mismatch has the exact finite form
+
+```text
+sum_M normSq(normalization(M) * commonAmplitude(M)) *
+  (WalshSignedCount(M,1) - WalshSignedCount(M,0))^2.
+```
+
+The equality is machine-checked: `h xor hStar = h'` factors the secret-bit and
+measured-`h'` signs out of the two full signed counts, and their unit squared
+magnitudes disappear.  The resulting decoder theorem gives success at least
+`1 - budget/2` from a bound on this exact Walsh-only energy.  It needs neither
+an amplitude ratio nor a separate coefficient family.  It still requires the
+paper-path/circuit coordinate identification, normalization, and—most
+importantly—a bound on this Walsh-signed branch mismatch in the fully
+conditioned adaptive experiment.  Bare pairwise independence before fixing
+`W'`, `S`, and `h'` does not establish that bound.
 
 The final composed theorem therefore assumes: actual state coordinates equal
 to the displayed direct path sums with a common B-side path/residue/term

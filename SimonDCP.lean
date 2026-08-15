@@ -30,6 +30,7 @@ import SimonDCP.Probability.LabelledBornProbability
 import SimonDCP.Probability.LabelledParseval
 import SimonDCP.Probability.Lemma4AverageDecoder
 import SimonDCP.Probability.Lemma4Decoder
+import SimonDCP.Probability.Lemma4PaperDecoder
 import SimonDCP.Probability.Lemma4Parameters
 import SimonDCP.Probability.Lemma4Repair
 import SimonDCP.Probability.Lemma4StepSevenAverage
