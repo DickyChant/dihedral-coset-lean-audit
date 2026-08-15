@@ -25,7 +25,7 @@ implementation gap, not merely a missing concentration estimate.
 The source contains no `sorry`, `admit`, or handwritten project-local axioms.
 A clean build, including the Lemma 1 repair, current Lemma 3 repair, and
 decoder-facing conditional and expectation-level Lemma 4 repair modules,
-completed all 8673 jobs successfully on August 16, 2026.
+completed all 8674 jobs successfully on August 16, 2026.
 `SimonDCP/AxiomAudit.lean` prints the axiom dependencies of the principal
 results.  Analytic theorems contain only `propext`, `Classical.choice`, and
 `Quot.sound`.  The finite exhaustive searches, including the six-coordinate
@@ -826,6 +826,21 @@ compatible hidden states, and the unconditional fallback
 still needs a polynomial complete-transcript fibre bound.  This is a distinct,
 explicit alternative to bounding the signed adaptive off-diagonal
 correlation.
+
+`Lemma4AdaptiveWalshFibreObstruction.lean` proves the matching counting
+constraint.  Summing `K_M` over complete transcripts counts every compatible
+fine path exactly once.  Therefore a uniform `K_M <= K` requires
+
+```text
+#compatible paths <= #complete transcripts * K.
+```
+
+The squared `K_M` also obey the usual pigeonhole collision lower bound.  A
+polynomial fibre claim must therefore account for all surviving hidden paths
+and all available transcript labels.  The paper's displayed exponential mean
+`mu` for A-state portions suggests that this issue is substantive, but it is
+not yet an instantiation of the exact compatible-path cardinality: that would
+require the missing bridge from the concrete experiment to the finite model.
 
 The final composed theorem therefore assumes: actual state coordinates equal
 to the displayed direct path sums with a common B-side path/residue/term

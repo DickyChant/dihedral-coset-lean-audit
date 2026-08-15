@@ -672,6 +672,22 @@ separates compatible hidden states, `K = 1`; unconditionally Lean can only use
 adaptive cancellation premise by a precise conditioned-fibre bound, but does
 not claim that the paper proves that bound.
 
+[`Lemma4AdaptiveWalshFibreObstruction.lean`](SimonDCP/Probability/Lemma4AdaptiveWalshFibreObstruction.lean)
+records the matching pigeonhole constraint.  Compatible hidden states over
+all complete transcripts are exactly the compatible fine paths, so any
+uniform fibre bound must satisfy
+
+```text
+#compatible paths <= #complete transcripts * K.
+```
+
+Lean also proves the corresponding lower bound on the sum of squared fibre
+sizes.  Thus transcript separation or polynomial `K` must be derived from the
+actual surviving-path and transcript cardinalities; it cannot be assumed from
+the existence of the complete record.  Connecting the paper's displayed
+exponential mean `mu` for A-state portions to this exact compatible-path count
+would require the still-missing concrete experiment bridge.
+
 Consequently the fully composed finite theorem needs no separately postulated
 coefficient family or per-bin concentration event.  Its remaining hypotheses
 are that the actual state coordinates equal the direct path sums with a common
@@ -1027,7 +1043,7 @@ running `scripts/build-wsl.sh`; the source tree remains authoritative.
 
 The full project, including the Lemma 1 repair, current Lemma 3 repair, and
 decoder-facing conditional and expectation-level Lemma 4 repair modules, was
-verified on August 16, 2026. The command `lake build` completed all 8673 jobs
+verified on August 16, 2026. The command `lake build` completed all 8674 jobs
 successfully.
 
 ## Verification policy
