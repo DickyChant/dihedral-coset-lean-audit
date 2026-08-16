@@ -842,6 +842,23 @@ and all available transcript labels.  The paper's displayed exponential mean
 not yet an instantiation of the exact compatible-path cardinality: that would
 require the missing bridge from the concrete experiment to the finite model.
 
+The formal interface now makes that bridge quantitative.  A finite paper bin
+contained in one complete-transcript compatible fibre and lying within
+`error` of the displayed mean satisfies `mu <= K + error`.  Specializing the
+paper's `c = 12` mean exponent under
+`faultLoss + 12*logN <= n`, a half-relative-error bin forces
+
+```text
+2^(9*n) / 2 <= K.
+```
+
+Hence, once the paper's intended A-state bin is identified with such a
+compatible subfibre, its own near-uniformity premise makes `K` exponential.
+The cancellation-free fibre theorem would then be too coarse unless the
+transcript normalization supplies a compensating factor; the sharper repair
+must instead control the normalized weighted fibre moment or the adaptive
+Walsh-sign cancellation directly.
+
 The final composed theorem therefore assumes: actual state coordinates equal
 to the displayed direct path sums with a common B-side path/residue/term
 family in both branches; equal selected A-branch populations; selected-pair

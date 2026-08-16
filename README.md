@@ -688,6 +688,22 @@ the existence of the complete record.  Connecting the paper's displayed
 exponential mean `mu` for A-state portions to this exact compatible-path count
 would require the still-missing concrete experiment bridge.
 
+The same module now gives the exact conditional bridge for that comparison.
+Any paper bin whose state portions are all compatible with one complete
+transcript is a subfibre, so deviation at most `error` from the displayed mean
+forces `mu <= K + error`.  At `c = 12`, under the paper's parameter budget and
+half-relative bin error, Lean derives
+
+```text
+2^(9*n) / 2 <= K.
+```
+
+Thus the paper's own near-uniform, exponentially populated bins would rule
+out a polynomial complete-transcript fibre bound once the concrete bin-to-path
+identification is supplied.  A useful Lemma 4 repair would then have to retain
+the transcript normalization quantitatively or exploit actual Walsh-sign
+cancellation rather than cardinality alone.
+
 Consequently the fully composed finite theorem needs no separately postulated
 coefficient family or per-bin concentration event.  Its remaining hypotheses
 are that the actual state coordinates equal the direct path sums with a common

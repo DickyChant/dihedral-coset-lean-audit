@@ -1,4 +1,5 @@
 import SimonDCP.Probability.Lemma4AdaptiveWalshFibre
+import SimonDCP.Probability.Lemma4Parameters
 import SimonDCP.Probability.LemmaThreeCoherentFibreObstruction
 
 /-!
@@ -31,6 +32,7 @@ open SimonDCP.Probability.LemmaThreeCoherentFibreObstruction
 open SimonDCP.Probability.LemmaThreePaperPathBridge
 open SimonDCP.Probability.LemmaThreeTranscriptModel
 open SimonDCP.Probability.Lemma4AdaptiveWalshFibre
+open SimonDCP.Probability.Lemma4Parameters
 
 variable {Hidden Y D W S : Type*}
 
@@ -101,6 +103,134 @@ theorem card_paths_le_card_transcript_mul_fibreCardBound
       Finset.sum_le_sum fun transcript _ => hFibreCard transcript
     _ = Fintype.card (PaperMeasuredTranscript Y D W S) *
         fibreCardBound := by simp
+
+/-! ## Relating the paper's balls-in-bins mean to the fibre bound -/
+
+omit [Fintype Y] [Fintype D] [Fintype W] [Fintype S] [DecidableEq D] in
+/-- Any finite family of hidden states all compatible with one complete
+transcript is a subfibre of that transcript's full compatible-hidden-state
+fibre.  In a concrete paper instantiation, `bin` can represent the state
+portions in one fixed `A_(g_a)` and low-residue bin. -/
+theorem card_compatibleHiddenBin_le_count
+    (model : PaperStepSevenModel Hidden Y D W S)
+    (transcript : PaperMeasuredTranscript Y D W S)
+    (bin : Finset Hidden)
+    (hCompatible : ∀ hidden ∈ bin,
+      paperCompatible model transcript hidden) :
+    bin.card <= paperCompatibleHiddenCount model transcript := by
+  classical
+  unfold paperCompatibleHiddenCount paperCompatibleHiddenFibre
+  apply Finset.card_le_card
+  intro hidden hHidden
+  simp only [Finset.mem_filter, Finset.mem_univ, true_and]
+  exact hCompatible hidden hHidden
+
+omit [Fintype Y] [Fintype D] [Fintype W] [Fintype S] [DecidableEq D] in
+/-- If a compatible sub-bin has count within `error` of a real mean, then the
+mean cannot exceed the complete-transcript fibre bound by more than `error`.
+This is the exact deterministic implication needed to compare the paper's
+balls-in-bins calculation with the cancellation-free Lemma 4 route. -/
+theorem mean_le_fibreCardBound_add_error_of_compatibleHiddenBin
+    (model : PaperStepSevenModel Hidden Y D W S)
+    (transcript : PaperMeasuredTranscript Y D W S)
+    (bin : Finset Hidden) (mean error : Real) (fibreCardBound : Nat)
+    (hCompatible : ∀ hidden ∈ bin,
+      paperCompatible model transcript hidden)
+    (hDeviation : abs ((bin.card : Real) - mean) <= error)
+    (hFibreCard :
+      paperCompatibleHiddenCount model transcript <= fibreCardBound) :
+    mean <= (fibreCardBound : Real) + error := by
+  have hLower : mean - error <= (bin.card : Real) := by
+    have := (abs_le.mp hDeviation).1
+    linarith
+  have hBinCard : (bin.card : Real) <= fibreCardBound := by
+    exact_mod_cast
+      (card_compatibleHiddenBin_le_count model transcript bin hCompatible |>.trans
+        hFibreCard)
+  linarith
+
+omit [Fintype Y] [Fintype D] [Fintype W] [Fintype S] [DecidableEq D] in
+/-- Direct specialization to the page-13 mean
+`mu = 2 ^ meanExponent(c,n,logN,faultLoss)`.  It remains an application
+obligation to identify the paper's actual bin with `bin` and prove
+`hCompatible`; those premises are not inferred from the prose sketch. -/
+theorem paperMean_le_fibreCardBound_add_error_of_compatibleHiddenBin
+    (model : PaperStepSevenModel Hidden Y D W S)
+    (transcript : PaperMeasuredTranscript Y D W S)
+    (bin : Finset Hidden) (c n logN faultLoss error : Real)
+    (fibreCardBound : Nat)
+    (hCompatible : ∀ hidden ∈ bin,
+      paperCompatible model transcript hidden)
+    (hDeviation :
+      abs ((bin.card : Real) -
+        (2 : Real) ^ meanExponent c n logN faultLoss) <= error)
+    (hFibreCard :
+      paperCompatibleHiddenCount model transcript <= fibreCardBound) :
+    (2 : Real) ^ meanExponent c n logN faultLoss <=
+      (fibreCardBound : Real) + error := by
+  exact mean_le_fibreCardBound_add_error_of_compatibleHiddenBin
+    model transcript bin
+      ((2 : Real) ^ meanExponent c n logN faultLoss) error fibreCardBound
+      hCompatible hDeviation hFibreCard
+
+omit [Fintype Y] [Fintype D] [Fintype W] [Fintype S] [DecidableEq D] in
+/-- If the paper's bin deviation is at most half of its displayed mean, the
+complete-transcript fibre bound is at least half that mean. -/
+theorem half_paperMean_le_fibreCardBound_of_compatibleHiddenBin
+    (model : PaperStepSevenModel Hidden Y D W S)
+    (transcript : PaperMeasuredTranscript Y D W S)
+    (bin : Finset Hidden) (c n logN faultLoss error : Real)
+    (fibreCardBound : Nat)
+    (hCompatible : ∀ hidden ∈ bin,
+      paperCompatible model transcript hidden)
+    (hDeviation :
+      abs ((bin.card : Real) -
+        (2 : Real) ^ meanExponent c n logN faultLoss) <= error)
+    (hError :
+      error <= (2 : Real) ^ meanExponent c n logN faultLoss / 2)
+    (hFibreCard :
+      paperCompatibleHiddenCount model transcript <= fibreCardBound) :
+    (2 : Real) ^ meanExponent c n logN faultLoss / 2 <=
+      (fibreCardBound : Real) := by
+  have hMean :=
+    paperMean_le_fibreCardBound_add_error_of_compatibleHiddenBin
+      model transcript bin c n logN faultLoss error fibreCardBound
+      hCompatible hDeviation hFibreCard
+  linarith
+
+omit [Fintype Y] [Fintype D] [Fintype W] [Fintype S] [DecidableEq D] in
+/-- At `c = 12`, the same parameter budget used by the corrected deviation
+calculation makes the paper's displayed mean at least `2 ^ (9*n)`.  Therefore
+a half-relative-error compatible bin forces an exponential
+complete-transcript fibre. -/
+theorem c12_nineNMean_half_le_fibreCardBound
+    (model : PaperStepSevenModel Hidden Y D W S)
+    (transcript : PaperMeasuredTranscript Y D W S)
+    (bin : Finset Hidden) (n logN faultLoss error : Real)
+    (fibreCardBound : Nat)
+    (hBudget : faultLoss + 12 * logN <= n)
+    (hCompatible : ∀ hidden ∈ bin,
+      paperCompatible model transcript hidden)
+    (hDeviation :
+      abs ((bin.card : Real) -
+        (2 : Real) ^ meanExponent 12 n logN faultLoss) <= error)
+    (hError :
+      error <= (2 : Real) ^ meanExponent 12 n logN faultLoss / 2)
+    (hFibreCard :
+      paperCompatibleHiddenCount model transcript <= fibreCardBound) :
+    (2 : Real) ^ (9 * n) / 2 <= (fibreCardBound : Real) := by
+  have hExponent : 9 * n <= meanExponent 12 n logN faultLoss := by
+    unfold meanExponent
+    linarith
+  have hPower :
+      (2 : Real) ^ (9 * n) <=
+        (2 : Real) ^ meanExponent 12 n logN faultLoss :=
+    Real.rpow_le_rpow_of_exponent_le (by norm_num) hExponent
+  have hHalf :=
+    half_paperMean_le_fibreCardBound_of_compatibleHiddenBin
+      model transcript bin 12 n logN faultLoss error fibreCardBound
+      hCompatible hDeviation hError hFibreCard
+  linarith
 
 /-- Pigeonhole lower bound for the squared complete-transcript fibre sizes.
 A small maximum fibre therefore requires enough complete transcript labels
