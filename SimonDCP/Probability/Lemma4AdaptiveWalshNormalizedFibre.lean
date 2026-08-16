@@ -247,6 +247,54 @@ theorem paper_decoder_success_ge_of_unit_normalizedFibreWeight
       (Low := Low) normalization model stepTwoAmplitude 1
       hNormalizedFibreWeight (by norm_num) hStepTwoEnergy hNormalized
 
+/-- A directly recognizable sufficient condition: the squared magnitude of
+the transcript normalization is at most the reciprocal of that transcript's
+compatible-hidden-state fibre size.  Empty fibres cause no difficulty. -/
+theorem paper_decoder_success_ge_of_reciprocal_fibre_normalization
+    [Nonempty D] [Nonempty Low]
+    (normalization : PaperMeasuredTranscript Y D W S -> Complex)
+    (model : PaperStepSevenModel Hidden Y D W S)
+    (stepTwoAmplitude : Y -> Complex)
+    (hReciprocalNormalization : ∀ transcript,
+      Complex.normSq (normalization transcript) <=
+        (paperCompatibleHiddenCount model transcript : Real)⁻¹)
+    (hStepTwoEnergy :
+      (∑ hidden : Hidden,
+        Complex.normSq (stepTwoAmplitude (model.yOf hidden))) <= 1)
+    (hNormalized :
+      pairedBranchMass
+          (fun transcript =>
+            scaledPaperBranchAmplitude (Low := Low) normalization model
+              stepTwoAmplitude transcript false)
+          (fun transcript =>
+            scaledPaperBranchAmplitude (Low := Low) normalization model
+              stepTwoAmplitude transcript true) = 1) :
+    1 - (Fintype.card Low : Real)⁻¹ / 2 <=
+      pairedCorrectMass
+        (fun transcript =>
+          scaledPaperBranchAmplitude (Low := Low) normalization model
+            stepTwoAmplitude transcript false)
+        (fun transcript =>
+          scaledPaperBranchAmplitude (Low := Low) normalization model
+            stepTwoAmplitude transcript true)
+        model.secretBit := by
+  apply paper_decoder_success_ge_of_unit_normalizedFibreWeight
+    normalization model stepTwoAmplitude _ hStepTwoEnergy hNormalized
+  intro transcript
+  by_cases hCount : paperCompatibleHiddenCount model transcript = 0
+  · simp [hCount]
+  · have hCountRealNe :
+        (paperCompatibleHiddenCount model transcript : Real) ≠ 0 := by
+      exact_mod_cast hCount
+    calc
+      Complex.normSq (normalization transcript) *
+            (paperCompatibleHiddenCount model transcript : Real) <=
+          (paperCompatibleHiddenCount model transcript : Real)⁻¹ *
+            (paperCompatibleHiddenCount model transcript : Real) :=
+        mul_le_mul_of_nonneg_right
+          (hReciprocalNormalization transcript) (by positivity)
+      _ = 1 := inv_mul_cancel₀ hCountRealNe
+
 end
 
 end SimonDCP.Probability.Lemma4AdaptiveWalshNormalizedFibre
