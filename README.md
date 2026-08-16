@@ -704,6 +704,22 @@ identification is supplied.  A useful Lemma 4 repair would then have to retain
 the transcript normalization quantitatively or exploit actual Walsh-sign
 cancellation rather than cardinality alone.
 
+[`Lemma4AdaptiveWalshNormalizedFibre.lean`](SimonDCP/Probability/Lemma4AdaptiveWalshNormalizedFibre.lean)
+formalizes the first of those two routes.  It never separates normalization
+from fibre multiplicity: if every complete transcript satisfies
+
+```text
+normSq(normalization(M)) * compatibleHiddenCount(M) <= B,
+```
+
+then Lean proves Walsh mismatch at most `B / card(Low)` and concrete decoder
+success at least `1 - B / (2 * card(Low))`.  In particular, `B = 1` recovers
+the ideal exponentially small mismatch even for exponentially large raw
+fibres, provided the actual postmeasurement normalization supplies their
+reciprocal scale.  This is a genuine normalization-aware repair, not a
+consequence of average state normalization; deriving the pointwise product
+bound from the paper's concrete circuit remains the next obligation.
+
 Consequently the fully composed finite theorem needs no separately postulated
 coefficient family or per-bin concentration event.  Its remaining hypotheses
 are that the actual state coordinates equal the direct path sums with a common

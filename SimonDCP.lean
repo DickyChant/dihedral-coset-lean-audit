@@ -31,6 +31,7 @@ import SimonDCP.Probability.LabelledParseval
 import SimonDCP.Probability.Lemma4AdaptiveWalshEnergy
 import SimonDCP.Probability.Lemma4AdaptiveWalshFibre
 import SimonDCP.Probability.Lemma4AdaptiveWalshFibreObstruction
+import SimonDCP.Probability.Lemma4AdaptiveWalshNormalizedFibre
 import SimonDCP.Probability.Lemma4AverageDecoder
 import SimonDCP.Probability.Lemma4Decoder
 import SimonDCP.Probability.Lemma4PaperDecoder

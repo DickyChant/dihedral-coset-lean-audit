@@ -29,6 +29,7 @@ import SimonDCP.Probability.LabelledParseval
 import SimonDCP.Probability.Lemma4AdaptiveWalshEnergy
 import SimonDCP.Probability.Lemma4AdaptiveWalshFibre
 import SimonDCP.Probability.Lemma4AdaptiveWalshFibreObstruction
+import SimonDCP.Probability.Lemma4AdaptiveWalshNormalizedFibre
 import SimonDCP.Probability.Lemma4AverageDecoder
 import SimonDCP.Probability.Lemma4Decoder
 import SimonDCP.Probability.Lemma4PaperDecoder
@@ -139,6 +140,7 @@ open SimonDCP.Probability.LabelledParseval
 open SimonDCP.Probability.Lemma4AdaptiveWalshEnergy
 open SimonDCP.Probability.Lemma4AdaptiveWalshFibre
 open SimonDCP.Probability.Lemma4AdaptiveWalshFibreObstruction
+open SimonDCP.Probability.Lemma4AdaptiveWalshNormalizedFibre
 open SimonDCP.Probability.Lemma4AverageDecoder
 open SimonDCP.Probability.Lemma4Decoder
 open SimonDCP.Probability.Lemma4PaperDecoder
@@ -500,6 +502,11 @@ open SimonDCP.Quantum.Step2Phase
 #print axioms paperWalshMismatchEnergy_le_fibreCard_mul_normalizationBound
 #print axioms paper_decoder_success_ge_of_compatibleHiddenFibreCard
 #print axioms paper_decoder_success_ge_of_completeTranscriptSeparatesHidden
+#print axioms sum_normSq_common_mul_paperCompatibleHiddenCount_eq_pathEnergy
+#print axioms paperWalshMismatchEnergy_le_normalizedFibreWeight_mul_pathEnergy
+#print axioms paperWalshMismatchEnergy_le_normalizedFibreWeight_mul_inv_card_low
+#print axioms paper_decoder_success_ge_of_normalizedFibreWeight
+#print axioms paper_decoder_success_ge_of_unit_normalizedFibreWeight
 #print axioms paperCompatibleHiddenCount_eq_fibreCard
 #print axioms sum_paperCompatibleHiddenCount_eq_card_paths
 #print axioms card_paths_le_card_transcript_mul_fibreCardBound

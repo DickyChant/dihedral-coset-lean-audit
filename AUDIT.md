@@ -859,6 +859,30 @@ transcript normalization supplies a compensating factor; the sharper repair
 must instead control the normalized weighted fibre moment or the adaptive
 Walsh-sign cancellation directly.
 
+`Lemma4AdaptiveWalshNormalizedFibre.lean` proves the compensating-factor
+route without assuming any phase cancellation.  Rather than bounding
+`K_M` and the normalization separately, it assumes the coupled, circuit-facing
+quantity
+
+```text
+normSq(normalization(M)) * K_M <= B
+```
+
+for every complete transcript.  Regrouping by compatible hidden states then
+shows that the squared-fibre estimate is at most `B` times the *unnormalized*
+common-path energy.  The existing Step-2 theorem therefore gives
+
+```text
+Walsh mismatch energy <= B / card(Low),
+Pr[correct after H tensor I] >= 1 - B / (2 * card(Low)).
+```
+
+For `B = 1`, reciprocal normalization cancels even an exponential raw fibre
+and restores the ideal `1/card(Low)` mismatch scale.  This turns the next
+paper-specific task into a precise statement about the actual
+postmeasurement factor: prove the product bound above.  Normalization of the
+whole state only controls an average and does not imply this pointwise claim.
+
 The final composed theorem therefore assumes: actual state coordinates equal
 to the displayed direct path sums with a common B-side path/residue/term
 family in both branches; equal selected A-branch populations; selected-pair
