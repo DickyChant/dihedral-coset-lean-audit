@@ -21,17 +21,23 @@ jobs:
 
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
-      - name: Build and independently check Lean declarations
+      - name: Reject proof placeholders and project axioms
+        run: |
+          if rg -n '\b(sorry|admit)\b|^\s*axiom\b' SimonDCP --glob '*.lean'; then
+            echo 'Found a proof placeholder or project-local axiom.' >&2
+            exit 1
+          fi
+
+      - name: Build and kernel-replay Lean declarations
         uses: leanprover/lean-action@v1
         with:
           build: true
           test: false
           lint: false
           mk_all-check: true
-          nanoda: true
-          nanoda-allow-sorry: false
+          leanchecker: true
 
       - name: Report theorem axiom dependencies
         run: lake env lean SimonDCP/AxiomAudit.lean
