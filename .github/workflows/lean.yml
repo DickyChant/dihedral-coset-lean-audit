@@ -25,19 +25,30 @@ jobs:
 
       - name: Reject proof placeholders and project axioms
         run: |
-          if rg -n '\b(sorry|admit)\b|^\s*axiom\b' SimonDCP --glob '*.lean'; then
+          if rg -n '\b(sorry|admit)\b|^\s*axiom\b' SimonDCP.lean SimonDCP --glob '*.lean'; then
             echo 'Found a proof placeholder or project-local axiom.' >&2
             exit 1
           fi
 
-      - name: Build and kernel-replay Lean declarations
+      - name: Build Lean declarations
         uses: leanprover/lean-action@v1
         with:
           build: true
           test: false
           lint: false
           mk_all-check: true
-          leanchecker: true
+
+      - name: Kernel-replay project modules sequentially
+        run: |
+          # No-target mode launches one task per project module concurrently.
+          # Replay exact modules serially to keep the runner's memory bounded.
+          while IFS= read -r source_file; do
+            module="${source_file%.lean}"
+            module="${module//\//.}"
+            echo "::group::leanchecker ${module}"
+            lake env leanchecker "${module}"
+            echo "::endgroup::"
+          done < <(rg --files SimonDCP --glob '*.lean' | sort)
 
       - name: Report theorem axiom dependencies
         run: lake env lean SimonDCP/AxiomAudit.lean
